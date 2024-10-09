@@ -12,4 +12,7 @@ public class Const
     public static String USING_IP = URL_PUBLIC_TEST;
 
     public static final String URL_LOGIN = "TrackVeValidateLogin";
+    public static final String URL_Update_Daily_GPS_Data = "UpdateDailyGPSData";
+
+    public static final String URL_GET_DAILY_WISE_EMPLOYEE_GPS_DATA = "GetDailyWiseGPSData";
 }
