@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -24,6 +25,7 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +35,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
@@ -76,11 +79,16 @@ public class MainMenuActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) 
+    {
         super.onCreate(savedInstanceState);
         binding = ActivityMainMenuBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setOnNavigationItemSelectedListener(navListener);
+
 
         shp = getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
 
@@ -154,7 +162,77 @@ public class MainMenuActivity extends AppCompatActivity {
 
     }
 
+    private final BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
+        // By using switch we can easily get
+        // the selected fragment
+        // by using there id.
+        Fragment selectedFragment = null;
+        int itemId = item.getItemId();
+        if (itemId == R.id.home) {
+           // selectedFragment = new AlgorithmFragment();
+        } else if (itemId == R.id.message) {
+           // selectedFragment = new CourseFragment();
+        } else if (itemId == R.id.logout) {
+            logout();
+        }
+        // It will help to replace the
+        // one fragment to other.
+        if (selectedFragment != null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, selectedFragment).commit();
+        }
+        return true;
+    };
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.log_out_button:
+                logout();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
+    private void logout()
+    {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setMessage("Do you want to logout?");
+
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    SharedPreferences.Editor edt = shp.edit();
+                    edt.clear();
+                    edt.apply();
+
+                    startActivity(new Intent(MainMenuActivity.this, LoginActivity.class));
+
+                    finish();
+
+                }
+            });
+
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i)
+                {
+
+
+                }
+            });
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.setTitle("Alert");
+            alertDialog.show();
+
+
+    }
 
     private void buildAlertMessageNoGps()
     {
