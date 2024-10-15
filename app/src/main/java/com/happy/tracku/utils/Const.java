@@ -4,9 +4,12 @@ public class Const
 {
     public static final String Shared_Pref_name = "TrackUPref";
     public static final String Shp_Employee_Code = "EmployeeCode";
+    public static final String Shp_Employee_Name = "EmployeeName";
     public static final String Shp_Id_Employee = "IdEmployee";
-
     public static final String Shp_Token= "Token";
+    public static final String Shp_Is_Admin = "IsAdmin";
+    public static final String Shp_Is_LoggedIn = "IsLoggedIn";
+
 
     public static final String URL_PUBLIC_TEST = "https://test1.maxvalue.co.in:1222/api/TrackVeAppDetails/";
     public static String USING_IP = URL_PUBLIC_TEST;

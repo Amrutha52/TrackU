@@ -36,6 +36,18 @@ public class LoginResponsestatus {
     @Expose
     private String statusMessage;
 
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    @SerializedName("isAdmin")
+    @Expose
+    private Integer isAdmin;
+
     public Integer getStatus() {
         return status;
     }

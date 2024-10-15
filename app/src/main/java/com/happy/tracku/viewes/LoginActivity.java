@@ -283,7 +283,10 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences.Editor edt = shp.edit();
                 edt.putInt(Const.Shp_Id_Employee,loginStatusJson.getData().getLoginResponseStatus().get(0).getIdEmployee());
                 edt.putString(Const.Shp_Employee_Code, loginStatusJson.getData().getLoginResponseStatus().get(0).getEmployeeCode());
+                edt.putString(Const.Shp_Employee_Name, loginStatusJson.getData().getLoginResponseStatus().get(0).getName());
                 edt.putString(Const.Shp_Token, loginStatusJson.getData().getToken());
+                edt.putInt(Const.Shp_Is_Admin, loginStatusJson.getData().getLoginResponseStatus().get(0).getIsAdmin());
+                edt.putBoolean(Const.Shp_Is_LoggedIn, true);
                 edt.apply();
 
 

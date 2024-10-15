@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,8 +75,10 @@ public class MainMenuActivity extends AppCompatActivity {
     Double latitude, longitude;
     SharedPreferences shp;
     DbHelper dbHelper;
+    TextView employeeName, employeeCode;
 
     ArrayList<DailyTravelModel> dailyTravelModelArrayList;
+    LinearLayout mainLayout;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -91,6 +94,22 @@ public class MainMenuActivity extends AppCompatActivity {
 
 
         shp = getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+
+        employeeName = findViewById(R.id.employee_name);
+        employeeCode = findViewById(R.id.employee_code);
+        mainLayout = findViewById(R.id.mainLayout);
+
+        if (shp.getInt(Const.Shp_Is_Admin, 0) == 1)
+        {
+            mainLayout.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            mainLayout.setVisibility(View.GONE);
+        }
+
+        employeeName.setText(shp.getString(Const.Shp_Employee_Name, ""));
+        employeeCode.setText(shp.getString(Const.Shp_Employee_Code, ""));
 
         dbHelper = new DbHelper(this);
 
