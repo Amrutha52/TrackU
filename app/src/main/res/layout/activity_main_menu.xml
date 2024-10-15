@@ -174,7 +174,7 @@
                             android:backgroundTint="@color/white"
                             app:cardElevation="10dp"
                             app:strokeColor="#004d00"
-                            android:visibility="invisible"
+                            android:visibility="visible"
                             app:strokeWidth="1dp">
 
                             <LinearLayout
@@ -183,7 +183,7 @@
                                 android:orientation="horizontal">
 
                                 <LinearLayout
-                                    android:id="@+id/yard_inbox_button"
+                                    android:id="@+id/addEmployeeLL"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -196,6 +196,7 @@
                                         android:layout_width="40dp"
                                         android:layout_height="40dp"
                                         android:layout_gravity="center"
+                                        android:src="@drawable/addgroup"
                                          />
 
                                     <TextView
@@ -203,7 +204,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:padding="10dp"
-                                        android:text="Yard\nInbox"
+                                        android:text="Add\nEmployee"
                                         android:textAlignment="center" />
 
                                 </LinearLayout>

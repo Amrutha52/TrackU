@@ -263,6 +263,12 @@ public class MainMenuActivity extends AppCompatActivity {
 
             }
             break;
+
+            case R.id.addEmployeeLL:
+            {
+                startActivity(new Intent(this, AddEmployeeActivity.class));
+            }
+            break;
         }
     }
 
