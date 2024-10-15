@@ -13,6 +13,6 @@ public class Const
 
     public static final String URL_LOGIN = "TrackVeValidateLogin";
     public static final String URL_Update_Daily_GPS_Data = "UpdateDailyGPSData";
-
-    public static final String URL_GET_DAILY_WISE_EMPLOYEE_GPS_DATA = "GetDailyWiseGPSData";
+    public static final String URL_GET_DAILYWISE_EMPLOYEE_TRAVEL_DATA = "GetDailyWiseGPSData";
+    public static final String URL_CREATE_EMPLOYEE = "InsertEmployeeDetails";
 }

@@ -259,6 +259,7 @@ public class MainMenuActivity extends AppCompatActivity {
         {
             case R.id.adminMapViewActivity:
             {
+                startActivity(new Intent(this, ShowUserGPSActivity.class));
 
             }
             break;
@@ -374,7 +375,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 request = new Request.Builder()
                         //.header("X-Client-Type", "Android")
                         .url(url)
-                        .addHeader("Authorization", "Bearer " + shp.getString(Const.Shp_Token, ""))
+                        //.addHeader("Authorization", "Bearer " + shp.getString(Const.Shp_Token, ""))
                         .post(body)
                         .build();
 

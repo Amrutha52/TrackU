@@ -18,8 +18,11 @@ import com.happy.tracku.R;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class Fns {
     public static boolean isInternetAvailable(Context context) {
@@ -107,4 +110,18 @@ public class Fns {
         return dateTime + userId + errorMsgs;
 
     }
+
+    public static String convertFormatDate(String expectedDate, String currentFormat, String desiredFormat)
+    {
+        SimpleDateFormat currentSDF = new SimpleDateFormat(currentFormat, Locale.getDefault());
+        Date currentDate = null;
+        try {
+            currentDate = currentSDF.parse(expectedDate);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        SimpleDateFormat desiredSDF = new SimpleDateFormat(desiredFormat, Locale.getDefault());
+        return desiredSDF.format(currentDate);
+    }
+
 }
