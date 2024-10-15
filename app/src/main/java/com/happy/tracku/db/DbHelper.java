@@ -117,4 +117,61 @@ public class DbHelper extends SQLiteOpenHelper
         return jsonArray;
 
     }
+
+    public ArrayList<DailyTravelModel> getDailyTravelDataForCompensationAsArray()
+    {
+
+        JSONArray jsonArray = new JSONArray();
+
+        ArrayList<DailyTravelModel> dailyTravelModelArrayList = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cur = db.rawQuery("select * from " + EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE + " where IsSynced=0", null);
+        if (cur.getCount() > 0) {
+            cur.moveToFirst();
+            for (int i = 0; i < cur.getCount(); i++) {
+
+                DailyTravelModel dailyTravelModel = new DailyTravelModel();
+                dailyTravelModel.setIdLocation(cur.getString(cur.getColumnIndex("idLocation")));
+                dailyTravelModel.setLatitude(cur.getString(cur.getColumnIndex("Latitude")));
+                dailyTravelModel.setLongitude(cur.getString(cur.getColumnIndex("Longitude")));
+                dailyTravelModel.setAddress(cur.getString(cur.getColumnIndex("Address")));
+                dailyTravelModel.setDateTime(cur.getString(cur.getColumnIndex("DateTime")));
+                dailyTravelModel.setIdEmployee(cur.getInt(cur.getColumnIndex("idEmployee")));
+                dailyTravelModel.setIsForUpload(cur.getInt(cur.getColumnIndex("IsForUpload")));
+                dailyTravelModel.setIsSynced(cur.getInt(cur.getColumnIndex("IsSynced")));
+
+                dailyTravelModelArrayList.add(dailyTravelModel);
+
+                cur.moveToNext();
+            }
+
+
+        }
+        cur.close();
+
+        return dailyTravelModelArrayList;
+
+    }
+
+    public void deleteTravelCompensationGPSData() {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("DELETE FROM " + EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE + " where IsSynced=1");
+
+
+    }
+
+    public void setAsSyncedTravelCompensationGPSData(ArrayList<DailyTravelModel> dailyTravelModelArrayList) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        for (DailyTravelModel dailyTravelModel : dailyTravelModelArrayList) {
+            db.execSQL("update " + EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE + " set IsSynced=1 where idLocation='" + dailyTravelModel.getIdLocation() + "'");
+        }
+
+        db.close();
+
+    }
 }
