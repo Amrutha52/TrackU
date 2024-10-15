@@ -47,17 +47,27 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity
+{
     private ActivityLoginBinding activityLoginBinding;
     String usernameString;
 
+    SharedPreferences shp;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         activityLoginBinding = ActivityLoginBinding.inflate(getLayoutInflater());
         View view = activityLoginBinding.getRoot();
         setContentView(view);
 
+        shp = getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+
+        if (shp.getBoolean(Const.Shp_Is_LoggedIn, true))
+        {
+            startActivity(new Intent(this, MainMenuActivity.class));
+        }
 
     }
 

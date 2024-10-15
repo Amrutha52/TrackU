@@ -226,7 +226,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialogInterface, int i) {
 
                     SharedPreferences.Editor edt = shp.edit();
-                    edt.clear();
+                    edt.putBoolean(Const.Shp_Is_LoggedIn, false);
                     edt.apply();
 
                     startActivity(new Intent(MainMenuActivity.this, LoginActivity.class));
