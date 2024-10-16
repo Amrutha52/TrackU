@@ -55,7 +55,7 @@
         </activity>
 
         <service
-            android:name=".service.BackGroundInternetService"
+            android:name=".service.ForeGroundService"
             android:foregroundServiceType="location"
             android:enabled="true"
             android:exported="true" />

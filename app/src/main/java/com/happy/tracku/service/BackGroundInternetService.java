@@ -301,7 +301,8 @@ public class BackGroundInternetService extends Service implements
 
     }
 
-    private LocationCallback createNewLocationCallback() {
+    private LocationCallback createNewLocationCallback()
+    {
         LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult result) {
@@ -319,77 +320,27 @@ public class BackGroundInternetService extends Service implements
                 SimpleDateFormat sdf2 = new SimpleDateFormat("ddMMyyHHmmss");
                 String idLocation = shp.getString(Const.Shp_Employee_Code, "") + "" + sdf2.format(dateNow);
 
-                String latitude = String.valueOf(location.getLatitude());
-                String longitude = String.valueOf(location.getLongitude());
+                Double latitude = location.getLatitude();
+                Double longitude = location.getLongitude();
                 DbHelper dbHelper = new DbHelper(context);
 
                 SimpleDateFormat sdf3 = new SimpleDateFormat("HHmmss");
                 String timeNowString = sdf3.format(dateNow);
                 int timeNowValue = Integer.parseInt(timeNowString);
 
-                if(timeNowValue>50000 && timeNowValue < 240000)
-                {
+                DailyTravelModel dailyTravelModel = new DailyTravelModel();
+                dailyTravelModel.setIdLocation(String.valueOf(dateNow.getTime()));
+                dailyTravelModel.setLatitude(latitude);
+                dailyTravelModel.setLongitude(longitude);
+                dailyTravelModel.setAddress("");
+                dailyTravelModel.setDateTime(dateTimeString);
+                dailyTravelModel.setIdEmployee(shp.getInt(Const.Shp_Id_Employee, 0));
+                dailyTravelModel.setIsForUpload(0);
+                dailyTravelModel.setIsSynced(0);
 
-                    //Save latitude and longitude every time
-                    SharedPreferences.Editor edt = shp.edit();
-                    edt.putString(Const.Shp_gps_compensation_longitude,longitude);
-                    edt.putString(Const.Shp_gps_compensation_latitude,latitude);
-                    edt.apply();
-
-                    //If Gps Recording in On in Compensation Page
-                    if(shp.getBoolean(Const.Shp_gps_recording_start_stop_for_compensation,false))
-                    {
-                        DailyTravelModel dailyTravelModel = new DailyTravelModel();
-                        dailyTravelModel.setIdLocation(String.valueOf(dateNow.getTime()));
-                        dailyTravelModel.setAccountNumber("");
-                        dailyTravelModel.setName("");
-                        dailyTravelModel.setAddress("");
-                        dailyTravelModel.setDistance(0);
-                        dailyTravelModel.setLatitude(latitude);
-                        dailyTravelModel.setLongitude(longitude);
-                        dailyTravelModel.setDateTime(dateTimeString);
-                        dailyTravelModel.setDateTimeInMillis(dateNow.getTime());
-                        dailyTravelModel.setIsSynced(0);
-                        dailyTravelModel.setIsStartPosition(0);
-                        dailyTravelModel.setIsEndPosition(0);
-                        dailyTravelModel.setIsOnlyForCalculation(1);
-
-                        dbHelper.insertContinousGPSLocationForCompensation(dailyTravelModel);
-                    }
-
-                    double timeInSecondsAfterLastInsert = dateNow.getTime() - shp.getLong(Const.Shp_last_gps_insert_time_for_normal_gps_tracking,0);
-
-                    if(timeInSecondsAfterLastInsert >= 30*60*1000)
-                    {
-
-                        dbHelper.insertGpsData(idLocation, latitude, longitude, dateTimeString);
-
-                        SharedPreferences.Editor edt2 = shp.edit();
-                        edt2.putLong(Const.Shp_last_gps_insert_time_for_normal_gps_tracking,dateNow.getTime());
-                        edt2.apply();
-
-                    }
-                }
+                dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
 
                 try{
-
-                    if (dbHelper.getGPSDataAsArray().length() >= 2)
-                    {
-                        new PushGPSData(context).execute();
-
-                    }
-
-                    //JSONArray paymentArraySecretFile = dbHelper.readTransactionArrayFromExternalSecretFile();
-                    //if(paymentArraySecretFile.length() >= 1)
-                    //{
-                    //new NetworkChangeReceiver.UploadPickedUpEntriesInSecretFileTask(context).execute();
-                    //}
-
-                    JSONArray paymentArray = dbHelper.getTransactionsAsArrayForBackgroundUpload();
-                    if(paymentArray.length() >= 1)
-                    {
-                        new NetworkChangeReceiver.UploadPickedUpEntriesTask(context).execute();
-                    }
 
                     if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
                     {
@@ -438,7 +389,8 @@ public class BackGroundInternetService extends Service implements
         GPSUpdateStatusJson gpsUpdateStatusJson;
         int status;
 
-        public UploadTravelCompensationGPSData(Context context) {
+        public UploadTravelCompensationGPSData(Context context)
+        {
             this.context = new WeakReference<>(context);
 
             CustomTrust customTrust = new CustomTrust(context);
@@ -467,7 +419,8 @@ public class BackGroundInternetService extends Service implements
         }
 
         @Override
-        protected String doInBackground(String... strings) {
+        protected String doInBackground(String... strings)
+        {
 
             try {
 
@@ -543,9 +496,9 @@ public class BackGroundInternetService extends Service implements
 
                 try {
 
-                    if (status == 1) {
+                    if (status == 1)
+                    {
                         dbHelper.setAsSyncedTravelCompensationGPSData(dailyTravelModelArrayList);
-
 
                     }
 

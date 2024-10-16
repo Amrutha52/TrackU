@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
@@ -45,6 +46,8 @@ import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.gpsstatusjson.GPSUpdateStatusJson;
 import com.happy.tracku.gson.login.LoginStatusJson;
 import com.happy.tracku.models.DailyTravelModel;
+import com.happy.tracku.service.BackGroundInternetService;
+import com.happy.tracku.service.ForeGroundService;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
@@ -113,6 +116,24 @@ public class MainMenuActivity extends AppCompatActivity {
 
         dbHelper = new DbHelper(this);
 
+        /**
+         * ForeGround Service
+         */
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                    121);
+        }
+        else
+        {
+            Log.e("Log", "Service calling");
+            Intent serviceIntent = new Intent(this, ForeGroundService.class);
+            startService(serviceIntent);
+        }
 
         FusedLocationProviderClient client = LocationServices
                 .getFusedLocationProviderClient(getApplicationContext());
@@ -142,11 +163,14 @@ public class MainMenuActivity extends AppCompatActivity {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            if (addresses != null) {
-                returnedAddress = addresses.get(0).getAddressLine(0);
+            if (addresses != null)
+            {
+                Log.e("Log", "addressNotEqualToNull");
+              //  returnedAddress = addresses.get(0).getAddressLine(0);
 
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
             Log.e("loctionaddress", "Address didn't find...");
         }
@@ -181,7 +205,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
     }
 
-    private final BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
+    private final BottomNavigationView.OnNavigationItemSelectedListener navListener = item ->
+    {
         // By using switch we can easily get
         // the selected fragment
         // by using there id.
@@ -291,6 +316,16 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        Log.e("Log", "onRequestPermissionsResult");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        Intent serviceIntent = new Intent(this, ForeGroundService.class);
+        startService(serviceIntent);
+
+    }
     static class CustomLocationCallback extends LocationCallback
     {
 
@@ -302,8 +337,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
             location = locationResult.getLastLocation();
             // Do something with the location (may be null!)
-            Log.e("Log", "LocationLatitude" + location.getLatitude());
-            Log.e("Log", "LocationChanged: " + location);
+            Log.e("Log", "LocationLatitudeCustomLocationCallback:" + location.getLatitude());
+            Log.e("Log", "LocationChangedCustomLocationCallback: " + location);
 
             //setMethodForLocation(location.getLatitude(), location.getLongitude());
 
@@ -338,7 +373,7 @@ public class MainMenuActivity extends AppCompatActivity {
         int status;
         public updateLocationOfEmployee(MainMenuActivity mContext, DailyTravelModel dailyTravelModel)
         {
-            Log.e("Log", "InsideUpdateLocation");
+            Log.e("Log", "InsideUpdateLocationMainMenu");
             this.mContext = mContext;
             this.dailyTravelModel = dailyTravelModel;
 
@@ -420,6 +455,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 gpsUpdateStatusJson = gson.fromJson(resultString, GPSUpdateStatusJson.class);
 
                 status = gpsUpdateStatusJson.getData().getLocationUpdateStatus().get(0).getStatus();
+                Log.e("Log", "gpsStatusMainMenu" + status);
 
                 if (status != 1) {
                     return "failure";
@@ -447,44 +483,49 @@ public class MainMenuActivity extends AppCompatActivity {
                 try {
 
                     String statusMsg = gpsUpdateStatusJson.getData().getLocationUpdateStatus().get(0).getStatusMsg();
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                    View dialogView = LayoutInflater.from(mContext).inflate(R.layout.dialog_success, null);
-
-                    builder.setView(dialogView);
-
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-
-                    TextView successMsg = dialogView.findViewById(R.id.success_msg);
-                    successMsg.setText(statusMsg);
-
-                    MaterialButton okButton = dialogView.findViewById(R.id.ok_button);
-                    okButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            alertDialog.dismiss();
-
-                        }
-                    });
-
-//                    if (Status == 1) {
-//                        dbHelper.setAsSyncedTravelCompensationGPSData(dailyTravelModelArrayList);
-//                        dbHelper.deleteTravelCompensationGPSData();
-//                        context.get().updateRecyclerviewAndDistance();
 //
-//                    }
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+//                    View dialogView = LayoutInflater.from(mContext).inflate(R.layout.dialog_success, null);
+//
+//                    builder.setView(dialogView);
+//
+//                    AlertDialog alertDialog = builder.create();
+//                    alertDialog.show();
+//
+//                    TextView successMsg = dialogView.findViewById(R.id.success_msg);
+//                    successMsg.setText(statusMsg);
+//
+//                    MaterialButton okButton = dialogView.findViewById(R.id.ok_button);
+//                    okButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//
+//                            alertDialog.dismiss();
+//
+//                        }
+//                    });
+
+                    if (status == 1)
+                    {
+                        dbHelper.setAsSyncedTravelCompensationGPSData(dailyTravelModelArrayList);
+                        dbHelper.deleteTravelCompensationGPSData();
+
+                        Toast.makeText(mContext, statusMsg, Toast.LENGTH_LONG).show();
+
+                    }
 
 
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
 
                     Fns.neutralAlert("Alert","Result String :  "+resultString+"\nException : "+Fns.getErrorMsgFromException(e), mContext);
                     Toast.makeText(mContext, "Exception Occurred", Toast.LENGTH_LONG).show();
 
                 }
 
-            } else if (s.equals("failure"))
+            }
+            else if (s.equals("failure"))
             {
                 String statusMsg = gpsUpdateStatusJson.getData().getLocationUpdateStatus().get(0).getStatusMsg();
                 Toast.makeText(mContext, statusMsg, Toast.LENGTH_LONG).show();

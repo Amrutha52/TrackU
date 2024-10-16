@@ -133,8 +133,8 @@ public class DbHelper extends SQLiteOpenHelper
 
                 DailyTravelModel dailyTravelModel = new DailyTravelModel();
                 dailyTravelModel.setIdLocation(cur.getString(cur.getColumnIndex("idLocation")));
-                dailyTravelModel.setLatitude(cur.getString(cur.getColumnIndex("Latitude")));
-                dailyTravelModel.setLongitude(cur.getString(cur.getColumnIndex("Longitude")));
+                dailyTravelModel.setLatitude(cur.getDouble(cur.getColumnIndex("Latitude")));
+                dailyTravelModel.setLongitude(cur.getDouble(cur.getColumnIndex("Longitude")));
                 dailyTravelModel.setAddress(cur.getString(cur.getColumnIndex("Address")));
                 dailyTravelModel.setDateTime(cur.getString(cur.getColumnIndex("DateTime")));
                 dailyTravelModel.setIdEmployee(cur.getInt(cur.getColumnIndex("idEmployee")));
