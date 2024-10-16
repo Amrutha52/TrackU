@@ -14,7 +14,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+//        ndk {
+//            abiFilters 'arm64-v8a', 'x86_64'
+//        }
+
     }
+
+
 
     buildTypes {
         release {
@@ -48,10 +55,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation("com.google.android.libraries.places:places:4.0.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
-    implementation("com.karumi:dexter:6.2.3")
-    implementation("de.hdodenhof:circleimageview:3.1.0")
-    implementation("com.google.firebase:firebase-storage-ktx")
-    implementation("com.firebaseui:firebase-ui-storage:7.2.0")
+
     implementation("com.google.maps.android:android-maps-utils:2.3.0")
     implementation("com.google.maps.android:maps-utils-ktx:3.4.0")
 
@@ -62,7 +66,6 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
-    implementation("com.google.firebase:firebase-auth:23.0.0")
-    implementation("com.google.firebase:firebase-firestore:25.1.0")
+    
 
 }

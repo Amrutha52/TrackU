@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,9 +24,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
+import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -37,32 +38,28 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.databinding.ActivityMainMenuBinding;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.gpsstatusjson.GPSUpdateStatusJson;
-import com.happy.tracku.gson.login.LoginStatusJson;
 import com.happy.tracku.models.DailyTravelModel;
-import com.happy.tracku.service.BackGroundInternetService;
 import com.happy.tracku.service.ForeGroundService;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Executor;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -74,15 +71,29 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private ActivityMainMenuBinding binding;
     LocationManager locationManager;
-    CustomLocationCallback locationCallback;
+    //CustomLocationCallback locationCallback;
     Double latitude, longitude;
+    String locationAddress;
     SharedPreferences shp;
     DbHelper dbHelper;
     TextView employeeName, employeeCode;
-
     ArrayList<DailyTravelModel> dailyTravelModelArrayList;
     LinearLayout mainLayout;
+    private FusedLocationProviderClient mFusedLocationClient;
+    DailyTravelModel dailyTravelModel;
 
+
+    private double wayLatitude = 0.0, wayLongitude = 0.0;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+    private android.widget.Button btnLocation;
+    private TextView txtLocation;
+    private android.widget.Button btnContinueLocation;
+    private TextView txtContinueLocation;
+    private StringBuilder stringBuilder;
+
+    private boolean isContinue = false;
+    private boolean isGPS = false;
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) 
@@ -116,6 +127,57 @@ public class MainMenuActivity extends AppCompatActivity {
 
         dbHelper = new DbHelper(this);
 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+//        locationRequest = LocationRequest.create();
+//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        locationRequest.setInterval(10 * 1000); // 10 seconds
+//        locationRequest.setFastestInterval(5 * 1000); // 5 seconds
+//
+//        new GpsUtils(this).turnGPSOn(new GpsUtils.onGpsListener() {
+//            @Override
+//            public void gpsStatus(boolean isGPSEnable) {
+//                // turn on GPS
+//                isGPS = isGPSEnable;
+//            }
+//        });
+//
+//        locationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                Log.e("Log", "LocationResult" + locationResult);
+//                if (locationResult == null) {
+//                    return;
+//                }
+//                for (Location location : locationResult.getLocations()) {
+//                    if (location != null) {
+//                        wayLatitude = location.getLatitude();
+//                        wayLongitude = location.getLongitude();
+//                        Log.e("Log", "wayLatitude" + wayLatitude);
+//                        Log.e("Log", "wayLongitude" + wayLongitude);
+//                        if (!isContinue) {
+//                            txtLocation.setText(String.format(Locale.US, "%s - %s", wayLatitude, wayLongitude));
+//                        } else {
+//                            stringBuilder.append(wayLatitude);
+//                            stringBuilder.append("-");
+//                            stringBuilder.append(wayLongitude);
+//                            stringBuilder.append("\n\n");
+//                            txtContinueLocation.setText(stringBuilder.toString());
+//                        }
+//                        if (!isContinue && mFusedLocationClient != null) {
+//                            mFusedLocationClient.removeLocationUpdates(locationCallback);
+//                        }
+//                    }
+//                }
+//            }
+//        };
+//
+//        // method to get the location
+//        getLocation();
+
+        // method to get the location
+        getLastLocation();
+
         /**
          * ForeGround Service
          */
@@ -135,75 +197,283 @@ public class MainMenuActivity extends AppCompatActivity {
             startService(serviceIntent);
         }
 
-        FusedLocationProviderClient client = LocationServices
-                .getFusedLocationProviderClient(getApplicationContext());
-        LocationRequest request = LocationRequest.create();
-        request.setInterval(15 * 1000); //Every 15 seconds
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationCallback = new CustomLocationCallback();
-
-        client.requestLocationUpdates(request, locationCallback, null);
-
-        Location location = locationCallback==null?null:locationCallback.getLocation();
 
 
+//        LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+//
+//        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) || location == null) {
+//           // buildAlertMessageNoGps();
+//          //  return;
+//        }
+//
+//        if(!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) || location == null || latitude == 0 || longitude == 0)
+//        {
+//
+//            Toast.makeText(this, "Please Turn On GPS and wait some minutes before submitting", Toast.LENGTH_LONG).show();
+//            //return;
+//        }
 
-        latitude = location==null?0.0:location.getLatitude();
-        Log.e("Log", "locationLatitude" + latitude);
 
-        longitude = location==null?0.0:location.getLongitude();
-        Log.e("Log", "locationlongitude" + longitude);
-
-        Calendar cal = Calendar.getInstance();
-        Date dateNow = cal.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateTimeString = sdf.format(dateNow);
-
-        String returnedAddress = "AddressOfCustomer";
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            if (addresses != null)
-            {
-                Log.e("Log", "addressNotEqualToNull");
-              //  returnedAddress = addresses.get(0).getAddressLine(0);
-
-            }
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.e("loctionaddress", "Address didn't find...");
-        }
-
-        DailyTravelModel dailyTravelModel = new DailyTravelModel();
-        dailyTravelModel.setIdLocation(shp.getString(Const.Shp_Employee_Code, "") + String.valueOf(dateNow.getTime()));
-        dailyTravelModel.setLatitude(latitude);
-        dailyTravelModel.setLongitude(longitude);
-        dailyTravelModel.setAddress(returnedAddress);
-        dailyTravelModel.setDateTime(dateTimeString);
-        dailyTravelModel.setIdEmployee(1);
-        dailyTravelModel.setIsForUpload(0);
-        dailyTravelModel.setIsSynced(0);
-
-        dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
-
-        LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) || location == null) {
-            buildAlertMessageNoGps();
-            return;
-        }
-
-        if(!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) || location == null || latitude == 0 || longitude == 0)
-        {
-
-            Toast.makeText(this, "Please Turn On GPS and wait some minutes before submitting", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        new updateLocationOfEmployee(this, dailyTravelModel).execute();
 
     }
+
+  /*  private void getLocation() {
+        if (ActivityCompat.checkSelfPermission(MainMenuActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(MainMenuActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainMenuActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    Const.LOCATION_REQUEST);
+
+        } else {
+            if (isContinue) {
+                mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+            } else {
+                mFusedLocationClient.getLastLocation().addOnSuccessListener(MainMenuActivity.this, location -> {
+                    if (location != null) {
+                        wayLatitude = location.getLatitude();
+                        Log.e("Log", "wayLatitude" + wayLatitude);
+                        wayLongitude = location.getLongitude();
+                        Log.e("Log", "wayLongitude" + wayLongitude);
+                        txtLocation.setText(String.format(Locale.US, "%s - %s", wayLatitude, wayLongitude));
+                    } else {
+                        mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                    }
+                });
+            }
+        }
+    }
+
+   */
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1000: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    if (isContinue) {
+                        mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                    } else {
+                        mFusedLocationClient.getLastLocation().addOnSuccessListener(MainMenuActivity.this, location -> {
+                            if (location != null) {
+                                wayLatitude = location.getLatitude();
+                                wayLongitude = location.getLongitude();
+                                Log.e("Log", "wayLatitudeOnRequest" + wayLatitude);
+                                Log.e("Log", "wayLongitudeOnRequest" + wayLongitude);
+                                txtLocation.setText(String.format(Locale.US, "%s - %s", wayLatitude, wayLongitude));
+                            } else {
+                                mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                            }
+                        });
+                    }
+                } else {
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == Const.GPS_REQUEST) {
+                isGPS = true; // flag maintain before get location
+            }
+        }
+    }
+
+
+    private void getLastLocation()
+    {
+        Log.e("Log", "getLastLocation");
+        // check if permissions are given
+        if (checkPermissions()) {
+
+            // check if location is enabled
+            if (isLocationEnabled()) {
+
+                // getting last
+                // location from
+                // FusedLocationClient
+                // object
+                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                {
+
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    Log.e("Log", "permission");
+                    return;
+                }
+                mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        Location location = task.getResult();
+                        if (location == null || location.getLongitude() == 0 || location.getLatitude() == 0) {
+                            requestNewLocationData();
+                        } else {
+                            Log.e("Log", "latitudeInsideFusedlocation" + location.getLatitude());
+                            Log.e("Log", "longitudeInsideFusedlocation" + location.getLongitude());
+                            latitude = location==null?0.0:location.getLatitude();
+                            Log.e("Log", "location Latitude" + latitude);
+
+                            longitude = location==null?0.0:location.getLongitude();
+                            Log.e("Log", "location longitude" + longitude);
+
+                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                            try
+                            {
+                                // throw new RuntimeException("Exception For Testing");
+
+                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                                Log.e("Log", latitude + "" + longitude);
+
+                                if (addresses != null && addresses.size() != 0)
+                                {
+                                    locationAddress = addresses.get(0).getAddressLine(0);
+                                    Log.e("address", locationAddress);
+                                }
+
+                            }
+                            catch (Exception e)
+                            {
+                                locationAddress = "Not Able To Get Address";
+                                Log.e("ExceptionAddress", locationAddress);
+                                Log.e("Log", "Exception", e);
+                            }
+
+                            Calendar cal = Calendar.getInstance();
+                            Date dateNow = cal.getTime();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            String dateTimeString = sdf.format(dateNow);
+
+
+
+                            dailyTravelModel = new DailyTravelModel();
+                            dailyTravelModel.setIdLocation(shp.getString(Const.Shp_Employee_Code, "") + String.valueOf(dateNow.getTime()));
+                            dailyTravelModel.setLatitude(latitude);
+                            dailyTravelModel.setLongitude(longitude);
+                            dailyTravelModel.setAddress(locationAddress);
+                            dailyTravelModel.setDateTime(dateTimeString);
+                            dailyTravelModel.setIdEmployee(1);
+                            dailyTravelModel.setIsForUpload(0);
+                            dailyTravelModel.setIsSynced(0);
+
+                            dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
+                            new updateLocationOfEmployee(getApplicationContext(), dailyTravelModel).execute();
+                        }
+                    }
+                });
+            } else {
+                Toast.makeText(this, "Please turn on" + " your location...", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        } else {
+            // if permissions aren't available,
+            // request for permissions
+            requestPermissions();
+        }
+
+
+
+    }
+
+    // method to check for permissions
+    private boolean checkPermissions() {
+        return ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermissions() {
+        ActivityCompat.requestPermissions(this, new String[]{
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.ACCESS_FINE_LOCATION}, 44);
+    }
+
+    private void requestNewLocationData() {
+
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(60000);
+        mLocationRequest.setFastestInterval(5000);
+
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+    }
+
+    private LocationCallback mLocationCallback = new LocationCallback() {
+
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            Log.e("Log", "LocationCallBackMainMenu");
+            Location mLastLocation = locationResult.getLastLocation();
+            Log.e("Log", "latitude" + mLastLocation.getLatitude());
+            Log.e("Log", "latitude" + mLastLocation.getLatitude());
+
+            latitude = mLastLocation == null ? 0.0 : mLastLocation.getLatitude();
+            Log.e("Log", "Last location Latitude" + latitude);
+
+            longitude = mLastLocation == null ? 0.0 : mLastLocation.getLongitude();
+            Log.e("Log", "Last location longitude" + longitude);
+
+            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+            try {
+                // throw new RuntimeException("Exception For Testing");
+
+                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                Log.e("Log", latitude + "" + longitude);
+
+                if (addresses != null && addresses.size() != 0) {
+                    locationAddress = addresses.get(0).getAddressLine(0);
+                    Log.e("address", locationAddress);
+                }
+
+            } catch (Exception e) {
+                locationAddress = "Not Able To Get Address";
+                Log.e("ExceptionAddress", locationAddress);
+                Log.e("Log", "Exception", e);
+            }
+
+            Calendar cal = Calendar.getInstance();
+            Date dateNow = cal.getTime();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String dateTimeString = sdf.format(dateNow);
+
+
+
+            dailyTravelModel = new DailyTravelModel();
+            dailyTravelModel.setIdLocation(shp.getString(Const.Shp_Employee_Code, "") + String.valueOf(dateNow.getTime()));
+            dailyTravelModel.setLatitude(latitude);
+            dailyTravelModel.setLongitude(longitude);
+            dailyTravelModel.setAddress(locationAddress);
+            dailyTravelModel.setDateTime(dateTimeString);
+            dailyTravelModel.setIdEmployee(1);
+            dailyTravelModel.setIsForUpload(0);
+            dailyTravelModel.setIsSynced(0);
+
+            dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
+
+            new updateLocationOfEmployee(getApplicationContext(), dailyTravelModel).execute();
+
+        }
+    };
+
+    private boolean isLocationEnabled() {
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener = item ->
     {
@@ -278,24 +548,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     }
 
-    private void buildAlertMessageNoGps()
-    {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("GPS is Mandatory to proceed, do you want to enable it? Also Please wait 5 mins after enabling")
-                .setCancelable(false)
-                .setPositiveButton("Enable Now", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
+
 
     public void listeners(View view)
     {
@@ -316,7 +569,7 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    @Override
+   /* @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         Log.e("Log", "onRequestPermissionsResult");
@@ -326,33 +579,10 @@ public class MainMenuActivity extends AppCompatActivity {
         startService(serviceIntent);
 
     }
-    static class CustomLocationCallback extends LocationCallback
-    {
 
-        Location location;
-
-        @Override
-        public void onLocationResult(@NonNull LocationResult locationResult) {
-            super.onLocationResult(locationResult);
-
-            location = locationResult.getLastLocation();
-            // Do something with the location (may be null!)
-            Log.e("Log", "LocationLatitudeCustomLocationCallback:" + location.getLatitude());
-            Log.e("Log", "LocationChangedCustomLocationCallback: " + location);
-
-            //setMethodForLocation(location.getLatitude(), location.getLongitude());
-
-        }
+    */
 
 
-
-        public Location getLocation() {
-            Log.e("Log", "InsideGetLocation");
-            return location;
-
-        }
-
-    }
 
     private static class updateLocationOfEmployee extends AsyncTask<String, String, String>
     {
@@ -360,7 +590,7 @@ public class MainMenuActivity extends AppCompatActivity {
         String url;
         Request request;
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        MainMenuActivity mContext;
+        Context mContext;
 
         ProgressDialog pd;
         SharedPreferences shp;
@@ -371,7 +601,7 @@ public class MainMenuActivity extends AppCompatActivity {
         ArrayList<DailyTravelModel> dailyTravelModelArrayList;
 
         int status;
-        public updateLocationOfEmployee(MainMenuActivity mContext, DailyTravelModel dailyTravelModel)
+        public updateLocationOfEmployee(Context mContext, DailyTravelModel dailyTravelModel)
         {
             Log.e("Log", "InsideUpdateLocationMainMenu");
             this.mContext = mContext;
@@ -394,6 +624,8 @@ public class MainMenuActivity extends AppCompatActivity {
             pd.setMessage("wait...");
             pd.setCancelable(false);
         }
+
+
 
         @Override
         protected void onPreExecute() {
@@ -423,7 +655,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 jsonObject.put("dailyGPSData", dbHelper.getDailyTravelDataForCompensation());
-                //dailyTravelModelArrayList = dbHelper.getDailyTravelDataForCompensationAsArray();
+                dailyTravelModelArrayList = dbHelper.getDailyTravelDataForCompensationAsArray();
 
 
                 url = USING_IP + Const.URL_Update_Daily_GPS_Data;

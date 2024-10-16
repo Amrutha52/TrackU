@@ -10,6 +10,9 @@ public class Const
     public static final String Shp_Is_Admin = "IsAdmin";
     public static final String Shp_Is_LoggedIn = "IsLoggedIn";
 
+    public static final int LOCATION_REQUEST = 1000;
+    public static final int GPS_REQUEST = 1001;
+
 
     public static final String URL_PUBLIC_TEST = "https://test1.maxvalue.co.in:1222/api/TrackVeAppDetails/";
     public static String USING_IP = URL_PUBLIC_TEST;
