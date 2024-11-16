@@ -94,6 +94,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private boolean isContinue = false;
     private boolean isGPS = false;
+    private static final int PERMISSION_REQUEST_ID = 1000;
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) 
@@ -188,7 +189,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                    121);
+                    PERMISSION_REQUEST_ID);
         }
         else
         {
@@ -249,7 +250,7 @@ public class MainMenuActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case 1000: {
+            case PERMISSION_REQUEST_ID: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -304,12 +305,10 @@ public class MainMenuActivity extends AppCompatActivity {
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 {
 
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    Log.e("Log", "permission");
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                            PERMISSION_REQUEST_ID);
+                    Log.e("Log", "permissionDeniedMainMenu");
                     return;
                 }
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
@@ -322,7 +321,7 @@ public class MainMenuActivity extends AppCompatActivity {
                             Log.e("Log", "latitudeInsideFusedlocation" + location.getLatitude());
                             Log.e("Log", "longitudeInsideFusedlocation" + location.getLongitude());
                             latitude = location==null?0.0:location.getLatitude();
-                            Log.e("Log", "location Latitude" + latitude);
+                            Log.e("Log", "locationLatitude" + latitude);
 
                             longitude = location==null?0.0:location.getLongitude();
                             Log.e("Log", "location longitude" + longitude);
@@ -394,14 +393,14 @@ public class MainMenuActivity extends AppCompatActivity {
     private void requestPermissions() {
         ActivityCompat.requestPermissions(this, new String[]{
                 android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                android.Manifest.permission.ACCESS_FINE_LOCATION}, 44);
+                android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_ID);
     }
 
     private void requestNewLocationData() {
 
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(60000);
+        mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
 
 

@@ -3,6 +3,7 @@ package com.happy.tracku.service;
 import static com.happy.tracku.utils.Const.URL_Update_Daily_GPS_Data;
 import static com.happy.tracku.utils.Const.USING_IP;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -19,6 +20,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -63,6 +65,8 @@ public class ForeGroundService extends Service
 {
     private static final int UPDATE_INTERVAL_IN_SECONDS = 15;
     private static final int UPDATE_FASTEST_INTERVAL_IN_SECONDS = 15;
+
+    private static final int PERMISSION_REQUEST_ID = 44;
     Context context;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -77,7 +81,7 @@ public class ForeGroundService extends Service
 
     private Notification getNotification() {
         Intent notificationIntent = new Intent(this, MainMenuActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, PERMISSION_REQUEST_ID,
                 notificationIntent,
                 PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new
@@ -105,6 +109,10 @@ public class ForeGroundService extends Service
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions((Activity) getApplicationContext(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSION_REQUEST_ID);
             Log.e("Log", "Permission not granted");
             // Handle permission not granted
         }
@@ -164,6 +172,7 @@ public class ForeGroundService extends Service
                 },
                 Looper.myLooper());
     }
+
 
     private void createNotificationChannel()
     {

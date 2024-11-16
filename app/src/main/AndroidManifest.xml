@@ -11,9 +11,10 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature
         android:name="android.hardware.location.gps"
@@ -23,16 +24,19 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/trackulogo"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/trackulogo"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Tracku"
         tools:targetApi="31">
+       <!-- <activity
+            android:name=".viewes.SecondActivity"
+            android:exported="false" />-->
         <activity
             android:name=".viewes.AddEmployeeActivity"
-            android:parentActivityName=".viewes.MainMenuActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".viewes.MainMenuActivity" />
         <activity
             android:name=".viewes.MapActivity"
             android:exported="false" />
@@ -57,9 +61,9 @@
 
         <service
             android:name=".service.ForeGroundService"
-            android:foregroundServiceType="location"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:foregroundServiceType="location" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
