@@ -30,9 +30,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tracku"
         tools:targetApi="31">
-       <!-- <activity
-            android:name=".viewes.SecondActivity"
-            android:exported="false" />-->
+        <activity
+            android:name=".viewes.PolyActivity"
+            android:exported="false" />
         <activity
             android:name=".viewes.AddEmployeeActivity"
             android:exported="false"

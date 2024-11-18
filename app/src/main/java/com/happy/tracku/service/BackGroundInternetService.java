@@ -78,7 +78,7 @@ public class BackGroundInternetService extends Service implements
     // the notification id for the foreground notification
     public static final int GPS_NOTIFICATION = 1;
     // the interval in seconds that gps updates are requested
-    private static final int UPDATE_INTERVAL_IN_SECONDS = 15;
+    private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 300000;
     // is this service currently running in the foreground?
     private boolean isForeground = false;
     // the google api client
@@ -247,7 +247,7 @@ public class BackGroundInternetService extends Service implements
         // the location service. for example, if Google Maps is running in the background
         // we can update our location from what it sees every five seconds
         locationRequest.setFastestInterval(TimeUnit.SECONDS.toMillis(0));
-        locationRequest.setMaxWaitTime(TimeUnit.SECONDS.toMillis(UPDATE_INTERVAL_IN_SECONDS));
+        locationRequest.setMaxWaitTime(TimeUnit.SECONDS.toMillis(UPDATE_INTERVAL_IN_MILLI_SECONDS));
 
         return locationRequest;
     }
@@ -283,7 +283,7 @@ public class BackGroundInternetService extends Service implements
             //Define quality of service:
             LocationRequest request = LocationRequest.create();
             //request.setInterval(30*60*1000); //Every 30 mins
-            request.setInterval(60*1000); //Every 1 min
+            request.setInterval(60*1000*5); //Every 5 min
             request.setSmallestDisplacement(100); //Every 100 meters
             request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             if (locCallback != null) {

@@ -400,8 +400,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(10000*6*5);
+        mLocationRequest.setFastestInterval(10000*6*5);
 
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -562,7 +562,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
             case R.id.addEmployeeLL:
             {
-                startActivity(new Intent(this, AddEmployeeActivity.class));
+               // startActivity(new Intent(this, AddEmployeeActivity.class));
+                startActivity(new Intent(this, PolyActivity.class));
             }
             break;
         }

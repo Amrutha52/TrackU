@@ -63,8 +63,8 @@ import okhttp3.Response;
 
 public class ForeGroundService extends Service
 {
-    private static final int UPDATE_INTERVAL_IN_SECONDS = 15;
-    private static final int UPDATE_FASTEST_INTERVAL_IN_SECONDS = 15;
+    private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 300000; // 5 minutes
+    private static final int UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS = 300000;
 
     private static final int PERMISSION_REQUEST_ID = 44;
     Context context;
@@ -104,8 +104,8 @@ public class ForeGroundService extends Service
         LocationRequest mLocationRequestHighAccuracy = new LocationRequest();
 
         mLocationRequestHighAccuracy.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequestHighAccuracy.setInterval(UPDATE_INTERVAL_IN_SECONDS);
-        mLocationRequestHighAccuracy.setFastestInterval(UPDATE_FASTEST_INTERVAL_IN_SECONDS);
+        mLocationRequestHighAccuracy.setInterval(UPDATE_INTERVAL_IN_MILLI_SECONDS);
+        mLocationRequestHighAccuracy.setFastestInterval(UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS);
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {

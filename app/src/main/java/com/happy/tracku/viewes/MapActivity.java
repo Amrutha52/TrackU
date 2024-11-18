@@ -1,5 +1,6 @@
 package com.happy.tracku.viewes;
 
+import static android.icu.util.MeasureUnit.DOT;
 import static com.happy.tracku.utils.Const.USING_IP;
 
 import androidx.annotation.NonNull;
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -19,8 +21,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
 import com.google.gson.Gson;
 import com.google.maps.android.SphericalUtil;
 import com.happy.tracku.R;
@@ -33,6 +45,7 @@ import com.happy.tracku.utils.Const;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,8 +55,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
-{
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
+    private static final int PATTERN_GAP_LENGTH_PX = 20;
+    private static final PatternItem DOT = new Dot();
+    private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
+    private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
     ArrayList<LatLng> latlngPoints;
     Double latitude, longitude;
     private GoogleMap mMap;
@@ -52,6 +68,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     String travelDateString, employeeCodeString;
     ArrayList<String> cityArrayList;
     String returnAddress;
+    private static final int COLOR_BLACK_ARGB = 0xffF9A825;
+    private static final int POLYLINE_STROKE_WIDTH_PX = 20;
+    LatLng copoints, firstLatLng;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -94,6 +114,32 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         cityArrayList = new ArrayList<String>();
 
         latlngPoints.add(new LatLng(latitude, longitude));
+        Log.e("Log", "latlngPoints" +latlngPoints.toString());
+
+
+      /*  for (int j =0; j<latlngPoints.size(); j++)
+        {
+
+            firstLatLng = latlngPoints.get(j);
+            Log.e("firstLatLng", String.valueOf(firstLatLng));
+
+            for (int k =1; k<latlngPoints.size(); k++){
+                copoints = latlngPoints.get(k);
+                Log.e("coPoint", String.valueOf(copoints));
+
+                //  getDistance(firstLatLng, copoints);
+
+                String.valueOf(SphericalUtil.computeDistanceBetween(firstLatLng, copoints)); // Return distance between in Meters
+                //  Log.e("distOfTwoPoints", String.valueOf(SphericalUtil.computeDistanceBetween(firstLatLng, copoints)));
+
+            }
+        }
+
+       */
+
+
+
+
 
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
@@ -110,6 +156,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 10));
 
+                Polyline polyline = mMap.addPolyline(new PolylineOptions()
+                        .clickable(true)
+                        .add(new LatLng(latitude, longitude))
+                );
+                polyline.setTag("A");
+                stylePolyline(polyline);
+                mMap.setOnPolylineClickListener(this);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,9 +172,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return returnAddress;
     }
 
-
-    private class getLocationOfEmployee extends AsyncTask<String, String, String>
+    @Override
+    public void onPolylineClick(@NonNull Polyline polyline)
     {
+        Log.e("Log", "InsideonPolyLineClick");
+        // Flip from solid stroke to dotted stroke pattern.
+        if ((polyline.getPattern() == null) || (!polyline.getPattern().contains(DOT))) {
+            polyline.setPattern(PATTERN_POLYLINE_DOTTED);
+        } else {
+            // The default pattern is a solid stroke.
+            polyline.setPattern(null);
+        }
+
+        Toast.makeText(this, "Route type " + polyline.getTag().toString(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+
+    private class getLocationOfEmployee extends AsyncTask<String, String, String>  {
         OkHttpClient okHttpClient;
         String url, employeeCodeString, travelDateString;
         Request request;
@@ -253,25 +322,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                 }
 
-                latlngPoints = new ArrayList<>();
 
-                for (int j =0; j<latlngPoints.size(); j++)
-                {
 
-                    firstLatLng = latlngPoints.get(j);
-                    Log.e("firstLatLng", String.valueOf(firstLatLng));
 
-                    for (int k =1; k<latlngPoints.size(); k++){
-                        copoints = latlngPoints.get(k);
-                        Log.e("coPoint", String.valueOf(copoints));
+//                PolylineOptions polylineOptions = new PolylineOptions();
+//                polylineOptions.addAll(latlngPoints);
+//                polylineOptions.width(12)
+//                        .color(Color.parseColor("#cd32e2"))
+//                        .geodesic(true);
+//                mMap.addPolyline(polylineOptions);
 
-                        //  getDistance(firstLatLng, copoints);
+                // Set listeners for click events.
+               // mMap.setOnPolylineClickListener(this);
 
-                        String.valueOf(SphericalUtil.computeDistanceBetween(firstLatLng, copoints)); // Return distance between in Meters
-                        //  Log.e("distOfTwoPoints", String.valueOf(SphericalUtil.computeDistanceBetween(firstLatLng, copoints)));
 
-                    }
-                }
 
             }
             else if (s.equals("failure"))
@@ -286,6 +350,57 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
 
         }
+
+
+
+//        @Override
+//        public void onPolylineClick(@NonNull Polyline polyline)
+//        {
+//            Log.e("Log", "InsidePolyLine");
+//            // Flip from solid stroke to dotted stroke pattern.
+//            if ((polyline.getPattern() == null) || (!polyline.getPattern().contains(DOT))) {
+//                polyline.setPattern(PATTERN_POLYLINE_DOTTED);
+//            } else {
+//
+//                // The default pattern is a solid stroke
+//                polyline.setPattern(null);
+//            }
+//
+//            Toast.makeText(mContext, "Route type " + polyline.getTag().toString(),
+//                    Toast.LENGTH_SHORT).show();
+//        }
+
+    }
+
+    private void stylePolyline(Polyline polyline)
+    {
+        Log.e("Log", "polyline" + polyline.getTag());
+        Log.e("Log","stylePolyline");
+        String type = "";
+        // Get the data object stored with the polyline.
+        if (polyline.getTag() != null) {
+            type = polyline.getTag().toString();
+        }
+
+        switch (type) {
+
+            // If no type is given, allow the API to use the default.
+            case "B":
+                // Use a custom bitmap as the cap at the start of the line.
+                polyline.setStartCap(
+                        new CustomCap(
+                                BitmapDescriptorFactory.fromResource(R.drawable.ic_arrow), 10));
+                break;
+            case "A":
+                // Use a round cap at the start of the line.
+                polyline.setStartCap(new RoundCap());
+                break;
+        }
+
+        polyline.setEndCap(new RoundCap());
+        polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
+        polyline.setColor(COLOR_BLACK_ARGB);
+        polyline.setJointType(JointType.ROUND);
     }
 
 }
