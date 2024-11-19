@@ -56,7 +56,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
-    private static final int PATTERN_GAP_LENGTH_PX = 20;
+    private static final int PATTERN_GAP_LENGTH_PX = 10;
     private static final PatternItem DOT = new Dot();
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
     private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
@@ -68,9 +68,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     String travelDateString, employeeCodeString;
     ArrayList<String> cityArrayList;
     String returnAddress;
-    private static final int COLOR_BLACK_ARGB = 0xffF9A825;
-    private static final int POLYLINE_STROKE_WIDTH_PX = 20;
+    private static final int COLOR_YELLOW_ARGB = 0xffF9A825;
+    private static final int POLYLINE_STROKE_WIDTH_PX = 10;
     LatLng copoints, firstLatLng;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -84,7 +85,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
+        latlngPoints = new ArrayList<>();
     }
 
     @Override
@@ -107,23 +108,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onPointerCaptureChanged(hasCapture);
     }
 
-    private String getCompleteAddressString(double latitude, double longitude, ArrayList<LatLng> latlngPoints)
+    private String getCompleteAddressString(double latitude, double longitude)
     {
 
-        latlngPoints = new ArrayList<>();
         cityArrayList = new ArrayList<String>();
 
         latlngPoints.add(new LatLng(latitude, longitude));
         Log.e("Log", "latlngPoints" +latlngPoints.toString());
 
 
-      /*  for (int j =0; j<latlngPoints.size(); j++)
+        for (int j =0; j<latlngPoints.size(); j++)
         {
-
+            Log.e("Log","InsideForJ");
+            Log.e("Log", "latlngPointsSize" + latlngPoints.size());
             firstLatLng = latlngPoints.get(j);
             Log.e("firstLatLng", String.valueOf(firstLatLng));
 
-            for (int k =1; k<latlngPoints.size(); k++){
+
+            for (int k =1; k<latlngPoints.size(); k++)
+            {
+                Log.e("Log", "InsideForK");
                 copoints = latlngPoints.get(k);
                 Log.e("coPoint", String.valueOf(copoints));
 
@@ -132,13 +136,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 String.valueOf(SphericalUtil.computeDistanceBetween(firstLatLng, copoints)); // Return distance between in Meters
                 //  Log.e("distOfTwoPoints", String.valueOf(SphericalUtil.computeDistanceBetween(firstLatLng, copoints)));
 
+                Polyline polyline2 = mMap.addPolyline(new PolylineOptions()
+                        .clickable(true)
+                        .add(firstLatLng,copoints));
+                polyline2.setTag("A");
+
+                stylePolyline(polyline2);
+                mMap.setOnPolylineClickListener(this);
             }
         }
-
-       */
-
-
-
 
 
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -156,13 +162,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 10));
 
-                Polyline polyline = mMap.addPolyline(new PolylineOptions()
-                        .clickable(true)
-                        .add(new LatLng(latitude, longitude))
-                );
-                polyline.setTag("A");
-                stylePolyline(polyline);
-                mMap.setOnPolylineClickListener(this);
+
 
             }
         } catch (Exception e) {
@@ -318,23 +318,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     latitude = Double.valueOf(dailyWiseGPSDataResponsestatus.getLatitude());
                     longitude = Double.valueOf(dailyWiseGPSDataResponsestatus.getLongitude());
 
-                    getCompleteAddressString(latitude, longitude, latlngPoints);
+                    getCompleteAddressString(latitude, longitude);
 
                 }
-
-
-
-
-//                PolylineOptions polylineOptions = new PolylineOptions();
-//                polylineOptions.addAll(latlngPoints);
-//                polylineOptions.width(12)
-//                        .color(Color.parseColor("#cd32e2"))
-//                        .geodesic(true);
-//                mMap.addPolyline(polylineOptions);
-
-                // Set listeners for click events.
-               // mMap.setOnPolylineClickListener(this);
-
 
 
             }
@@ -351,24 +337,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         }
 
-
-
-//        @Override
-//        public void onPolylineClick(@NonNull Polyline polyline)
-//        {
-//            Log.e("Log", "InsidePolyLine");
-//            // Flip from solid stroke to dotted stroke pattern.
-//            if ((polyline.getPattern() == null) || (!polyline.getPattern().contains(DOT))) {
-//                polyline.setPattern(PATTERN_POLYLINE_DOTTED);
-//            } else {
-//
-//                // The default pattern is a solid stroke
-//                polyline.setPattern(null);
-//            }
-//
-//            Toast.makeText(mContext, "Route type " + polyline.getTag().toString(),
-//                    Toast.LENGTH_SHORT).show();
-//        }
 
     }
 
@@ -399,7 +367,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         polyline.setEndCap(new RoundCap());
         polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
-        polyline.setColor(COLOR_BLACK_ARGB);
+        polyline.setColor(COLOR_YELLOW_ARGB);
         polyline.setJointType(JointType.ROUND);
     }
 
