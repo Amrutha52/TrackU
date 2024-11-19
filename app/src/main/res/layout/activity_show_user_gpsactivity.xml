@@ -54,6 +54,10 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:inputType="textNoSuggestions"
+                    android:clickable="false"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
                     android:maxLength="20"/>
 
             </com.google.android.material.textfield.TextInputLayout>

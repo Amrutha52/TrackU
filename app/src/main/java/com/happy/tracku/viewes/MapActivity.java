@@ -69,7 +69,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     ArrayList<String> cityArrayList;
     String returnAddress;
     private static final int COLOR_YELLOW_ARGB = 0xffF9A825;
-    private static final int POLYLINE_STROKE_WIDTH_PX = 10;
+    private static final int POLYLINE_STROKE_WIDTH_PX = 5;
     LatLng copoints, firstLatLng;
 
 
