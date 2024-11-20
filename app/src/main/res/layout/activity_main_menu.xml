@@ -228,7 +228,7 @@
                             app:cardCornerRadius="15dp"
                             android:backgroundTint="@color/white"
                             app:strokeColor="#004d00"
-                            android:visibility="invisible"
+                            android:visibility="visible"
                             app:strokeWidth="1dp"
                             app:cardElevation="10dp">
 
@@ -238,7 +238,7 @@
                                 android:orientation="horizontal">
 
                                 <LinearLayout
-                                    android:id="@+id/yardReleaseListButton"
+                                    android:id="@+id/photopunchingLL"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="16dp"
@@ -251,6 +251,7 @@
                                         android:layout_width="40dp"
                                         android:layout_height="40dp"
                                         android:layout_gravity="center"
+                                        android:src="@drawable/facepunching"
                                         />
 
                                     <TextView
@@ -258,7 +259,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:padding="10dp"
-                                        android:text="Yard\nRelease"
+                                        android:text="Photo\nPunching"
                                         android:textAlignment="center" />
 
                                 </LinearLayout>
@@ -276,7 +277,7 @@
                             android:backgroundTint="@color/white"
                             app:strokeColor="#004d00"
                             app:strokeWidth="1dp"
-                            android:visibility="invisible"
+                            android:visibility="visible"
                             app:cardElevation="10dp">
 
                             <LinearLayout
@@ -285,7 +286,7 @@
                                 android:orientation="horizontal">
 
                                 <LinearLayout
-                                    android:id="@+id/yardReleaseInboxLayout"
+                                    android:id="@+id/punchinghistoryLL"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -298,6 +299,7 @@
                                         android:layout_width="40dp"
                                         android:layout_height="40dp"
                                         android:layout_gravity="center"
+                                        android:src="@drawable/calendarwithcheck"
                                          />
 
                                     <TextView
@@ -305,7 +307,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:padding="10dp"
-                                        android:text="Yard Release\nInbox"
+                                        android:text="Punching\nHistory"
                                         android:textAlignment="center" />
 
                                 </LinearLayout>

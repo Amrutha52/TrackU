@@ -189,7 +189,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-    private class getLocationOfEmployee extends AsyncTask<String, String, String>  {
+    private class getLocationOfEmployee extends AsyncTask<String, String, String>
+    {
         OkHttpClient okHttpClient;
         String url, employeeCodeString, travelDateString;
         Request request;

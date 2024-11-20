@@ -264,7 +264,7 @@ public class MainMenuActivity extends AppCompatActivity {
                                 wayLongitude = location.getLongitude();
                                 Log.e("Log", "wayLatitudeOnRequest" + wayLatitude);
                                 Log.e("Log", "wayLongitudeOnRequest" + wayLongitude);
-                                txtLocation.setText(String.format(Locale.US, "%s - %s", wayLatitude, wayLongitude));
+
                             } else {
                                 mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
                             }
@@ -562,8 +562,14 @@ public class MainMenuActivity extends AppCompatActivity {
 
             case R.id.addEmployeeLL:
             {
-               // startActivity(new Intent(this, AddEmployeeActivity.class));
-                startActivity(new Intent(this, PolyActivity.class));
+                startActivity(new Intent(this, AddEmployeeActivity.class));
+
+            }
+            break;
+
+            case R.id.photopunchingLL:
+            {
+                startActivity(new Intent(this, PhotoPunchActivity.class));
             }
             break;
         }
@@ -599,6 +605,7 @@ public class MainMenuActivity extends AppCompatActivity {
         DailyTravelModel dailyTravelModel;
         DbHelper dbHelper;
         ArrayList<DailyTravelModel> dailyTravelModelArrayList;
+        String statusMsg;
 
         int status;
         public updateLocationOfEmployee(Context mContext, DailyTravelModel dailyTravelModel)
@@ -686,13 +693,20 @@ public class MainMenuActivity extends AppCompatActivity {
                 Gson gson = new Gson();
                 gpsUpdateStatusJson = gson.fromJson(resultString, GPSUpdateStatusJson.class);
 
-                status = gpsUpdateStatusJson.getData().getLocationUpdateStatus().get(0).getStatus();
-                Log.e("Log", "gpsStatusMainMenu" + status);
+                if (gpsUpdateStatusJson.getData().getLocationUpdateStatus().isEmpty() || gpsUpdateStatusJson.getData().getLocationUpdateStatus().size() == 0)
+                {
+                    return "nullException";
+                }
 
-                if (status != 1) {
+                if (status != 1)
+                {
                     return "failure";
 
                 }
+
+                status = gpsUpdateStatusJson.getData().getLocationUpdateStatus().get(0).getStatus();
+                Log.e("Log", "gpsStatusMainMenu" + status);
+                statusMsg = gpsUpdateStatusJson.getData().getLocationUpdateStatus().get(0).getStatusMsg();
 
 
             } catch (Exception e) {
@@ -714,8 +728,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 try {
 
-                    String statusMsg = gpsUpdateStatusJson.getData().getLocationUpdateStatus().get(0).getStatusMsg();
-//
+                    //
 //                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 //                    View dialogView = LayoutInflater.from(mContext).inflate(R.layout.dialog_success, null);
 //
@@ -759,9 +772,15 @@ public class MainMenuActivity extends AppCompatActivity {
             }
             else if (s.equals("failure"))
             {
-                String statusMsg = gpsUpdateStatusJson.getData().getLocationUpdateStatus().get(0).getStatusMsg();
-                Toast.makeText(mContext, statusMsg, Toast.LENGTH_LONG).show();
-            } else {
+
+                Toast.makeText(mContext, "failure", Toast.LENGTH_LONG).show();
+            }
+            else if (s.equals("nullException"))
+            {
+                Toast.makeText(mContext, "Null Exception From Server", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
 
                 Toast.makeText(mContext, "Failed to Push", Toast.LENGTH_LONG).show();
 
