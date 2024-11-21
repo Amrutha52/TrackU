@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Data {
 
-    @SerializedName("dailyWiseGPSDataResponseStatus")
+    @SerializedName("getDailyWiseGPSDataResponseStatus")
     @Expose
     private List<DailyWiseGPSDataResponsestatus> dailyWiseGPSDataResponseStatus;
     @SerializedName("exceptionData")

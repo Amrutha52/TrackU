@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Data {
 
-    @SerializedName("insertEmployeeDetailsStatus")
+    @SerializedName("insertEmployeeDetailsResponseStatus")
     @Expose
     private List<InsertEmployeeDetailsstatus> insertEmployeeDetailsStatus;
     @SerializedName("exceptionData")

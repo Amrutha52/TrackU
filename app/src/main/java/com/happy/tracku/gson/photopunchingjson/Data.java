@@ -1,4 +1,4 @@
-package com.happy.tracku.gson.gpsstatusjson;
+package com.happy.tracku.gson.photopunchingjson;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -7,19 +7,19 @@ import java.util.List;
 
 public class Data {
 
-    @SerializedName("updateDailyGPSDataStatus")
+    @SerializedName("photoPunchStatus")
     @Expose
-    private List<LocationUpdatestatus> locationUpdateStatus;
+    private List<PhotoPunchstatus> photoPunchStatus;
     @SerializedName("exceptionData")
     @Expose
     private Object exceptionData;
 
-    public List<LocationUpdatestatus> getLocationUpdateStatus() {
-        return locationUpdateStatus;
+    public List<PhotoPunchstatus> getPhotoPunchStatus() {
+        return photoPunchStatus;
     }
 
-    public void setLocationUpdateStatus(List<LocationUpdatestatus> locationUpdateStatus) {
-        this.locationUpdateStatus = locationUpdateStatus;
+    public void setPhotoPunchStatus(List<PhotoPunchstatus> photoPunchStatus) {
+        this.photoPunchStatus = photoPunchStatus;
     }
 
     public Object getExceptionData() {
@@ -31,3 +31,4 @@ public class Data {
     }
 
 }
+
