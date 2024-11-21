@@ -3,13 +3,22 @@ package com.happy.tracku.viewes;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.happy.tracku.R;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class PhotoPunchActivity extends AppCompatActivity
 {
@@ -19,6 +28,7 @@ public class PhotoPunchActivity extends AppCompatActivity
     // Define the button and imageview type variable
     Button camera_open_id;
     ImageView click_image_id;
+    Bitmap photo, resizedBitmapBig;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -47,7 +57,7 @@ public class PhotoPunchActivity extends AppCompatActivity
         // Match the request 'pic id with requestCode
         if (requestCode == pic_id) {
             // BitMap is data structure of image file which store the image in memory
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            photo = (Bitmap) data.getExtras().get("data");
             // Set the image in imageview for display
             click_image_id.setImageBitmap(photo);
         }
@@ -62,6 +72,45 @@ public class PhotoPunchActivity extends AppCompatActivity
                 Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 // Start the activity with camera_intent, and request pic id
                 startActivityForResult(camera_intent, pic_id);
+            }
+            break;
+
+            case R.id.submitButon:
+            {
+                /**
+                 * Today's Date
+                 */
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String currentDateAndTime = sdf.format(calendar.getTime());
+                Log.e("Log", "currentDateAndTime" + currentDateAndTime);
+
+                /**
+                 * Bitmap to base64
+                 */
+
+                byte[] bytearray = photo;
+                InputStream myInputStream = new ByteArrayInputStream(bytearray);
+                Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+                //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+                //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+
+
+                //previewImageView.setImageDrawable(image);
+                resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+                if(bytearray.length<=1024)
+                {
+
+                    resizedBitmapBig = bitmap;
+
+                }
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+                String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
             }
             break;
         }
