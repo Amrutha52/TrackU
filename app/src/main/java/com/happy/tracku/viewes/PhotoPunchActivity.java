@@ -89,7 +89,10 @@ public class PhotoPunchActivity extends AppCompatActivity
                  * Bitmap to base64
                  */
 
-                byte[] bytearray = photo;
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] bytearray = stream.toByteArray();
+
                 InputStream myInputStream = new ByteArrayInputStream(bytearray);
                 Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
                 //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
