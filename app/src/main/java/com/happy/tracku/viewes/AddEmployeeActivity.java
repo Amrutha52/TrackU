@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
@@ -246,9 +247,10 @@ public class AddEmployeeActivity extends AppCompatActivity
             {
                 Fns.neutralAlert("Alert", addEmployeeJson.getData().getInsertEmployeeDetailsStatus().get(0).getStatusMsg(), mContext);
                 // Toast.makeText(context.get(), "Updation Failed", Toast.LENGTH_SHORT).show();
-            } else if (s.equals(""))
+            }
+            else if (s.equals("nullException"))
             {
-
+                Toast.makeText(mContext, "Null Exception From Server", Toast.LENGTH_SHORT).show();
             }
         }
     }

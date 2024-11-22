@@ -21,4 +21,6 @@ public class Const
     public static final String URL_Update_Daily_GPS_Data = "UpdateDailyGPSData";
     public static final String URL_GET_DAILYWISE_EMPLOYEE_TRAVEL_DATA = "GetDailyWiseGPSData";
     public static final String URL_CREATE_EMPLOYEE = "InsertEmployeeDetails";
+    public static final String URL_MANUAL_PUNCH = "PhotoPunching";
+    public static final String URL_PUNCH_HISTORY = "GetPunchHistory";
 }

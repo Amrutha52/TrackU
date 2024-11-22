@@ -1,9 +1,16 @@
 package com.happy.tracku.viewes;
 
+import static com.happy.tracku.utils.Const.URL_CREATE_EMPLOYEE;
+import static com.happy.tracku.utils.Const.URL_MANUAL_PUNCH;
+import static com.happy.tracku.utils.Const.USING_IP;
+
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -11,14 +18,32 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.gson.Gson;
 import com.happy.tracku.R;
+import com.happy.tracku.db.DbHelper;
+import com.happy.tracku.gson.addemployeejsondetails.AddEmployeeJson;
+import com.happy.tracku.gson.photopunchingjson.Photopunchingjson;
+import com.happy.tracku.ssl.CustomTrust;
+import com.happy.tracku.utils.Const;
+import com.happy.tracku.utils.Fns;
+
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class PhotoPunchActivity extends AppCompatActivity
 {
@@ -114,8 +139,159 @@ public class PhotoPunchActivity extends AppCompatActivity
 
                 String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
+                new PushPhotoPunchingDetails(this, currentDateAndTime, base64).execute();
+
             }
             break;
         }
+    }
+
+    private static class PushPhotoPunchingDetails extends AsyncTask<String, String, String>
+    {
+        OkHttpClient okHttpClient;
+        String url;
+        Request request;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        PhotoPunchActivity mContext;
+        ProgressDialog pd;
+        SharedPreferences shp;
+        String failureMsg, resultString;
+        Photopunchingjson photopunchingjson;
+        DbHelper dbHelper;
+        int status;
+
+        String punchingDateTime, punchingImage;
+        public PushPhotoPunchingDetails(PhotoPunchActivity mContext, String currentDateAndTime, String base64)
+        {
+            this.mContext = mContext;
+            this.punchingDateTime = currentDateAndTime;
+            this.punchingImage = base64;
+
+            CustomTrust customTrust = new CustomTrust(mContext);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+                    /*= new OkHttpClient.Builder()
+                    .connectTimeout(180, TimeUnit.SECONDS)
+                    .callTimeout(180, TimeUnit.SECONDS)
+                    .readTimeout(180, TimeUnit.SECONDS)
+                    .build();*/
+            pd = new ProgressDialog(mContext);
+            shp = mContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+            dbHelper = new DbHelper(mContext);
+
+            pd.setTitle("Please wait");
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("wait...");
+            pd.setCancelable(false);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+            try {
+
+                pd.show();
+
+
+            } catch (Exception e) {
+
+                Log.e("Log", "Exception", e);
+
+            }
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+
+                JSONObject photoPunchObj = new JSONObject();
+                photoPunchObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+                photoPunchObj.put("employeeCode", shp.getString(Const.Shp_Employee_Code, ""));
+                photoPunchObj.put("date", punchingDateTime);
+                photoPunchObj.put("employeeImage", punchingImage);
+
+
+
+                url = USING_IP + URL_MANUAL_PUNCH;
+                Log.e("Log", "photoPunchURL" + url);
+                Log.e("Log", "photoPunchJsonObject" + photoPunchObj);
+
+                RequestBody body = RequestBody.create(photoPunchObj.toString(), JSON);
+
+                request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                Response response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "response" + response);
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+                }
+
+                resultString = response.body().string();
+                Log.e("Log", "resultString" + resultString);
+
+                Gson gson = new Gson();
+                photopunchingjson = gson.fromJson(resultString, Photopunchingjson.class);
+
+                if (photopunchingjson.getData().getPhotoPunchStatus().isEmpty() || photopunchingjson.getData().getPhotoPunchStatus().size() == 0 || photopunchingjson.getData().getPhotoPunchStatus() == null)
+                {
+                    return "nullException";
+                }
+                else
+                {
+                    status = photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatus();
+                    if (status != 1)
+                    {
+                        return "failure";
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+                return "failure";
+            }
+
+            return "success";
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+            pd.dismiss();
+
+            if (s.equals("success"))
+            {
+                Fns.neutralAlert("Alert", photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMsg(), mContext);
+
+                if (photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatus() == 1)
+                {
+
+                    mContext.finish();
+                }
+            }
+            else if (s.equals("failure"))
+            {
+                Fns.neutralAlert("Alert", photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMsg(), mContext);
+                // Toast.makeText(context.get(), "Updation Failed", Toast.LENGTH_SHORT).show();
+            }
+            else if (s.equals("nullException"))
+            {
+                Toast.makeText(mContext, "Null Exception From Server", Toast.LENGTH_SHORT).show();
+            }
+        }
+
     }
 }
