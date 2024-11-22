@@ -15,12 +15,12 @@
 
 
         <TextView
-            android:id="@+id/from_date"
+            android:id="@+id/monthTV"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:hint="FromDate"
+            android:hint="Month"
             android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="visible" />
@@ -31,12 +31,12 @@
             android:text="To" />
 
         <TextView
-            android:id="@+id/to_date"
+            android:id="@+id/yearTV"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:hint="ToDate"
+            android:hint="Year"
             android:textSize="18sp"
             android:textStyle="bold" />
 
