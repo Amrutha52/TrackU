@@ -15,18 +15,23 @@ import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.happy.tracku.R;
+import com.happy.tracku.adapters.PhotoPunchHistoryAdapters;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.login.LoginStatusJson;
+import com.happy.tracku.gson.photopunchhistoryjson.GetPunchHistoryDetail;
 import com.happy.tracku.gson.photopunchhistoryjson.Punchinghistoryjson;
 import com.happy.tracku.gson.photopunchingjson.Photopunchingjson;
 import com.happy.tracku.ssl.CustomTrust;
@@ -36,6 +41,7 @@ import com.happy.tracku.utils.Fns;
 import org.json.JSONObject;
 
 import java.util.Calendar;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -238,6 +244,14 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                 punchinghistoryjson = gson.fromJson(resultString, Punchinghistoryjson.class);
                 Log.e("Log", "punchinghistoryjson" + punchinghistoryjson);
 
+                if (punchinghistoryjson.getData().getGetPunchHistoryDetails().isEmpty() || punchinghistoryjson.getData().getGetPunchHistoryDetails().size() == 0 || punchinghistoryjson.getData().getGetPunchHistoryDetails() == null || punchinghistoryjson.getData().getGetPunchHistoryStatus().isEmpty() || punchinghistoryjson.getData().getGetPunchHistoryStatus().size() == 0 || punchinghistoryjson.getData().getGetPunchHistoryStatus() == null)
+                {
+                    return "nullException";
+                }
+                else if (punchinghistoryjson.getData().getGetPunchHistoryStatus().get(0).getStatus() != 1)
+                {
+                    return "failure";
+                }
 
             }
             catch (Exception e)
@@ -258,22 +272,28 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
             if (s.equals("success"))
             {
                 punchingHistoryRecyclerview =  mContext.findViewById(R.id.punch_history_recycler_view);
-                List<EmiChartDetail> emiChartDetailList = emiChartDetailsJson.getData().getEmiChartDetails();
-                Log.e("Log", "emiChart DetailList size"+emiChartDetailList.size());
+                List<GetPunchHistoryDetail> getPunchHistoryDetailList = punchinghistoryjson.getData().getGetPunchHistoryDetails();
+                Log.e("Log", "getPunchHistoryDetailList size"+getPunchHistoryDetailList.size());
 
-                EmiChartAdapter emiChartAdapter = new EmiChartAdapter(context, emiChartDetailList);
-                Log.e("Log", "emiChart adapter" + emiChartAdapter);
+                PhotoPunchHistoryAdapters punchHistoryAdapters = new PhotoPunchHistoryAdapters(mContext, getPunchHistoryDetailList);
+                Log.e("Log", "punchHistoryAdapters" + punchHistoryAdapters);
 
-                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
 
-                emiTrackRecyclerView.setLayoutManager(layoutManager);
-                emiTrackRecyclerView.setItemAnimator(new DefaultItemAnimator());
-                emiTrackRecyclerView.setAdapter(emiChartAdapter);
+                punchingHistoryRecyclerview.setLayoutManager(layoutManager);
+                punchingHistoryRecyclerview.setItemAnimator(new DefaultItemAnimator());
+                punchingHistoryRecyclerview.setAdapter(punchHistoryAdapters);
 
-            }
-            else
+            } else if (s.equals("nullException"))
             {
-                Toast.makeText(context, "Fetching Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Null Exception from server", Toast.LENGTH_SHORT).show();
+            }
+            else if (s.equals("failure"))
+            {
+                Toast.makeText(mContext, "Failure", Toast.LENGTH_SHORT).show();
+            } else
+            {
+                Toast.makeText(mContext, "Fetching Failed", Toast.LENGTH_SHORT).show();
             }
 
         }
