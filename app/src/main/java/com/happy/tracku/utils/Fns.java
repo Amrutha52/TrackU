@@ -1,9 +1,14 @@
 package com.happy.tracku.utils;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -104,7 +109,7 @@ public class Fns {
 
 
         String dateTime = "Date : " + new SimpleDateFormat("dd-MM-yyy HH:mm:ss").format(Calendar.getInstance().getTime()) + "\n";
-        String userId = "UserId : " + context.getSharedPreferences(Const.Shared_Pref_name, Context.MODE_PRIVATE).getString(Const.Shp_Id_Employee, "") + "\n";
+        String userId = "UserId : " + context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE).getString(Const.Shp_Id_Employee, "") + "\n";
         String errorMsgs = "Error Msg : " + errorMsg + "\n";
 
         return dateTime + userId + errorMsgs;
@@ -124,4 +129,22 @@ public class Fns {
         return desiredSDF.format(currentDate);
     }
 
+    public static String getAppVersionName(Context context) {
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+
+            SharedPreferences shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+            SharedPreferences.Editor edt = shp.edit();
+            edt.putInt(Const.Shp_Version_No, packageInfo.versionCode);
+            edt.apply();
+
+        } catch (PackageManager.NameNotFoundException e) {
+
+            Log.e("Log", "Exception", e);
+
+        }
+
+        return packageInfo.versionName;
+    }
 }

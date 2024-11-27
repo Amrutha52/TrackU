@@ -9,6 +9,7 @@ public class Const
     public static final String Shp_Token= "Token";
     public static final String Shp_Is_Admin = "IsAdmin";
     public static final String Shp_Is_LoggedIn = "IsLoggedIn";
+    public static final String Shp_Version_No = "VersionNo";
 
     public static final int LOCATION_REQUEST = 1000;
     public static final int GPS_REQUEST = 1001;

@@ -50,7 +50,7 @@ import okhttp3.Response;
 public class LoginActivity extends AppCompatActivity
 {
     private ActivityLoginBinding activityLoginBinding;
-    String usernameString;
+    String usernameString, versionNameString;
 
     SharedPreferences shp;
 
@@ -61,6 +61,8 @@ public class LoginActivity extends AppCompatActivity
         activityLoginBinding = ActivityLoginBinding.inflate(getLayoutInflater());
         View view = activityLoginBinding.getRoot();
         setContentView(view);
+
+        activityLoginBinding.versionNo.setText("Ver"+Fns.getAppVersionName(this));
 
         shp = getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
 

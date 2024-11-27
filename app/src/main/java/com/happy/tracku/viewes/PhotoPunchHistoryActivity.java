@@ -251,6 +251,7 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                 else if (punchinghistoryjson.getData().getGetPunchHistoryStatus().get(0).getStatus() != 1)
                 {
                     return "failure";
+
                 }
 
             }
