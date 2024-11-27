@@ -662,6 +662,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 jsonObject.put("dailyGPSData", dbHelper.getDailyTravelDataForCompensation());
+                jsonObject.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
                 dailyTravelModelArrayList = dbHelper.getDailyTravelDataForCompensationAsArray();
 
 

@@ -214,8 +214,7 @@ public class PhotoPunchActivity extends AppCompatActivity
                 photoPunchObj.put("employeeCode", shp.getString(Const.Shp_Employee_Code, ""));
                 photoPunchObj.put("date", punchingDateTime);
                 photoPunchObj.put("employeeImage", punchingImage);
-
-
+                photoPunchObj.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
 
                 url = USING_IP + URL_MANUAL_PUNCH;
                 Log.e("Log", "photoPunchURL" + url);
