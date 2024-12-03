@@ -15,8 +15,10 @@ public class Const
     public static final int GPS_REQUEST = 1001;
 
 
-    public static final String URL_PUBLIC_TEST = "https://test1.maxvalue.co.in:1222/api/TrackVeAppDetails/";
-    public static String USING_IP = URL_PUBLIC_TEST;
+    public static final String URL_PUBLIC_TEST = "https://test1.maxvalue.co.in:1222/api/TrackVeDetails/";
+    public static final String URL_PUBLIC_LIVE = "https://yardmobapp.maxvalue.co.in:92/api/TrackVeDetails/";
+   // public static String USING_IP = URL_PUBLIC_TEST;
+   public static String USING_IP = URL_PUBLIC_LIVE;
 
     public static final String URL_LOGIN = "TrackVeValidateLogin";
     public static final String URL_Update_Daily_GPS_Data = "UpdateDailyGPSData";

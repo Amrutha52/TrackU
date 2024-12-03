@@ -214,7 +214,7 @@ public class PhotoPunchActivity extends AppCompatActivity
                 photoPunchObj.put("employeeCode", shp.getString(Const.Shp_Employee_Code, ""));
                 photoPunchObj.put("date", punchingDateTime);
                 photoPunchObj.put("employeeImage", punchingImage);
-                photoPunchObj.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
+                //photoPunchObj.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
 
                 url = USING_IP + URL_MANUAL_PUNCH;
                 Log.e("Log", "photoPunchURL" + url);
@@ -283,7 +283,7 @@ public class PhotoPunchActivity extends AppCompatActivity
             }
             else if (s.equals("failure"))
             {
-                Fns.neutralAlert("Alert", photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMsg(), mContext);
+                Fns.neutralAlert("Alert", photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMessage(), mContext);
                 // Toast.makeText(context.get(), "Updation Failed", Toast.LENGTH_SHORT).show();
             }
             else if (s.equals("nullException"))

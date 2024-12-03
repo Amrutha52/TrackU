@@ -12,6 +12,18 @@ public class PhotoPunchstatus {
     @Expose
     private String statusMsg;
 
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+    }
+
+    @SerializedName("statusMessage")
+    @Expose
+    private String statusMessage;
+
     public Integer getStatus() {
         return status;
     }

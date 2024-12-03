@@ -95,10 +95,10 @@ public class MainMenuActivity extends AppCompatActivity {
     private boolean isContinue = false;
     private boolean isGPS = false;
     private static final int PERMISSION_REQUEST_ID = 1000;
+
     @SuppressLint("MissingPermission")
     @Override
-    protected void onCreate(Bundle savedInstanceState) 
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainMenuBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
@@ -114,12 +114,9 @@ public class MainMenuActivity extends AppCompatActivity {
         employeeCode = findViewById(R.id.employee_code);
         mainLayout = findViewById(R.id.mainLayout);
 
-        if (shp.getInt(Const.Shp_Is_Admin, 0) == 1)
-        {
+        if (shp.getInt(Const.Shp_Is_Admin, 0) == 1) {
             mainLayout.setVisibility(View.VISIBLE);
-        }
-        else
-        {
+        } else {
             mainLayout.setVisibility(View.GONE);
         }
 
@@ -184,20 +181,16 @@ public class MainMenuActivity extends AppCompatActivity {
          */
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)
-        {
+                != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_REQUEST_ID);
-        }
-        else
-        {
+        } else {
             Log.e("Log", "Service calling");
             Intent serviceIntent = new Intent(this, ForeGroundService.class);
             startService(serviceIntent);
         }
-
 
 
 //        LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
@@ -213,7 +206,6 @@ public class MainMenuActivity extends AppCompatActivity {
 //            Toast.makeText(this, "Please Turn On GPS and wait some minutes before submitting", Toast.LENGTH_LONG).show();
 //            //return;
 //        }
-
 
 
     }
@@ -245,7 +237,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
    */
 
-    @SuppressLint("MissingPermission")
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -256,6 +248,12 @@ public class MainMenuActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     if (isContinue) {
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                                    PERMISSION_REQUEST_ID);
+                            return;
+                        }
                         mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
                     } else {
                         mFusedLocationClient.getLastLocation().addOnSuccessListener(MainMenuActivity.this, location -> {
