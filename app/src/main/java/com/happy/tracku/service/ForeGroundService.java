@@ -368,5 +368,5 @@ public class ForeGroundService extends Service
         }
 
     }
-    
+
 }

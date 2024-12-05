@@ -570,6 +570,12 @@ public class MainMenuActivity extends AppCompatActivity {
                 startActivity(new Intent(this, PhotoPunchActivity.class));
             }
             break;
+
+            case R.id.punchinghistoryLL:
+            {
+                startActivity(new Intent(this, PhotoPunchHistoryActivity.class));
+            }
+            break;
         }
     }
 

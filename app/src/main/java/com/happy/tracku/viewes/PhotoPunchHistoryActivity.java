@@ -86,7 +86,7 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                                                   int monthOfYear, int dayOfMonth) {
                                 // on below line we are setting date to our edit text.
                                // fromDateTV.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                                monthTV.setText(monthOfYear);
+                                monthTV.setText(String.valueOf(monthOfYear));
 
                             }
                         },
@@ -121,7 +121,7 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 // on below line we are setting date to our edit text.
-                                yearTV.setText(year);
+                                yearTV.setText(String.valueOf(year));
 
                             }
                         },
