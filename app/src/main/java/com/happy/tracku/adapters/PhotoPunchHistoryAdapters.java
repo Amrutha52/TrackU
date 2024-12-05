@@ -2,6 +2,7 @@ package com.happy.tracku.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,9 +51,11 @@ public class PhotoPunchHistoryAdapters extends RecyclerView.Adapter<PhotoPunchHi
         if (position == 0)
         {
             holder.punchDateTV.setText("Date");
-            holder.punchDateTV.setBackgroundColor(ContextCompat.getColor(holder.punchDateTV.getContext(), R.color.purple_200));
+            holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
+            //holder.punchDateTV.setBackgroundColor(ContextCompat.getColor(holder.punchDateTV.getContext(), R.color.purple_200));
             holder.punchINTV.setText("IN Time");
-            holder.punchINTV.setBackgroundColor(ContextCompat.getColor(holder.punchINTV.getContext(), R.color.purple_200));
+            holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
+            //holder.punchINTV.setBackgroundColor(ContextCompat.getColor(holder.punchINTV.getContext(), R.color.purple_200));
 
         }
         else{
@@ -60,10 +63,12 @@ public class PhotoPunchHistoryAdapters extends RecyclerView.Adapter<PhotoPunchHi
             GetPunchHistoryDetail getPunchHistoryDetail = getPunchHistoryDetailList.get(position-1);
 
             holder.punchDateTV.setText(getPunchHistoryDetail.getDate());
-            holder.punchDateTV.setBackgroundColor(ContextCompat.getColor(holder.punchDateTV.getContext(), R.color.white));
+            holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
+           // holder.punchDateTV.setBackgroundColor(ContextCompat.getColor(holder.punchDateTV.getContext(), R.color.white));
 
             holder.punchINTV.setText(getPunchHistoryDetail.getPunchTime());
-            holder.punchINTV.setBackgroundColor(ContextCompat.getColor(holder.punchINTV.getContext(), R.color.white));
+            holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
+            //holder.punchINTV.setBackgroundColor(ContextCompat.getColor(holder.punchINTV.getContext(), R.color.white));
 
         }
     }
