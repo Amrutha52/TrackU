@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ServiceInfo;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.AsyncTask;
@@ -53,6 +55,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -74,6 +78,7 @@ public class BackGroundInternetService extends Service implements
     private final int LOCATION_INTERVAL = 3 * 60 * 1000;
     private final int LOCATION_DISTANCE = 1;
     Context context;
+    String locationAddress;
 
     // the notification id for the foreground notification
     public static final int GPS_NOTIFICATION = 1;
@@ -324,6 +329,24 @@ public class BackGroundInternetService extends Service implements
                 Double longitude = location.getLongitude();
                 DbHelper dbHelper = new DbHelper(context);
 
+                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                try {
+                    // throw new RuntimeException("Exception For Testing");
+
+                    List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                    Log.e("Log", latitude + "" + longitude);
+
+                    if (addresses != null && addresses.size() != 0) {
+                        locationAddress = addresses.get(0).getAddressLine(0);
+                        Log.e("address", locationAddress);
+                    }
+
+                } catch (Exception e) {
+                    locationAddress = "Not Able To Get Address";
+                    Log.e("ExceptionAddress", locationAddress);
+                    Log.e("Log", "Exception", e);
+                }
+
                 SimpleDateFormat sdf3 = new SimpleDateFormat("HHmmss");
                 String timeNowString = sdf3.format(dateNow);
                 int timeNowValue = Integer.parseInt(timeNowString);
@@ -332,7 +355,7 @@ public class BackGroundInternetService extends Service implements
                 dailyTravelModel.setIdLocation(String.valueOf(dateNow.getTime()));
                 dailyTravelModel.setLatitude(latitude);
                 dailyTravelModel.setLongitude(longitude);
-                dailyTravelModel.setAddress("");
+                dailyTravelModel.setAddress(locationAddress);
                 dailyTravelModel.setDateTime(dateTimeString);
                 dailyTravelModel.setIdEmployee(shp.getInt(Const.Shp_Id_Employee, 0));
                 dailyTravelModel.setIsForUpload(0);

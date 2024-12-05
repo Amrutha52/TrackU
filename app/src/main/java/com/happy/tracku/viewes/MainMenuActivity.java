@@ -127,10 +127,10 @@ public class MainMenuActivity extends AppCompatActivity {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-//        locationRequest = LocationRequest.create();
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        locationRequest.setInterval(10 * 1000); // 10 seconds
-//        locationRequest.setFastestInterval(5 * 1000); // 5 seconds
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(6*10000*5); // 10 seconds
+        locationRequest.setFastestInterval(5*10000*6); // 5 seconds
 //
 //        new GpsUtils(this).turnGPSOn(new GpsUtils.onGpsListener() {
 //            @Override
@@ -666,8 +666,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 url = USING_IP + Const.URL_Update_Daily_GPS_Data;
 
-                Log.e("Log", "locationURL" +url);
-                Log.e("Log", "locationJson" +jsonObject.toString());
+                Log.e("Log", "locationURLMainMenuActivity" +url);
+                Log.e("Log", "locationJsonMainMenuActivity" +jsonObject.toString());
 
                 RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
                 request = new Request.Builder()

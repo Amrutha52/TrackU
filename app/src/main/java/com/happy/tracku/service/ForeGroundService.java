@@ -14,6 +14,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -54,6 +56,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -68,6 +72,7 @@ public class ForeGroundService extends Service
 
     private static final int PERMISSION_REQUEST_ID = 44;
     Context context;
+    String locationAddress;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
@@ -137,6 +142,24 @@ public class ForeGroundService extends Service
                             Log.e("Log", "longitudeForeGround" + longitude);
                             // Process latitude and longitude as needed
 
+                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                            try {
+                                // throw new RuntimeException("Exception For Testing");
+
+                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                                Log.e("Log", latitude + "" + longitude);
+
+                                if (addresses != null && addresses.size() != 0) {
+                                    locationAddress = addresses.get(0).getAddressLine(0);
+                                    Log.e("address", locationAddress);
+                                }
+
+                            } catch (Exception e) {
+                                locationAddress = "Not Able To Get Address";
+                                Log.e("ExceptionAddress", locationAddress);
+                                Log.e("Log", "Exception", e);
+                            }
+
                             Calendar cal = Calendar.getInstance();
                             Date dateNow = cal.getTime();
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -146,7 +169,7 @@ public class ForeGroundService extends Service
                             dailyTravelModel.setIdLocation(String.valueOf(dateNow.getTime()));
                             dailyTravelModel.setLatitude(latitude);
                             dailyTravelModel.setLongitude(longitude);
-                            dailyTravelModel.setAddress("");
+                            dailyTravelModel.setAddress(locationAddress);
                             dailyTravelModel.setDateTime(dateTimeString);
                             dailyTravelModel.setIdEmployee(shp.getInt(Const.Shp_Id_Employee, 0));
                             dailyTravelModel.setIsForUpload(0);
@@ -260,8 +283,8 @@ public class ForeGroundService extends Service
 
                 url = USING_IP + URL_Update_Daily_GPS_Data;
 
-                Log.e("Log","uploadUserDataService" + url);
-                Log.e("Log", jsonObject.toString());
+                Log.e("Log","uploadUserDataServiceURL" + url);
+                Log.e("Log", "uploadUserDataServiceJson"+jsonObject.toString());
 
                 RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
                 request = new Request.Builder()
@@ -280,7 +303,7 @@ public class ForeGroundService extends Service
 
                 resultString = response.body().string();
 
-                Log.e("Log", "" + resultString);
+                Log.e("Log", "uploadUserDataServiceResultStriing" + resultString);
 
                 Gson gson = new Gson();
 
@@ -345,7 +368,5 @@ public class ForeGroundService extends Service
         }
 
     }
-
-    // Other methods...
-
+    
 }
