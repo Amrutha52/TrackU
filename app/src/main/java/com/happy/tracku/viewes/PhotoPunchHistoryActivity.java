@@ -14,6 +14,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,8 +52,11 @@ import okhttp3.Response;
 
 public class PhotoPunchHistoryActivity extends AppCompatActivity
 {
-    TextView monthTV, yearTV;
+    //TextView yearTV; //monthTV,
+    EditText monthET, yearET;
     //String fromDateString, toDateString;
+
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,46 +64,12 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_punch_history);
 
-        monthTV = findViewById(R.id.monthTV);
-        yearTV = findViewById(R.id.yearTV);
+        //monthTV = findViewById(R.id.monthTV);
+        //yearTV = findViewById(R.id.yearTV);
+        monthET = findViewById(R.id.monthET);
+        yearET = findViewById(R.id.yearET);
 
-        monthTV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // on below line we are getting
-                // the instance of our calendar.
-                final Calendar c = Calendar.getInstance();
-
-                // on below line we are getting
-                // our day, month and year.
-               // int year = c.get(Calendar.YEAR);
-                int month = c.get(Calendar.MONTH);
-               // int day = c.get(Calendar.DAY_OF_MONTH);
-
-                // on below line we are creating a variable for date picker dialog.
-                DatePickerDialog datePickerDialog = new DatePickerDialog(
-                        // on below line we are passing context.
-                        PhotoPunchHistoryActivity.this,
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // on below line we are setting date to our edit text.
-                               // fromDateTV.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                                monthTV.setText(String.valueOf(monthOfYear));
-
-                            }
-                        },
-                        // on below line we are passing year,
-                        // month and day for selected date in our date picker.
-                        0, month, 0);
-                // at last we are calling show to
-                // display our date picker dialog.
-                datePickerDialog.show();
-            }
-        });
-
-        yearTV.setOnClickListener(new View.OnClickListener() {
+        monthET.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // on below line we are getting
@@ -109,8 +79,8 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                 // on below line we are getting
                 // our day, month and year.
                 int year = c.get(Calendar.YEAR);
-               // int month = c.get(Calendar.MONTH);
-               // int day = c.get(Calendar.DAY_OF_MONTH);
+                int month = c.get(Calendar.MONTH);
+                int day = c.get(Calendar.DAY_OF_MONTH);
 
                 // on below line we are creating a variable for date picker dialog.
                 DatePickerDialog datePickerDialog = new DatePickerDialog(
@@ -121,18 +91,57 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 // on below line we are setting date to our edit text.
-                                yearTV.setText(String.valueOf(year));
-
+                               // monthET.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                                monthET.setText(String.valueOf((monthOfYear + 1)));
                             }
                         },
                         // on below line we are passing year,
                         // month and day for selected date in our date picker.
-                        year, 0, 0);
+                        year, month, day);
                 // at last we are calling show to
                 // display our date picker dialog.
                 datePickerDialog.show();
             }
         });
+
+        yearET.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // on below line we are getting
+                // the instance of our calendar.
+                final Calendar c = Calendar.getInstance();
+
+                // on below line we are getting
+                // our day, month and year.
+                int year = c.get(Calendar.YEAR);
+                int month = c.get(Calendar.MONTH);
+                int day = c.get(Calendar.DAY_OF_MONTH);
+
+                // on below line we are creating a variable for date picker dialog.
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        // on below line we are passing context.
+                        PhotoPunchHistoryActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // on below line we are setting date to our edit text.
+                                //monthET.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                                yearET.setText(String.valueOf(year));
+
+                            }
+                        },
+                        // on below line we are passing year,
+                        // month and day for selected date in our date picker.
+                        year, month, day);
+                // at last we are calling show to
+                // display our date picker dialog.
+                datePickerDialog.show();
+            }
+        });
+
+
+
     }
 
     public void listeners(View view)
@@ -141,7 +150,8 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
         {
             case R.id.pull_punch_data:
             {
-                new GetPunchingHistory(this, yearTV.getText().toString(), monthTV.getText().toString()).execute();
+
+                new GetPunchingHistory(this, yearET.getText().toString(), monthET.getText().toString()).execute();
             }
             break;
         }
