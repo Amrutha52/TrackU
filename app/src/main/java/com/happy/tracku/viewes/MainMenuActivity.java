@@ -364,7 +364,7 @@ public class MainMenuActivity extends AppCompatActivity {
                             dailyTravelModel.setIsSynced(0);
 
                             dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
-                            new updateLocationOfEmployee(getApplicationContext(), dailyTravelModel).execute();
+                            new updateLocationOfEmployee(MainMenuActivity.this, dailyTravelModel).execute();
                         }
                     }
                 });
@@ -461,7 +461,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
             dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
 
-            new updateLocationOfEmployee(getApplicationContext(), dailyTravelModel).execute();
+            new updateLocationOfEmployee(MainMenuActivity.this, dailyTravelModel).execute();
 
         }
     };
@@ -594,7 +594,7 @@ public class MainMenuActivity extends AppCompatActivity {
         String url;
         Request request;
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        Context mContext;
+        MainMenuActivity mContext;
 
         ProgressDialog pd;
         SharedPreferences shp;
@@ -606,7 +606,7 @@ public class MainMenuActivity extends AppCompatActivity {
         String statusMsg;
 
         int status;
-        public updateLocationOfEmployee(Context mContext, DailyTravelModel dailyTravelModel)
+        public updateLocationOfEmployee(MainMenuActivity mContext, DailyTravelModel dailyTravelModel)
         {
             Log.e("Log", "InsideUpdateLocationMainMenu");
             this.mContext = mContext;
@@ -660,7 +660,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 jsonObject.put("dailyGPSData", dbHelper.getDailyTravelDataForCompensation());
-                jsonObject.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
+                //jsonObject.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
                 dailyTravelModelArrayList = dbHelper.getDailyTravelDataForCompensationAsArray();
 
 

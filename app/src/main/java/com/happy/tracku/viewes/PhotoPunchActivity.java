@@ -5,22 +5,29 @@ import static com.happy.tracku.utils.Const.URL_MANUAL_PUNCH;
 import static com.happy.tracku.utils.Const.USING_IP;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.gson.Gson;
 import com.happy.tracku.R;
@@ -273,13 +280,54 @@ public class PhotoPunchActivity extends AppCompatActivity
 
             if (s.equals("success"))
             {
-                Fns.neutralAlert("Alert", photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMsg(), mContext);
+              //  Fns.neutralAlert("Alert", photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMsg(), mContext);
 
-                if (photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatus() == 1)
+//                if (photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatus() == 1)
+//                {
+//
+//                    mContext.finish();
+//                }
+
+                AlertDialog.Builder adb = new AlertDialog.Builder(mContext);
+
+                TextView titletxtview = new TextView(mContext);
+                titletxtview.setText("Alert");
+                titletxtview.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
+                titletxtview.setPadding(10, 10, 10, 10);
+                titletxtview.setGravity(Gravity.CENTER);
+                titletxtview.setTextColor(Color.WHITE);
+                titletxtview.setTextSize(20);
+
+                adb.setCustomTitle(titletxtview);
+
+                TextView messagetxtview = new TextView(mContext);
+                messagetxtview.setText(photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMsg());
+                messagetxtview.setBackgroundColor(Color.WHITE);
+                messagetxtview.setPadding(10, 24, 10, 10);
+                messagetxtview.setGravity(Gravity.CENTER);
+                messagetxtview.setTextColor(Color.BLACK);
+                messagetxtview.setTextSize(18);
+                messagetxtview.setVerticalScrollBarEnabled(true);
+                messagetxtview.setMaxHeight(750);
+                messagetxtview.setMovementMethod(new ScrollingMovementMethod());
+
+                adb.setView(messagetxtview);
+
+                adb.setNegativeButton("OK", new DialogInterface.OnClickListener()
                 {
 
-                    mContext.finish();
-                }
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        //dialog.cancel();
+                        mContext.finish();
+
+                    }
+                });
+
+                AlertDialog ad = adb.create();
+                ad.show();
+
             }
             else if (s.equals("failure"))
             {

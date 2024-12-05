@@ -62,6 +62,7 @@ public class LoginActivity extends AppCompatActivity
         View view = activityLoginBinding.getRoot();
         setContentView(view);
 
+        Log.e("Log", "versionNo" + Fns.getAppVersionName(this));
         activityLoginBinding.versionNo.setText("Ver"+Fns.getAppVersionName(this));
 
         shp = getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
@@ -236,7 +237,7 @@ public class LoginActivity extends AppCompatActivity
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("loginId", usernameString);
                 jsonObject.put("password", passwordString);
-                jsonObject.put("versionCode", Integer.parseInt(shp.getString(Const.Shp_Version_No, "")));
+                jsonObject.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
                 jsonObject.put("createdBy", "");
 
 

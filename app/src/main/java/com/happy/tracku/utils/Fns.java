@@ -136,7 +136,7 @@ public class Fns {
 
             SharedPreferences shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
             SharedPreferences.Editor edt = shp.edit();
-            edt.putInt(Const.Shp_Version_No, packageInfo.versionCode);
+            edt.putString(Const.Shp_Version_No, String.valueOf(packageInfo.versionCode));
             edt.apply();
 
         } catch (PackageManager.NameNotFoundException e) {
