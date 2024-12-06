@@ -14,7 +14,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/monthET"
+            android:id="@+id/fromDateET"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_centerInParent="true"
@@ -25,7 +25,7 @@
             android:cursorVisible="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:hint="Month" />
+            android:hint="From Date" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
             android:text="To" />
 
         <EditText
-            android:id="@+id/yearET"
+            android:id="@+id/toDateET"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_centerInParent="true"
@@ -44,7 +44,7 @@
             android:cursorVisible="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:hint="Year" />
+            android:hint="To Date" />
 
     </LinearLayout>
 

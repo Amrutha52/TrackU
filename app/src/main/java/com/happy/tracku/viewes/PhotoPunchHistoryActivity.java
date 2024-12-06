@@ -53,7 +53,7 @@ import okhttp3.Response;
 public class PhotoPunchHistoryActivity extends AppCompatActivity
 {
     //TextView yearTV; //monthTV,
-    EditText monthET, yearET;
+    EditText fromDateET, toDateET;
     //String fromDateString, toDateString;
 
 
@@ -66,10 +66,10 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
 
         //monthTV = findViewById(R.id.monthTV);
         //yearTV = findViewById(R.id.yearTV);
-        monthET = findViewById(R.id.monthET);
-        yearET = findViewById(R.id.yearET);
+        fromDateET = findViewById(R.id.fromDateET);
+        toDateET = findViewById(R.id.toDateET);
 
-        monthET.setOnClickListener(new View.OnClickListener() {
+        fromDateET.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // on below line we are getting
@@ -91,8 +91,8 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 // on below line we are setting date to our edit text.
-                               // monthET.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                                monthET.setText(String.valueOf((monthOfYear + 1)));
+                                fromDateET.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                              //  monthET.setText(String.valueOf((monthOfYear + 1)));
                             }
                         },
                         // on below line we are passing year,
@@ -104,7 +104,7 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
             }
         });
 
-        yearET.setOnClickListener(new View.OnClickListener() {
+        toDateET.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // on below line we are getting
@@ -126,8 +126,8 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 // on below line we are setting date to our edit text.
-                                //monthET.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                                yearET.setText(String.valueOf(year));
+                                toDateET.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                //yearET.setText(String.valueOf(year));
 
                             }
                         },
@@ -151,7 +151,7 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
             case R.id.pull_punch_data:
             {
 
-                new GetPunchingHistory(this, yearET.getText().toString(), monthET.getText().toString()).execute();
+                new GetPunchingHistory(this, fromDateET.getText().toString(), toDateET.getText().toString()).execute();
             }
             break;
         }
@@ -169,14 +169,14 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
         String failureMsg, resultString;
         Punchinghistoryjson punchinghistoryjson;
         int status;
-        String year, month;
+        String fromDate, toDate;
 
         RecyclerView punchingHistoryRecyclerview;
-        public GetPunchingHistory(PhotoPunchHistoryActivity mContext, String year, String month)
+        public GetPunchingHistory(PhotoPunchHistoryActivity mContext, String fromDate, String toDate)
         {
             this.mContext = mContext;
-            this.year = year;
-            this.month = month;
+            this.fromDate = fromDate;
+            this.toDate = toDate;
 
             CustomTrust customTrust = new CustomTrust(mContext);
             OkHttpClient client = customTrust.getClient();
@@ -222,8 +222,8 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
                 JSONObject photoPunchHistoryObj = new JSONObject();
                 photoPunchHistoryObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 photoPunchHistoryObj.put("employeeCode", shp.getString(Const.Shp_Employee_Code, ""));
-                photoPunchHistoryObj.put("year", Integer.parseInt(year));
-                photoPunchHistoryObj.put("month", Integer.parseInt(month));
+                photoPunchHistoryObj.put("fromDate", fromDate);
+                photoPunchHistoryObj.put("toDate", toDate);
                 photoPunchHistoryObj.put("isCompressed", 0);
 
                 url = USING_IP + URL_PUNCH_HISTORY;
