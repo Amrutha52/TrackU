@@ -67,10 +67,10 @@ public class LoginActivity extends AppCompatActivity
 
         shp = getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
 
-        if (shp.getBoolean(Const.Shp_Is_LoggedIn, true))
-        {
-            startActivity(new Intent(this, MainMenuActivity.class));
-        }
+//        if (shp.getBoolean(Const.Shp_Is_LoggedIn, true))
+//        {
+//            startActivity(new Intent(this, MainMenuActivity.class));
+//        }
 
     }
 

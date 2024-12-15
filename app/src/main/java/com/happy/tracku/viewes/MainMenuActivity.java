@@ -523,7 +523,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
                     startActivity(new Intent(MainMenuActivity.this, LoginActivity.class));
 
-                    finish();
+                    //finish();
 
                 }
             });
@@ -574,6 +574,12 @@ public class MainMenuActivity extends AppCompatActivity {
             case R.id.punchinghistoryLL:
             {
                 startActivity(new Intent(this, PhotoPunchHistoryActivity.class));
+            }
+            break;
+
+            case R.id.travellogLL:
+            {
+                startActivity(new Intent(this, TravelLogActivity.class));
             }
             break;
         }

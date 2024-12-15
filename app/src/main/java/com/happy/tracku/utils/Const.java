@@ -26,4 +26,6 @@ public class Const
     public static final String URL_CREATE_EMPLOYEE = "InsertEmployeeDetails";
     public static final String URL_MANUAL_PUNCH = "PhotoPunching";
     public static final String URL_PUNCH_HISTORY = "GetPunchHistory";
+    public static final String URL_EMPLOYEE_MASTER = "TrackVeMaster";
+    public static final String URL_TRAVEL_LOG = "TravelLog";
 }

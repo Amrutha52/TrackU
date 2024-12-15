@@ -16,5 +16,11 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="AppThemeMaterial" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimaryDark">@color/quantum_amber50</item>
+    </style>
+
     <style name="Theme.Tracku" parent="Base.Theme.Tracku" />
 </resources>

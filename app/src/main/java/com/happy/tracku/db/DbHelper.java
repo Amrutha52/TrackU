@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
 import com.happy.tracku.models.DailyTravelModel;
 import com.happy.tracku.utils.Const;
 
@@ -18,12 +19,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
+    public static final String EMPLOYEE_MASTER = "EmployeeDetails";
+
     private SharedPreferences shp;
     private Context context;
 
@@ -38,12 +42,20 @@ public class DbHelper extends SQLiteOpenHelper
     {
         db.execSQL("CREATE TABLE " + EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE + "(idLocation TEXT, Latitude DOUBLE, Longitude DOUBLE, Address TEXT, DateTime TEXT,idEmployee INTEGER,IsForUpload INTEGER,IsSynced INTEGER)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+EMPLOYEE_MASTER+" (idEmployee INTEGER,employeeCode TEXT, employeeName TEXT)");
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
         db.execSQL("DROP TABLE IF EXISTS EmployeesDailyTravelAllLocation");
+
+        if (oldVersion <= 1)
+        {
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+EMPLOYEE_MASTER+" (idEmployee INTEGER,employeeCode TEXT, employeeName TEXT)");
+
+        }
         onCreate(db);
     }
 
@@ -174,4 +186,50 @@ public class DbHelper extends SQLiteOpenHelper
         db.close();
 
     }
+
+    public void insertEmployeeMaster(List<EmployeeMasterDetail> employeeMasterList)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        for (EmployeeMasterDetail employeeMasterDetail : employeeMasterList)
+        {
+            ContentValues cv = new ContentValues();
+            cv.put("idEmployee", employeeMasterDetail.getIdEmployee());
+            cv.put("employeeCode", employeeMasterDetail.getEmployeeCode());
+            cv.put("employeeName", employeeMasterDetail.getEmployeeName());
+
+            db.insert(EMPLOYEE_MASTER, null, cv);
+        }
+        db.close();
+    }
+
+
+
+    public void deleteEmployeeMaster()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + EMPLOYEE_MASTER);
+    }
+
+    public ArrayList<EmployeeMasterDetail> getEmployeeMaster()
+    {
+        ArrayList<EmployeeMasterDetail> employeeMasterArrayList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select * from " + EMPLOYEE_MASTER + " order by employeeCode asc", null);
+        cur.moveToFirst();
+
+        for (int i = 0; i < cur.getCount(); i++)
+        {
+            EmployeeMasterDetail employeeMasterDetail = new EmployeeMasterDetail();
+            employeeMasterDetail.setIdEmployee(cur.getInt(cur.getColumnIndex("idEmployee")));
+            employeeMasterDetail.setEmployeeCode(cur.getString(cur.getColumnIndex("employeeCode")));
+            employeeMasterDetail.setEmployeeName(cur.getString(cur.getColumnIndex("employeeName")));
+            cur.moveToNext();
+
+            employeeMasterArrayList.add(employeeMasterDetail);
+        }
+
+        return employeeMasterArrayList;
+    }
+
 }

@@ -53,8 +53,8 @@ public class AddEmployeeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_employee);
 
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setTitle("Add Employee");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Add Employee");
 
         employeeNameET = findViewById(R.id.employeeNameET);
         employeeAddressET = findViewById(R.id.employeeAddressET);
