@@ -1,6 +1,5 @@
 package com.happy.tracku.viewes;
 
-import static com.happy.tracku.utils.Const.URL_MANUAL_PUNCH;
 import static com.happy.tracku.utils.Const.URL_PUNCH_HISTORY;
 import static com.happy.tracku.utils.Const.USING_IP;
 
@@ -10,37 +9,33 @@ import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.adapters.PhotoPunchHistoryAdapters;
 import com.happy.tracku.db.DbHelper;
-import com.happy.tracku.gson.login.LoginStatusJson;
+import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
 import com.happy.tracku.gson.photopunchhistoryjson.GetPunchHistoryDetail;
 import com.happy.tracku.gson.photopunchhistoryjson.Punchinghistoryjson;
-import com.happy.tracku.gson.photopunchingjson.Photopunchingjson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
-import com.happy.tracku.utils.Fns;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -52,10 +47,12 @@ import okhttp3.Response;
 
 public class PhotoPunchHistoryActivity extends AppCompatActivity
 {
-    //TextView yearTV; //monthTV,
-    EditText fromDateET, toDateET;
-    //String fromDateString, toDateString;
 
+    EditText fromDateET, toDateET;
+    DbHelper dbHelper;
+    MaterialAutoCompleteTextView employeeCodeMATV;
+    List<EmployeeMasterDetail> employeeMasterDetailList;
+    String employeeCode;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -64,10 +61,18 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_punch_history);
 
-        //monthTV = findViewById(R.id.monthTV);
-        //yearTV = findViewById(R.id.yearTV);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Punch History");
+
         fromDateET = findViewById(R.id.fromDateET);
         toDateET = findViewById(R.id.toDateET);
+        employeeCodeMATV = findViewById(R.id.employeecodeMATV);
+
+        dbHelper = new DbHelper(this);
+
+        new PullEmployeeMasterDetails(this).execute();
+
+        toDateET.setText(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
 
         fromDateET.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +145,31 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
             }
         });
 
+        employeeMasterDetailList = dbHelper.getEmployeeMaster();
+        Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
+
+        ArrayAdapter<EmployeeMasterDetail> adpterEmployeeMaster = new ArrayAdapter<EmployeeMasterDetail>(this, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
+
+        employeeCodeMATV.setAdapter(adpterEmployeeMaster);
+
+        employeeCodeMATV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                employeeCodeMATV.showDropDown();
+            }
+        });
+
+        employeeCodeMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                employeeCode = employeeMasterDetailList.get(position).getEmployeeCode();
+                Log.e("Log", "employeeCode" + employeeCode);
+
+            }
+        });
 
 
     }
@@ -151,7 +181,7 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
             case R.id.pull_punch_data:
             {
 
-                new GetPunchingHistory(this, fromDateET.getText().toString(), toDateET.getText().toString()).execute();
+                new GetPunchingHistory(this, fromDateET.getText().toString(), toDateET.getText().toString(), employeeCode).execute();
             }
             break;
         }
@@ -169,14 +199,15 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
         String failureMsg, resultString;
         Punchinghistoryjson punchinghistoryjson;
         int status;
-        String fromDate, toDate;
-
+        String fromDate, toDate, employeeCode;
         RecyclerView punchingHistoryRecyclerview;
-        public GetPunchingHistory(PhotoPunchHistoryActivity mContext, String fromDate, String toDate)
+
+        public GetPunchingHistory(PhotoPunchHistoryActivity mContext, String fromDate, String toDate, String employeeCode)
         {
             this.mContext = mContext;
             this.fromDate = fromDate;
             this.toDate = toDate;
+            this.employeeCode = employeeCode;
 
             CustomTrust customTrust = new CustomTrust(mContext);
             OkHttpClient client = customTrust.getClient();
@@ -221,7 +252,7 @@ public class PhotoPunchHistoryActivity extends AppCompatActivity
             {
                 JSONObject photoPunchHistoryObj = new JSONObject();
                 photoPunchHistoryObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
-                photoPunchHistoryObj.put("employeeCode", shp.getString(Const.Shp_Employee_Code, ""));
+                photoPunchHistoryObj.put("employeeCode", employeeCode);
                 photoPunchHistoryObj.put("fromDate", fromDate);
                 photoPunchHistoryObj.put("toDate", toDate);
                 photoPunchHistoryObj.put("isCompressed", 0);

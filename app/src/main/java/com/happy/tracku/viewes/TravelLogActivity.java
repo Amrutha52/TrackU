@@ -56,6 +56,7 @@ public class TravelLogActivity extends AppCompatActivity
     List<EmployeeMasterDetail> employeeMasterDetailList;
     DbHelper dbHelper;
     String employeeCode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {

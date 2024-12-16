@@ -48,12 +48,63 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Employee Code"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            app:boxBackgroundColor="@color/white"
+            app:suffixText="▼">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/employeecodeMATV"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:focusable="false"
+                android:clickable="false"
+                android:textSize="14dp"
+                android:textColor="@color/black" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Date"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:visibility="invisible"
+            app:boxBackgroundColor="@color/white">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:focusable="false"
+                android:clickable="false" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
     <Button
         android:id="@+id/pull_punch_data"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:backgroundTint="@color/blue_1"
+        android:backgroundTint="@color/quantum_amber500"
         android:onClick="listeners"
         android:text="Punch Time Log"
         android:textColor="#ffffff" />

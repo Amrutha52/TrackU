@@ -40,9 +40,13 @@
             android:exported="false" />
         <activity
             android:name=".viewes.PhotoPunchHistoryActivity"
+            android:theme="@style/AppThemeMaterial"
+            android:parentActivityName=".viewes.MainMenuActivity"
             android:exported="false" />
         <activity
             android:name=".viewes.PhotoPunchActivity"
+            android:theme="@style/AppThemeMaterial"
+            android:parentActivityName=".viewes.MainMenuActivity"
             android:exported="false" />
         <activity
             android:name=".viewes.PolyActivity"
@@ -54,9 +58,13 @@
             android:parentActivityName=".viewes.MainMenuActivity" />
         <activity
             android:name=".viewes.MapActivity"
+            android:theme="@style/AppThemeMaterial"
+            android:parentActivityName=".viewes.ShowUserGPSActivity"
             android:exported="false" />
         <activity
             android:name=".viewes.ShowUserGPSActivity"
+            android:theme="@style/AppThemeMaterial"
+            android:parentActivityName=".viewes.MainMenuActivity"
             android:exported="false" />
         <activity
             android:name=".viewes.MainMenuActivity"
