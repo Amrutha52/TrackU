@@ -78,7 +78,7 @@ public class MainMenuActivity extends AppCompatActivity {
     DbHelper dbHelper;
     TextView employeeName, employeeCode;
     ArrayList<DailyTravelModel> dailyTravelModelArrayList;
-    LinearLayout mainLayout;
+    LinearLayout mainLayout, travelLogLayout, punchHistoryLayout;
     private FusedLocationProviderClient mFusedLocationClient;
     DailyTravelModel dailyTravelModel;
 
@@ -113,11 +113,17 @@ public class MainMenuActivity extends AppCompatActivity {
         employeeName = findViewById(R.id.employee_name);
         employeeCode = findViewById(R.id.employee_code);
         mainLayout = findViewById(R.id.mainLayout);
+        travelLogLayout = findViewById(R.id.travellogLL);
+        punchHistoryLayout = findViewById(R.id.punchinghistoryLL);
 
         if (shp.getInt(Const.Shp_Is_Admin, 0) == 1) {
             mainLayout.setVisibility(View.VISIBLE);
+            travelLogLayout.setVisibility(View.VISIBLE);
+            punchHistoryLayout.setVisibility(View.VISIBLE);
         } else {
             mainLayout.setVisibility(View.GONE);
+            travelLogLayout.setVisibility(View.GONE);
+            punchHistoryLayout.setVisibility(View.GONE);
         }
 
         employeeName.setText(shp.getString(Const.Shp_Employee_Name, ""));
@@ -129,8 +135,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(6*10000*5); // 10 seconds
-        locationRequest.setFastestInterval(5*10000*6); // 5 seconds
+        locationRequest.setInterval(300000); // 5 minutes
+        locationRequest.setFastestInterval(300000); // 5 minutes
 //
 //        new GpsUtils(this).turnGPSOn(new GpsUtils.onGpsListener() {
 //            @Override
@@ -398,8 +404,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(10000*6*5);
-        mLocationRequest.setFastestInterval(10000*6*5);
+        mLocationRequest.setInterval(300000);
+        mLocationRequest.setFastestInterval(300000);
 
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);

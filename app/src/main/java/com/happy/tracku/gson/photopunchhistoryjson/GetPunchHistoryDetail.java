@@ -18,6 +18,18 @@ public class GetPunchHistoryDetail {
     @Expose
     private String punchTime;
 
+    public String getEmployeeCode() {
+        return employeeCode;
+    }
+
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
+    }
+
+    @SerializedName("employeeCode")
+    @Expose
+    private String employeeCode;
+
     public String getDate() {
         return date;
     }

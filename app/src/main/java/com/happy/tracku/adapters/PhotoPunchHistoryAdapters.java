@@ -53,6 +53,8 @@ public class PhotoPunchHistoryAdapters extends RecyclerView.Adapter<PhotoPunchHi
             holder.punchDateTV.setText("Date");
             holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
             //holder.punchDateTV.setBackgroundColor(ContextCompat.getColor(holder.punchDateTV.getContext(), R.color.purple_200));
+            holder.employeeCodeTV.setText("Employee");
+            holder.employeeCodeTV.setTypeface(Typeface.DEFAULT_BOLD);
             holder.punchINTV.setText("IN Time");
             holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
             //holder.punchINTV.setBackgroundColor(ContextCompat.getColor(holder.punchINTV.getContext(), R.color.purple_200));
@@ -65,6 +67,9 @@ public class PhotoPunchHistoryAdapters extends RecyclerView.Adapter<PhotoPunchHi
             holder.punchDateTV.setText(getPunchHistoryDetail.getDate());
             holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
            // holder.punchDateTV.setBackgroundColor(ContextCompat.getColor(holder.punchDateTV.getContext(), R.color.white));
+
+            holder.employeeCodeTV.setText(getPunchHistoryDetail.getEmployeeCode() + '-' + getPunchHistoryDetail.getEmployeeName());
+            holder.employeeCodeTV.setTypeface(Typeface.DEFAULT_BOLD);
 
             holder.punchINTV.setText(getPunchHistoryDetail.getPunchTime());
             holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);

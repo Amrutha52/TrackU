@@ -13,7 +13,7 @@ import com.happy.tracku.R;
 public class PhotoPunchHistoryViewHolder extends RecyclerView.ViewHolder
 {
 
-    public TextView punchDateTV, punchINTV;
+    public TextView punchDateTV, punchINTV, employeeCodeTV;
 
     public PhotoPunchHistoryViewHolder(@NonNull View itemView)
     {
@@ -21,7 +21,6 @@ public class PhotoPunchHistoryViewHolder extends RecyclerView.ViewHolder
 
         punchDateTV = itemView.findViewById(R.id.punch_date);
         punchINTV = itemView.findViewById(R.id.in_time);
-
-
+        employeeCodeTV = itemView.findViewById(R.id.employeeCode);
     }
 }

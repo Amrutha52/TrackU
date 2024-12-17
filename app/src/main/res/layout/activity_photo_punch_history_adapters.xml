@@ -23,6 +23,15 @@
             android:textStyle="bold"/>
 
         <TextView
+            android:id="@+id/employeeCode"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:text="Employee Code"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:gravity="center"/>
+
+        <TextView
             android:id="@+id/in_time"
             android:layout_width="70dp"
             android:layout_height="match_parent"
