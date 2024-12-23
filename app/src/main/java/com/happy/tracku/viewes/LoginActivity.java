@@ -67,6 +67,18 @@ public class LoginActivity extends AppCompatActivity
 
         shp = getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
 
+        String androidIdString = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        activityLoginBinding.androidId.setText("Android ID : "+androidIdString);
+        Log.e("Log", "androidIdString" + androidIdString);
+
+        /**
+         * Android Id Saved into Shared Preferences
+         */
+
+        SharedPreferences.Editor edt = shp.edit();
+        edt.putString(Const.Shp_Android_Id, androidIdString);
+        edt.apply();
+
 //        if (shp.getBoolean(Const.Shp_Is_LoggedIn, true))
 //        {
 //            startActivity(new Intent(this, MainMenuActivity.class));
@@ -294,14 +306,16 @@ public class LoginActivity extends AppCompatActivity
 
                  loginStatusJson = gsonTwo.fromJson(resultOne, LoginStatusJson.class);
 
-                SharedPreferences.Editor edt = shp.edit();
-                edt.putInt(Const.Shp_Id_Employee,loginStatusJson.getData().getLoginResponseStatus().get(0).getIdEmployee());
-                edt.putString(Const.Shp_Employee_Code, loginStatusJson.getData().getLoginResponseStatus().get(0).getEmployeeCode());
-                edt.putString(Const.Shp_Employee_Name, loginStatusJson.getData().getLoginResponseStatus().get(0).getName());
-                edt.putString(Const.Shp_Token, loginStatusJson.getData().getToken());
-                edt.putInt(Const.Shp_Is_Admin, loginStatusJson.getData().getLoginResponseStatus().get(0).getIsAdmin());
-                edt.putBoolean(Const.Shp_Is_LoggedIn, true);
-                edt.apply();
+                if (loginStatusJson.getData().getLoginResponseStatus().isEmpty() || loginStatusJson.getData().getLoginResponseStatus().size() == 0)
+                {
+                    return "failure";
+                }
+                else if (loginStatusJson.getData().getLoginResponseStatus().get(0).getStatus() != 1)
+                {
+                    return "failure";
+                }
+
+
 
 
             }
@@ -348,7 +362,17 @@ public class LoginActivity extends AppCompatActivity
 
             pd.dismiss();
 
-            if (s.equals("success")) {
+            if (s.equals("success"))
+            {
+
+                SharedPreferences.Editor edt = shp.edit();
+                edt.putInt(Const.Shp_Id_Employee,loginStatusJson.getData().getLoginResponseStatus().get(0).getIdEmployee());
+                edt.putString(Const.Shp_Employee_Code, loginStatusJson.getData().getLoginResponseStatus().get(0).getEmployeeCode());
+                edt.putString(Const.Shp_Employee_Name, loginStatusJson.getData().getLoginResponseStatus().get(0).getName());
+                edt.putString(Const.Shp_Token, loginStatusJson.getData().getToken());
+                edt.putInt(Const.Shp_Is_Admin, loginStatusJson.getData().getLoginResponseStatus().get(0).getIsAdmin());
+                edt.putBoolean(Const.Shp_Is_LoggedIn, true);
+                edt.apply();
 
                 mContext.startActivity(new Intent(mContext, MainMenuActivity.class));
                 mContext.finish();
@@ -373,7 +397,8 @@ public class LoginActivity extends AppCompatActivity
                 }
                 else
                 {
-                    Fns.neutralAlert("Alert","Login Failed "+failureMsg+"-------"+inputAndOutputJson,mContext);
+                    String message = loginStatusJson.getData().getLoginResponseStatus().get(0).getStatusMessage();
+                    Fns.neutralAlert("Alert",message,mContext);
                 }
 
 

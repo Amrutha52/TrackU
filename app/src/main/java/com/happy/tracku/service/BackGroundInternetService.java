@@ -367,7 +367,7 @@ public class BackGroundInternetService extends Service implements
 
                     if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
                     {
-                        new UploadTravelCompensationGPSData(context).execute();
+                       // new UploadTravelCompensationGPSData(context).execute();
                     }
 
 

@@ -133,10 +133,12 @@ public class Fns {
         PackageInfo packageInfo = null;
         try {
             packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            Log.e("Log", "versionname" + packageInfo.versionName);
+            Log.e("Log", "versionCode" + packageInfo.versionCode);
 
             SharedPreferences shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
             SharedPreferences.Editor edt = shp.edit();
-            edt.putString(Const.Shp_Version_No, String.valueOf(packageInfo.versionCode));
+            edt.putString(Const.Shp_Version_No, String.valueOf(packageInfo.versionName));
             edt.apply();
 
         } catch (PackageManager.NameNotFoundException e) {
