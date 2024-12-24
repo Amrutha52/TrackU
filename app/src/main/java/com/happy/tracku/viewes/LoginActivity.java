@@ -250,6 +250,7 @@ public class LoginActivity extends AppCompatActivity
                 jsonObject.put("loginId", usernameString);
                 jsonObject.put("password", passwordString);
                 jsonObject.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
+                jsonObject.put("androidId", shp.getString(Const.Shp_Android_Id, ""));
                 jsonObject.put("createdBy", "");
 
 
