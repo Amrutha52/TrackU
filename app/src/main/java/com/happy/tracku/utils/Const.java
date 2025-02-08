@@ -17,8 +17,10 @@ public class Const
 
 
     public static final String URL_PUBLIC_TEST = "https://test1.maxvalue.co.in:1222/api/TrackVeDetails/";
-    public static final String URL_PUBLIC_LIVE = "https://yardmobapp.maxvalue.co.in:92/api/TrackVeDetails/";
-   // public static String USING_IP = URL_PUBLIC_TEST;
+   // public static final String URL_PUBLIC_LIVE = "https://yardmobapp.maxvalue.co.in:92/api/TrackVeDetails/";
+    public static final String URL_PUBLIC_LIVE = "http://tracku.ecopackuae.com:82/api/TrackVeDetails/";
+
+    // public static String USING_IP = URL_PUBLIC_TEST;
    public static String USING_IP = URL_PUBLIC_LIVE;
 
     public static final String URL_LOGIN = "TrackVeValidateLogin";
