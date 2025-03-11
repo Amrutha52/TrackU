@@ -51,10 +51,10 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
 
-    implementation("com.google.android.gms:play-services-maps:19.0.0")
-    implementation("com.google.android.libraries.places:places:4.0.0")
+    implementation("com.google.android.gms:play-services-maps:19.1.0")
+    implementation("com.google.android.libraries.places:places:4.1.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
     implementation("com.google.maps.android:android-maps-utils:2.3.0")
@@ -65,8 +65,15 @@ dependencies {
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
-    
+    // Rx
+    implementation("io.reactivex.rxjava2:rxjava:2.2.2")
+    implementation("com.jakewharton.rxrelay2:rxrelay:2.0.0")
+    implementation("io.reactivex.rxjava2:rxandroid:2.0.2")
 
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.3.0")
+    implementation("com.squareup.retrofit2:adapter-rxjava2:2.4.0")
 }

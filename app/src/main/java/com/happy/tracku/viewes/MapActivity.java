@@ -1,45 +1,64 @@
 package com.happy.tracku.viewes;
 
 import static android.icu.util.MeasureUnit.DOT;
+import static com.google.android.gms.maps.model.JointType.ROUND;
 import static com.happy.tracku.utils.Const.USING_IP;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.animation.LinearInterpolator;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CustomCap;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.gms.maps.model.SquareCap;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.maps.android.SphericalUtil;
 import com.happy.tracku.R;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.dailywisegpsdatajsondetails.DailyWiseGPSDataJson;
 import com.happy.tracku.gson.dailywisegpsdatajsondetails.DailyWiseGPSDataResponsestatus;
+import com.happy.tracku.models.events.BeginJourneyEvent;
+import com.happy.tracku.models.events.CurrentJourneyEvent;
+import com.happy.tracku.models.events.EndJourneyEvent;
+import com.happy.tracku.models.events.JourneyEventBus;
+import com.happy.tracku.models.events.Result;
 import com.happy.tracku.ssl.CustomTrust;
+import com.happy.tracku.utils.ApiInterface;
 import com.happy.tracku.utils.Const;
 
 import org.json.JSONObject;
@@ -49,11 +68,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.Route;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
     private static final int PATTERN_GAP_LENGTH_PX = 10;
@@ -61,7 +86,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
     private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
     ArrayList<LatLng> latlngPoints;
-    Double latitude, longitude;
+
     private GoogleMap mMap;
     List<DailyWiseGPSDataJson> gpsDetailArrayList;
     Intent intent;
@@ -71,7 +96,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int COLOR_YELLOW_ARGB = 0xffF9A825;
     private static final int POLYLINE_STROKE_WIDTH_PX = 5;
     LatLng copoints, firstLatLng;
+    Bitmap BitMapMarker;
+    /**
+     * PolyLine
+     */
+    private ArrayList<LatLng> poliLineList;
+    private Marker marker;
+    private float v;
+    Double latitude, longitude;
+    private Handler handler;
+    private int index, next;
+   // private PolylineOptions polylineOptions, blackPolyLineOptions;
+  //  private Polyline blackPolyLine, greyPolyLine;
+    private LatLng myLocation;
 
+    /**
+     * Uber like
+     */
+    private PolylineOptions polylineOptions, blackPolylineOptions;
+    private Polyline blackPolyline, greyPolyLine;
+    private LatLng startPosition, endPosition;
+    private double lat, lng;
+    private LinearLayout linearLayout;
+    private Disposable disposable;
+    private ApiInterface apiInterface;
+    private LatLng sydney;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -81,6 +130,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         intent = getIntent();
 
+        BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.car_marker);
+        Bitmap b = bitmapdraw.getBitmap();
+        BitMapMarker = Bitmap.createScaledBitmap(b, 110, 60, false);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -89,14 +142,97 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
+    protected void onResume()
+    {
+        super.onResume();
+        //This is an event bus for receiving journey events this can be shifted anywhere
+        //in code.
+        //Do remember to dispose when not in use. For eg. its necessary to dispose it in
+        //onStop as activity is not visible.
+        disposable = JourneyEventBus.getInstance().getOnJourneyEvent()
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        if (o instanceof BeginJourneyEvent) {
+                            Snackbar.make(linearLayout, "Journey has started",
+                                    Snackbar.LENGTH_SHORT).show();
+                        } else if (o instanceof EndJourneyEvent) {
+                            Snackbar.make(linearLayout, "Journey has ended",
+                                    Snackbar.LENGTH_SHORT).show();
+                        } else if (o instanceof CurrentJourneyEvent) {
+                            /*
+                             * This can be used to receive the current location update of the car
+                             */
+                            //Log.d(TAG,"Current "+((CurrentJourneyEvent) o).getCurrentLatLng());
+                        }
+                    }
+                });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!disposable.isDisposed()) {
+            disposable.dispose();
+        }
+    }
+
+    @Override
     public void onMapReady(@NonNull GoogleMap googleMap)
     {
         mMap = googleMap;
+
+        /**
+         * Uber like execution
+         */
+        // Add a marker in Home and move the camera
+        sydney = new LatLng(28.671246, 77.317654);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setTrafficEnabled(false);
+        mMap.setIndoorEnabled(false);
+        mMap.setBuildingsEnabled(false);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setAllGesturesEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
 
         travelDateString = intent.getStringExtra("fromDate");
         Log.e("Log", "travelDateString" + travelDateString);
         employeeCodeString = intent.getStringExtra("employeeCode");
         Log.e("Log", "employeeCodeString" + employeeCodeString);
+
+        /**
+         * Uber like
+         */
+
+        apiInterface.getDirections("driving", "less_driving",
+                        latitude + "," + longitude,
+                        getResources().getString(R.string.google_map_api_key))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new SingleObserver<Result>() {
+
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onSuccess(Result result) {
+                                List<com.happy.tracku.models.events.Route> routeList = result.getRoutes();
+                                for (com.happy.tracku.models.events.Route route : routeList) {
+                                    String polyLine = route.getOverviewPolyline().getPoints();
+                                    latlngPoints = decodePoly(polyLine);
+                                    drawPolyLineAndAnimateCar();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                            }
+                        });
 
         new getLocationOfEmployee(this, employeeCodeString, travelDateString).execute();
 
@@ -112,6 +248,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     {
 
         cityArrayList = new ArrayList<String>();
+
+        poliLineList = new ArrayList<>();
 
         latlngPoints.add(new LatLng(latitude, longitude));
         Log.e("Log", "latlngPoints" +latlngPoints.toString());
@@ -164,6 +302,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
 
+
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,6 +312,157 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return returnAddress;
     }
 
+    private void drawPolyLineAndAnimateCar() {
+        //Adjusting bounds
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LatLng latLng : latlngPoints) {
+            builder.include(latLng);
+        }
+        LatLngBounds bounds = builder.build();
+        CameraUpdate mCameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 2);
+        mMap.animateCamera(mCameraUpdate);
+
+        polylineOptions = new PolylineOptions();
+        polylineOptions.color(Color.GRAY);
+        polylineOptions.width(5);
+        polylineOptions.startCap(new SquareCap());
+        polylineOptions.endCap(new SquareCap());
+        polylineOptions.jointType(ROUND);
+        polylineOptions.addAll(latlngPoints);
+        greyPolyLine = mMap.addPolyline(polylineOptions);
+
+        blackPolylineOptions = new PolylineOptions();
+        blackPolylineOptions.width(5);
+        blackPolylineOptions.color(Color.BLACK);
+        blackPolylineOptions.startCap(new SquareCap());
+        blackPolylineOptions.endCap(new SquareCap());
+        blackPolylineOptions.jointType(ROUND);
+        blackPolyline = mMap.addPolyline(blackPolylineOptions);
+
+        mMap.addMarker(new MarkerOptions()
+                .position(latlngPoints.get(latlngPoints.size() - 1)));
+
+        ValueAnimator polylineAnimator = ValueAnimator.ofInt(0, 100);
+        polylineAnimator.setDuration(2000);
+        polylineAnimator.setInterpolator(new LinearInterpolator());
+        polylineAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                List<LatLng> points = greyPolyLine.getPoints();
+                int percentValue = (int) valueAnimator.getAnimatedValue();
+                int size = points.size();
+                int newPoints = (int) (size * (percentValue / 100.0f));
+                List<LatLng> p = points.subList(0, newPoints);
+                blackPolyline.setPoints(p);
+            }
+        });
+        polylineAnimator.start();
+        marker = mMap.addMarker(new MarkerOptions().position(sydney)
+                .flat(true)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_car)));
+        handler = new Handler();
+        index = -1;
+        next = 1;
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (index < latlngPoints.size() - 1) {
+                    index++;
+                    next = index + 1;
+                }
+                if (index < latlngPoints.size() - 1) {
+                    startPosition = latlngPoints.get(index);
+                    endPosition = latlngPoints.get(next);
+                }
+                if (index == 0) {
+                    BeginJourneyEvent beginJourneyEvent = new BeginJourneyEvent();
+                    beginJourneyEvent.setBeginLatLng(startPosition);
+                    JourneyEventBus.getInstance().setOnJourneyBegin(beginJourneyEvent);
+                }
+                if (index == latlngPoints.size() - 1) {
+                    EndJourneyEvent endJourneyEvent = new EndJourneyEvent();
+                    endJourneyEvent.setEndJourneyLatLng(new LatLng(latlngPoints.get(index).latitude,
+                            latlngPoints.get(index).longitude));
+                    JourneyEventBus.getInstance().setOnJourneyEnd(endJourneyEvent);
+                }
+                ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
+                valueAnimator.setDuration(3000);
+                valueAnimator.setInterpolator(new LinearInterpolator());
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                        v = valueAnimator.getAnimatedFraction();
+                        lng = v * endPosition.longitude + (1 - v)
+                                * startPosition.longitude;
+                        lat = v * endPosition.latitude + (1 - v)
+                                * startPosition.latitude;
+                        LatLng newPos = new LatLng(lat, lng);
+                        CurrentJourneyEvent currentJourneyEvent = new CurrentJourneyEvent();
+                        currentJourneyEvent.setCurrentLatLng(newPos);
+                        JourneyEventBus.getInstance().setOnJourneyUpdate(currentJourneyEvent);
+                        marker.setPosition(newPos);
+                        marker.setAnchor(0.5f, 0.5f);
+                        marker.setRotation(getBearing(startPosition, newPos));
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition
+                                (new CameraPosition.Builder().target(newPos)
+                                        .zoom(15.5f).build()));
+                    }
+                });
+                valueAnimator.start();
+                if (index != latlngPoints.size() - 1) {
+                    handler.postDelayed(this, 3000);
+                }
+            }
+        }, 3000);
+    }
+
+    private ArrayList<LatLng> decodePoly(String encoded) {
+        ArrayList<LatLng> poly = new ArrayList<>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng((((double) lat / 1E5)),
+                    (((double) lng / 1E5)));
+            poly.add(p);
+        }
+
+        return poly;
+    }
+
+    private float getBearing(LatLng begin, LatLng end) {
+        double lat = Math.abs(begin.latitude - end.latitude);
+        double lng = Math.abs(begin.longitude - end.longitude);
+
+        if (begin.latitude < end.latitude && begin.longitude < end.longitude)
+            return (float) (Math.toDegrees(Math.atan(lng / lat)));
+        else if (begin.latitude >= end.latitude && begin.longitude < end.longitude)
+            return (float) ((90 - Math.toDegrees(Math.atan(lng / lat))) + 90);
+        else if (begin.latitude >= end.latitude && begin.longitude >= end.longitude)
+            return (float) (Math.toDegrees(Math.atan(lng / lat)) + 180);
+        else if (begin.latitude < end.latitude && begin.longitude >= end.longitude)
+            return (float) ((90 - Math.toDegrees(Math.atan(lng / lat))) + 270);
+        return -1;
+    }
     @Override
     public void onPolylineClick(@NonNull Polyline polyline)
     {
@@ -369,7 +660,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         polyline.setEndCap(new RoundCap());
         polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
         polyline.setColor(COLOR_YELLOW_ARGB);
-        polyline.setJointType(JointType.ROUND);
+        polyline.setJointType(ROUND);
     }
 
 }
