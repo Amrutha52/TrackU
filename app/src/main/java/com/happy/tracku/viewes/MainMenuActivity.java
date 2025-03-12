@@ -121,7 +121,7 @@ public class MainMenuActivity extends AppCompatActivity {
             travelLogLayout.setVisibility(View.VISIBLE);
             punchHistoryLayout.setVisibility(View.VISIBLE);
         } else {
-            mainLayout.setVisibility(View.GONE);
+            mainLayout.setVisibility(View.VISIBLE);
             travelLogLayout.setVisibility(View.GONE);
             punchHistoryLayout.setVisibility(View.GONE);
         }

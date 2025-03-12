@@ -71,9 +71,12 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxjava:2.2.2")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.0.0")
     implementation("io.reactivex.rxjava2:rxandroid:2.0.2")
+   // implementation("com.github.akarnokd:rxjava3-retrofit:3.0.2")
+
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.3.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.3.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:adapter-rxjava2:2.4.0")
 }
