@@ -7,10 +7,10 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 public interface ApiInterface {
 
-    @GET("maps/api/directions/json")
+    @GET("directions/json")
     Single<Result> getDirections(@Query("mode") String mode,
                                  @Query("transit_routing_preference") String routingPreference,
                                  @Query("origin") String origin,
-                                 //@Query("destination") String destination,
+                                 @Query("destination") String destination,
                                  @Query("key") String apiKey);
 }
