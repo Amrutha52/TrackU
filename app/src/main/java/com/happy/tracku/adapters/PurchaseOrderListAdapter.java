@@ -168,8 +168,8 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
         {
             case R.id.order_view_link:
             {
-                String idPurchaseOrder = (String) view.getTag(R.string.key_one);
-                Log.e("Log", "idPurchaseOrder" + idPurchaseOrder);
+                Integer idPurchaseOrder = (Integer) view.getTag(R.string.key_one);
+                Log.e("Log", "idPurchaseOrderAdapter" + idPurchaseOrder);
 
 
                 Intent intent = new Intent(context, PurchaseOrderItemListActivity.class);

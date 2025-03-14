@@ -92,7 +92,7 @@ public class PurchaseOrderListActivity extends AppCompatActivity
         public PullPurchaseOrderListDetails(PurchaseOrderListActivity context)
         {
             this.context = new WeakReference<>(context);
-            this.employeeCode = employeeCode;
+
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
 
@@ -125,14 +125,14 @@ public class PurchaseOrderListActivity extends AppCompatActivity
                 url = Const.USING_IP + URL_PURCHASE_ORDER_LIST;
                 Log.e("Log", "purchaseOrderListURL" + url);
 
-                JSONObject jsonObjectCenterList = new JSONObject();
+                JSONObject jsonObjectPurchaseOrderList = new JSONObject();
 
-                jsonObjectCenterList.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+                jsonObjectPurchaseOrderList.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
 
 
-                Log.e("Log", "jsonObjectpurchaseOrderList" + jsonObjectCenterList);
+                Log.e("Log", "jsonObjectpurchaseOrderList" + jsonObjectPurchaseOrderList);
 
-                RequestBody body = RequestBody.create(jsonObjectCenterList.toString(), JSON);
+                RequestBody body = RequestBody.create(jsonObjectPurchaseOrderList.toString(), JSON);
                 request = new Request.Builder()
                         //.header("X-Client-Type", "Android")
                         .url(url)

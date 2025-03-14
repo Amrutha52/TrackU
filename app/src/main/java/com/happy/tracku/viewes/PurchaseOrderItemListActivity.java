@@ -1,26 +1,218 @@
 package com.happy.tracku.viewes;
 
+import static com.happy.tracku.utils.Const.URL_PURCHASE_ORDER_ITEM_LIST;
+import static com.happy.tracku.utils.Const.URL_PURCHASE_ORDER_LIST;
+
+import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.happy.tracku.R;
+import com.happy.tracku.adapters.PurchaseOrderItemListAdapter;
+import com.happy.tracku.adapters.PurchaseOrderListAdapter;
+import com.happy.tracku.databinding.ActivityPurchaseOrderItemListBinding;
+import com.happy.tracku.databinding.ActivityPurchaseOrderListBinding;
+import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItemListJson;
+import com.happy.tracku.gson.purchaseorderlist.PurchaseOrder;
+import com.happy.tracku.gson.purchaseorderlist.PurchaseOrderListJson;
+import com.happy.tracku.ssl.CustomTrust;
+import com.happy.tracku.utils.Const;
+import com.happy.tracku.utils.Fns;
 
-public class PurchaseOrderItemListActivity extends AppCompatActivity {
+import org.json.JSONObject;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+public class PurchaseOrderItemListActivity extends AppCompatActivity
+{
+    private ActivityPurchaseOrderItemListBinding binding;
+    Intent intent;
+    Integer idPurchaseOrder;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
+        binding = ActivityPurchaseOrderItemListBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_purchase_order_item_list);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        View rootView = findViewById(android.R.id.content); // Get root view
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+            WindowInsetsCompat insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets.toWindowInsets());
+            int systemBarsInsetsTop = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            int systemBarsInsetsBottom = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+
+            // Apply padding to your main content view
+            v.setPadding(v.getPaddingLeft(), systemBarsInsetsTop, v.getPaddingRight(), systemBarsInsetsBottom);
+
+            return WindowInsetsCompat.CONSUMED;
         });
+
+        getSupportActionBar().setTitle("Purchase Order Item List");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        intent = getIntent();
+
+        idPurchaseOrder = intent.getIntExtra("idPurchaseOrder",0);
+        Log.e("Log", "idPurchaseOrderOrderItem" + idPurchaseOrder);
+
+        new PullPurchaseOrderItemListDetails(this, idPurchaseOrder).execute();
+
+    }
+
+    public void listeners(View view)
+    {
+        switch (view.getId())
+        {
+            case R.id.complete_save_button:
+            {
+
+            }
+            break;
+        }
+    }
+
+    private static class PullPurchaseOrderItemListDetails extends AsyncTask<String, String, String>
+    {
+        ProgressDialog pd;
+        WeakReference<PurchaseOrderItemListActivity> context;
+        private OkHttpClient okHttpClient;
+        private Request request;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        String url;
+        SharedPreferences shp;
+        PurchaseOrderItemListJson purchaseOrderItemListJson;
+        int idPurchaseOrder;
+
+        public PullPurchaseOrderItemListDetails(PurchaseOrderItemListActivity context, int idPurchaseOrder)
+        {
+            this.context = new WeakReference<>(context);
+            this.idPurchaseOrder = idPurchaseOrder;
+
+            shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
+
+            CustomTrust customTrust = new CustomTrust(context);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+            pd = new ProgressDialog(context.get());
+            pd.setTitle("Uploading Data");
+            pd.setMessage("Please wait few seconds...");
+            pd.setCancelable(false);
+            //pd.setIndeterminate(true);
+            pd.setMax(5);
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+                url = Const.USING_IP + URL_PURCHASE_ORDER_ITEM_LIST;
+                Log.e("Log", "purchaseOrderItemListURL" + url);
+
+                JSONObject jsonObjectPurchaseOrderItemList = new JSONObject();
+
+                jsonObjectPurchaseOrderItemList.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+                jsonObjectPurchaseOrderItemList.put("idPurchaseOrder", idPurchaseOrder);
+
+                Log.e("Log", "jsonObjectpurchaseOrderItemList" + jsonObjectPurchaseOrderItemList);
+
+                RequestBody body = RequestBody.create(jsonObjectPurchaseOrderItemList.toString(), JSON);
+                request = new Request.Builder()
+                        //.header("X-Client-Type", "Android")
+                        .url(url)
+                        .post(body)
+                        .build();
+
+                Response response = okHttpClient.newCall(request).execute();
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+
+                }
+
+                String result = response.body().string();
+
+
+                Log.e("Log", "purchaseOrderResult" + result);
+                Gson gson = new Gson();
+                purchaseOrderItemListJson = gson.fromJson(result, PurchaseOrderItemListJson.class);
+
+
+
+            }
+            catch (Exception e)
+            {
+
+                Log.e("Log","Exception",e);
+                return "failure";
+            }
+            return "success";
+        }
+
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+
+            if (s.equals("success"))
+            {
+
+                RecyclerView purchaseOrderItemListRecyclerview = context.get().findViewById(R.id.purchaseorderitemlistrecyclerview);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context.get());
+                purchaseOrderItemListRecyclerview.setLayoutManager(layoutManager);
+                purchaseOrderItemListRecyclerview.setItemAnimator(new DefaultItemAnimator());
+
+
+                PurchaseOrderItemListAdapter purchaseOrderItemListAdapter = new PurchaseOrderItemListAdapter(context.get(), purchaseOrderItemListJson.getData().getPurchaseOrderItemList());
+                purchaseOrderItemListRecyclerview.setAdapter(purchaseOrderItemListAdapter);
+
+
+
+            }
+            else
+            {
+                Fns.neutralAlert("Alert", "Failure", context.get());
+            }
+            pd.dismiss();
+        }
     }
 }

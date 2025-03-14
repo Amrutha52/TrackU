@@ -39,6 +39,12 @@ public class PurchaseOrderItem {
     @Expose
     private Integer idPurchaseOrderHeader;
 
+
+
+    @SerializedName("acceptedQuantity")
+    @Expose
+    private int acceptedQuantity;
+
     public String getVendorName() {
         return vendorName;
     }
@@ -125,6 +131,14 @@ public class PurchaseOrderItem {
 
     public void setIdPurchaseOrderHeader(Integer idPurchaseOrderHeader) {
         this.idPurchaseOrderHeader = idPurchaseOrderHeader;
+    }
+
+    public int getAcceptedQuantity() {
+        return acceptedQuantity;
+    }
+
+    public void setAcceptedQuantity(int acceptedQuantity) {
+        this.acceptedQuantity = acceptedQuantity;
     }
 
 }
