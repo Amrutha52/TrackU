@@ -588,6 +588,12 @@ public class MainMenuActivity extends AppCompatActivity {
                 startActivity(new Intent(this, TravelLogActivity.class));
             }
             break;
+
+            case R.id.purchaseOrderListLL:
+            {
+                startActivity(new Intent(this, PurchaseOrderListActivity.class));
+            }
+            break;
         }
     }
 

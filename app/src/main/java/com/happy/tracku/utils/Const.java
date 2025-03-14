@@ -31,4 +31,8 @@ public class Const
     public static final String URL_PUNCH_HISTORY = "GetPunchHistory";
     public static final String URL_EMPLOYEE_MASTER = "TrackVeMaster";
     public static final String URL_TRAVEL_LOG = "TravelLog";
+    public static final String URL_PURCHASE_ORDER_LIST = "PurchaseOrderList";
+    public static final String URL_PURCHASE_ORDER_ITEM_LIST= "PurchaseOrderItemList";
+    public static final String URL_VENDOR_LIST = "VendorList";
+    public static final String URL_SEND_PURCHASE_REQUEST = "SendPurchaseRequest";
 }

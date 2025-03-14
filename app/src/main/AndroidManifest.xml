@@ -12,11 +12,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-
-   <!-- <uses-permission
+    <!--
+ <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="QueryAllPackagesPermission" /> -->
-
+        tools:ignore="QueryAllPackagesPermission" />
+    -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature
@@ -34,41 +34,51 @@
         android:theme="@style/Theme.Tracku"
         tools:targetApi="31">
         <activity
-            android:name=".viewes.TravelLogActivity"
-            android:theme="@style/AppThemeMaterial"
+            android:name=".viewes.PurchaseOrderItemListActivity"
             android:parentActivityName=".viewes.MainMenuActivity"
+            android:theme="@style/AppThemeMaterial"
             android:exported="false" />
+        <activity
+            android:name=".viewes.PurchaseOrderListActivity"
+            android:parentActivityName=".viewes.MainMenuActivity"
+            android:theme="@style/AppThemeMaterial"
+            android:exported="false" />
+        <activity
+            android:name=".viewes.TravelLogActivity"
+            android:exported="false"
+            android:parentActivityName=".viewes.MainMenuActivity"
+            android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".adapters.PhotoPunchHistoryAdapters"
             android:exported="false" />
         <activity
             android:name=".viewes.PhotoPunchHistoryActivity"
-            android:theme="@style/AppThemeMaterial"
+            android:exported="false"
             android:parentActivityName=".viewes.MainMenuActivity"
-            android:exported="false" />
+            android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.PhotoPunchActivity"
-            android:theme="@style/AppThemeMaterial"
+            android:exported="false"
             android:parentActivityName=".viewes.MainMenuActivity"
-            android:exported="false" />
+            android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.PolyActivity"
             android:exported="false" />
         <activity
             android:name=".viewes.AddEmployeeActivity"
             android:exported="false"
-            android:theme="@style/AppThemeMaterial"
-            android:parentActivityName=".viewes.MainMenuActivity" />
+            android:parentActivityName=".viewes.MainMenuActivity"
+            android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.MapActivity"
-            android:theme="@style/AppThemeMaterial"
+            android:exported="false"
             android:parentActivityName=".viewes.ShowUserGPSActivity"
-            android:exported="false" />
+            android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.ShowUserGPSActivity"
-            android:theme="@style/AppThemeMaterial"
+            android:exported="false"
             android:parentActivityName=".viewes.MainMenuActivity"
-            android:exported="false" />
+            android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.MainMenuActivity"
             android:exported="false" />

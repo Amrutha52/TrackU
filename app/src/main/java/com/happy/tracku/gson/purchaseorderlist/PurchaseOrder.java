@@ -18,6 +18,10 @@ public class PurchaseOrder {
     @Expose
     private Integer totalAmount;
 
+    @SerializedName("idPurchaseOrderHeader")
+    @Expose
+    private int idPurchaseOrderHeader;
+
     public String getVendorName() {
         return vendorName;
     }
@@ -50,4 +54,11 @@ public class PurchaseOrder {
         this.totalAmount = totalAmount;
     }
 
+    public int getIdPurchaseOrderHeader() {
+        return idPurchaseOrderHeader;
+    }
+
+    public void setIdPurchaseOrderHeader(int idPurchaseOrderHeader) {
+        this.idPurchaseOrderHeader = idPurchaseOrderHeader;
+    }
 }

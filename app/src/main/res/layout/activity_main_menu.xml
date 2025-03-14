@@ -337,10 +337,11 @@
                             <LinearLayout
                                 android:layout_width="140dp"
                                 android:layout_height="wrap_content"
-                                android:visibility="invisible"
+                                android:visibility="visible"
                                 android:orientation="horizontal">
 
                                 <LinearLayout
+                                    android:id="@+id/purchaseOrderListLL"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="16dp"
@@ -353,7 +354,7 @@
                                         android:layout_width="40dp"
                                         android:layout_height="40dp"
                                         android:layout_gravity="center"
-                                        android:src="@drawable/facepunching"
+                                        android:src="@drawable/shoppinglist"
                                         />
 
                                     <TextView
@@ -361,7 +362,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:padding="10dp"
-                                        android:text="Photo\nPunching"
+                                        android:text="Purchase\nOrder"
                                         android:textAlignment="center" />
 
                                 </LinearLayout>
