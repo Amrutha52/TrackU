@@ -254,7 +254,7 @@ public class DbHelper extends SQLiteOpenHelper
             ContentValues cv = new ContentValues();
             cv.put("idItem",purchaseOrderItem.getIdItem());
             cv.put("idUnit",purchaseOrderItem.getIdUnit());
-            cv.put("idPurchaseOrderDetails",purchaseOrderItem.getIdPurchaseOrderHeader());
+            cv.put("idPurchaseOrder",purchaseOrderItem.getIdPurchaseOrderHeader());
             cv.put("Item",purchaseOrderItem.getItemName());
             cv.put("OrderQty",purchaseOrderItem.getOrderQuantity());
             cv.put("RackNo",purchaseOrderItem.getRackNumber());
@@ -268,7 +268,7 @@ public class DbHelper extends SQLiteOpenHelper
             db.insert(SAVE_PURCHASE_ORDER_TABLE, null, cv);
 
         }
-        db.close();
+        //db.close();
 
     }
 
