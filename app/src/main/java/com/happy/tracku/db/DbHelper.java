@@ -291,9 +291,6 @@ public class DbHelper extends SQLiteOpenHelper
     {
         JSONObject finalJson = new JSONObject();
         try {
-            finalJson.put("createdBy", createdBy);
-            finalJson.put("idStatus", idStatus);
-            Log.e("Log", "sendpurchasejson" + finalJson);
 
             JSONArray dataArray = new JSONArray();
 
@@ -325,8 +322,11 @@ public class DbHelper extends SQLiteOpenHelper
             }
             cur.close();
 
+            finalJson.put("createdBy", createdBy);
+            finalJson.put("idStatus", idStatus);
+            Log.e("Log", "sendpurchasejson" + finalJson);
             finalJson.put("StockInTable",dataArray);
-            Log.e("Log", "finalJson"+finalJson);
+            Log.e("Log", "finalJsonDB"+finalJson);
 
         } catch (JSONException e) {
             Log.e("Log", "exception" + e);
