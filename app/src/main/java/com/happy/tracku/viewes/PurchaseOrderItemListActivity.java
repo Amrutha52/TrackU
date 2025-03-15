@@ -179,7 +179,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                 Gson gson = new Gson();
                 purchaseOrderItemListJson = gson.fromJson(result, PurchaseOrderItemListJson.class);
 
-                dbHelper.deletePurchaseOrderRequest();
+               // dbHelper.deletePurchaseOrderRequest();
                 dbHelper.insertPurchaseOrderRequest(purchaseOrderItemListJson);
 
             }

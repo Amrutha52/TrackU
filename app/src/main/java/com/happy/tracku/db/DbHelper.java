@@ -265,7 +265,7 @@ public class DbHelper extends SQLiteOpenHelper
 
 
             Log.e("Log", "purchaseOrderItemList" + purchaseOrderItemList);
-            db.insert(EMPLOYEE_MASTER, null, cv);
+            db.insert(SAVE_PURCHASE_ORDER_TABLE, null, cv);
 
         }
         db.close();
@@ -280,6 +280,7 @@ public class DbHelper extends SQLiteOpenHelper
 
     public void updateAcceptedQuantity(Integer idItem, double acceptedQty)
     {
+        Log.e("Log", "updateAcceptedQuantity");
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set AcceptedQty="+acceptedQty+" where idItem="+idItem);
@@ -290,9 +291,8 @@ public class DbHelper extends SQLiteOpenHelper
     public JSONObject getSendPurchaseRequest(String createdBy, int idStatus, int idPurchaseOrder)
     {
         JSONObject finalJson = new JSONObject();
+        JSONArray dataArray = new JSONArray();
         try {
-
-            JSONArray dataArray = new JSONArray();
 
             SQLiteDatabase db = this.getReadableDatabase();
 
@@ -313,7 +313,7 @@ public class DbHelper extends SQLiteOpenHelper
 
 
                     dataArray.put(singleDataObj);
-                    Log.e("Log", "dataarray"+dataArray);
+
 
                     cur.moveToNext();
 
@@ -325,6 +325,7 @@ public class DbHelper extends SQLiteOpenHelper
             finalJson.put("createdBy", createdBy);
             finalJson.put("idStatus", idStatus);
             Log.e("Log", "sendpurchasejson" + finalJson);
+            Log.e("Log", "dataarray"+dataArray);
             finalJson.put("StockInTable",dataArray);
             Log.e("Log", "finalJsonDB"+finalJson);
 
