@@ -1,37 +1,36 @@
 package com.happy.tracku.viewes;
 
 import static com.happy.tracku.utils.Const.URL_PURCHASE_ORDER_ITEM_LIST;
-import static com.happy.tracku.utils.Const.URL_PURCHASE_ORDER_LIST;
+import static com.happy.tracku.utils.Const.URL_SEND_PURCHASE_REQUEST;
 
 import android.app.ProgressDialog;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.adapters.PurchaseOrderItemListAdapter;
-import com.happy.tracku.adapters.PurchaseOrderListAdapter;
 import com.happy.tracku.databinding.ActivityPurchaseOrderItemListBinding;
-import com.happy.tracku.databinding.ActivityPurchaseOrderListBinding;
+import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItemListJson;
-import com.happy.tracku.gson.purchaseorderlist.PurchaseOrder;
-import com.happy.tracku.gson.purchaseorderlist.PurchaseOrderListJson;
+import com.happy.tracku.gson.sendpurchaserequest.SendPurchaseRequestStatusJson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
@@ -39,7 +38,6 @@ import com.happy.tracku.utils.Fns;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -93,6 +91,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
         {
             case R.id.complete_save_button:
             {
+                new PushPurchaseOrderRequest(this, idPurchaseOrder).execute();
 
             }
             break;
@@ -111,12 +110,16 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
         PurchaseOrderItemListJson purchaseOrderItemListJson;
         int idPurchaseOrder;
 
+        DbHelper dbHelper;
+
         public PullPurchaseOrderItemListDetails(PurchaseOrderItemListActivity context, int idPurchaseOrder)
         {
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
+
+            dbHelper = new DbHelper(context);
 
             CustomTrust customTrust = new CustomTrust(context);
             OkHttpClient client = customTrust.getClient();
@@ -176,7 +179,8 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                 Gson gson = new Gson();
                 purchaseOrderItemListJson = gson.fromJson(result, PurchaseOrderItemListJson.class);
 
-
+                dbHelper.deletePurchaseOrderRequest();
+                dbHelper.insertPurchaseOrderRequest(purchaseOrderItemListJson);
 
             }
             catch (Exception e)
@@ -213,6 +217,189 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                 Fns.neutralAlert("Alert", "Failure", context.get());
             }
             pd.dismiss();
+        }
+    }
+
+    private static class PushPurchaseOrderRequest extends AsyncTask<String, String, String>
+    {
+        ProgressDialog pd;
+        WeakReference<PurchaseOrderItemListActivity> context;
+        private OkHttpClient okHttpClient;
+        private Request request;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        String url;
+        SharedPreferences shp;
+        DbHelper dbHelper;
+        SendPurchaseRequestStatusJson sendPurchaseRequestStatusJson;
+        String message;
+
+        int idPurchaseOrder;
+
+        public PushPurchaseOrderRequest(PurchaseOrderItemListActivity context, Integer idPurchaseOrder)
+        {
+            this.context = new WeakReference<>(context);
+            this.idPurchaseOrder = idPurchaseOrder;
+
+
+            shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
+
+            dbHelper = new DbHelper(context);
+
+            CustomTrust customTrust = new CustomTrust(context);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+            pd = new ProgressDialog(context.get());
+            pd.setTitle("Uploading Data");
+            pd.setMessage("Please wait few seconds...");
+            pd.setCancelable(false);
+            //pd.setIndeterminate(true);
+            pd.setMax(5);
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try {
+
+
+                JSONObject pushDataObj = dbHelper.getSendPurchaseRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder);
+
+                url = Const.USING_IP + URL_SEND_PURCHASE_REQUEST;
+
+                Log.e("Log","sendPurchaseRequest" +url);
+                Log.e("Log","sendPurchaseObject"+pushDataObj.toString());
+
+
+                RequestBody body = RequestBody.create(pushDataObj.toString(), JSON);
+                Log.e("Log", "customer list body" + body);
+                request = new Request.Builder()
+                        //.header("X-Client-Type", "Android")
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                Response response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "customer list" + response);
+
+                if (!response.isSuccessful()) {
+
+                    return "failure";
+
+                }
+
+                String resultString = response.body().string();
+
+                Log.e("Log", "" + resultString);
+
+                Gson gson = new Gson();
+
+                sendPurchaseRequestStatusJson= gson.fromJson(resultString,SendPurchaseRequestStatusJson.class);
+                Log.e("Log", "sendPurchaseRequestStatusJson" + sendPurchaseRequestStatusJson);
+
+                int status = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatus();
+                Log.e("Log", "status" + status);
+                message = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatusMsg();
+                Log.e("Log", "message" + message);
+
+                if(status != 1)
+                {
+                    return "failure";
+                }
+
+
+            }catch (Exception e)
+            {
+
+                Log.e("Log","Exception",e);
+                return "failure";
+            }
+
+            return "success";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            pd.dismiss();
+
+            if (s.equals("success"))
+            {
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context.get());
+                View dialogView = LayoutInflater.from(context.get()).inflate(R.layout.dialog_success,null);
+
+                builder.setView(dialogView);
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.green_text);
+                alertDialog.show();
+
+                TextView successMsg = dialogView.findViewById(R.id.success_msg);
+                successMsg.setTextColor(Color.BLACK);
+                successMsg.setText(message);
+
+                MaterialButton okButton = dialogView.findViewById(R.id.ok_button);
+                okButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        alertDialog.dismiss();
+
+
+                        context.get().startActivity(new Intent(context.get(), MainMenuActivity.class));
+                        context.get().finish();
+                    }
+                });
+
+            }
+            else if (s.equals("failure"))
+            {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context.get());
+                View dialogView = LayoutInflater.from(context.get()).inflate(R.layout.dialog_success,null);
+
+                builder.setView(dialogView);
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.red_button);
+                alertDialog.show();
+
+                TextView successMsg = dialogView.findViewById(R.id.success_msg);
+                successMsg.setTextColor(Color.BLACK);
+                successMsg.setText(message);
+
+                MaterialButton okButton = dialogView.findViewById(R.id.ok_button);
+                okButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        alertDialog.dismiss();
+
+
+                        context.get().startActivity(new Intent(context.get(), MainMenuActivity.class));
+                        context.get().finish();
+                    }
+                });
+
+            }
+            else
+            {
+                Log.e("Log", "failed to fetch");
+            }
+
         }
     }
 }

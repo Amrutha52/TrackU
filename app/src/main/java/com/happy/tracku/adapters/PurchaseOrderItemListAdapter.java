@@ -89,7 +89,9 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
 
              double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
 
-           //  dbHelper.updateCollectedAmount(memberDetail.getIdMember(), collectedAmount);
+             purchaseOrderItem.setAcceptedQuantity(acceptedQty);
+
+             dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
 
 
 

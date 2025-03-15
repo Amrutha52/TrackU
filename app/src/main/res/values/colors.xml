@@ -19,4 +19,6 @@
     <color name="primaryTextColor">#2661FA</color>
     <color name="colorPrimaryDark">#1E88E5</color>
     <color name="yellow">#FAAE3B</color>
+    <color name="green_text">#34BD39</color>
+    <color name="red_button">#ADF03E3E</color>
 </resources>

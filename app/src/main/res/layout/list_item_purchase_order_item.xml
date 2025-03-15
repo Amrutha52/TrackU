@@ -172,13 +172,21 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <ImageButton
+                <Button
+                    android:id="@+id/acceptedQtyOkButton"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="OK"
+                    android:layout_gravity="bottom"/>
+
+               <!-- <ImageButton
                     android:id="@+id/acceptedQtyOkButton"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_weight="1"
                     android:src="@drawable/accept"
-                    android:onClick="listeners" />
+                    android:onClick="listeners" /> -->
 
                 <!--<EditText
                     android:id="@+id/collection_amount"

@@ -39,11 +39,21 @@ public class PurchaseOrderItem {
     @Expose
     private Integer idPurchaseOrderHeader;
 
-
-
     @SerializedName("acceptedQuantity")
     @Expose
-    private int acceptedQuantity;
+    private double acceptedQuantity;
+
+    @SerializedName("idItem")
+    @Expose
+    private Integer idItem;
+
+    @SerializedName("idUnit")
+    @Expose
+    private Integer idUnit;
+
+    @SerializedName("idStatus")
+    @Expose
+    private Integer idStatus;
 
     public String getVendorName() {
         return vendorName;
@@ -133,12 +143,35 @@ public class PurchaseOrderItem {
         this.idPurchaseOrderHeader = idPurchaseOrderHeader;
     }
 
-    public int getAcceptedQuantity() {
+    public double getAcceptedQuantity() {
         return acceptedQuantity;
     }
 
-    public void setAcceptedQuantity(int acceptedQuantity) {
+    public void setAcceptedQuantity(double acceptedQuantity) {
         this.acceptedQuantity = acceptedQuantity;
     }
 
+    public Integer getIdStatus() {
+        return idStatus;
+    }
+
+    public void setIdStatus(Integer idStatus) {
+        this.idStatus = idStatus;
+    }
+
+    public Integer getIdUnit() {
+        return idUnit;
+    }
+
+    public void setIdUnit(Integer idUnit) {
+        this.idUnit = idUnit;
+    }
+
+    public Integer getIdItem() {
+        return idItem;
+    }
+
+    public void setIdItem(Integer idItem) {
+        this.idItem = idItem;
+    }
 }
