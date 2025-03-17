@@ -64,9 +64,9 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
 
         holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getAcceptedQuantity()));
 
-        holder.acceptedQtyET.setTag(R.string.key_one,purchaseOrderItem);
-        holder.acceptedQtyET.setTag(R.string.key_two,holder.acceptedQtyET);
-        holder.acceptedQtyET.setOnClickListener(this);
+        holder.acceptedQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
+        holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
+        holder.acceptedQtyOkButton.setOnClickListener(this);
 
     }
 
@@ -88,6 +88,7 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
              TextInputEditText acceptedQtyTextInput = (TextInputEditText)view.getTag(R.string.key_two);
 
              double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
+             Log.e("Log","acceptedQtyAdapter" + acceptedQty);
 
              purchaseOrderItem.setAcceptedQuantity(acceptedQty);
 

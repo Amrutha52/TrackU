@@ -281,6 +281,7 @@ public class DbHelper extends SQLiteOpenHelper
     public void updateAcceptedQuantity(Integer idItem, double acceptedQty)
     {
         Log.e("Log", "updateAcceptedQuantity");
+        Log.e("Log", "acceptedQtyDB" + acceptedQty);
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set AcceptedQty="+acceptedQty+" where idItem="+idItem);
@@ -309,7 +310,7 @@ public class DbHelper extends SQLiteOpenHelper
                     singleDataObj.put("idItem",cur.getInt(cur.getColumnIndex("idItem")));
                     singleDataObj.put("idUnit",cur.getInt(cur.getColumnIndex("idUnit")));
                     singleDataObj.put("Quantity",cur.getInt(cur.getColumnIndex("AcceptedQty")));
-                    singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idPurchaseOrderDetails")));
+                    singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idPurchaseOrder")));
 
 
                     dataArray.put(singleDataObj);

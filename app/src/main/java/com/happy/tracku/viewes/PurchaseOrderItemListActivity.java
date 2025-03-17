@@ -312,7 +312,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                 message = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatusMsg();
                 Log.e("Log", "message" + message);
 
-                if(status != 1)
+                if(status != 3)
                 {
                     return "failure";
                 }
