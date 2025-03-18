@@ -18,6 +18,7 @@ import com.happy.tracku.R;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
 import com.happy.tracku.gson.purchaseorderlist.PurchaseOrder;
+import com.happy.tracku.utils.Fns;
 import com.happy.tracku.viewes.PurchaseOrderItemListActivity;
 import com.happy.tracku.viewes.PurchaseOrderListActivity;
 import com.happy.tracku.viewholders.PurchaseOrderItemListViewHolder;
@@ -92,7 +93,16 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
 
              purchaseOrderItem.setAcceptedQuantity(acceptedQty);
 
-             dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
+             if (purchaseOrderItem.getOrderQuantity() != acceptedQty)
+             {
+                 Fns.neutralAlert("Alert", "The accepted quantity is different from your order quantity.", context);
+             }
+             else
+             {
+                 dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
+
+                 Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
+             }
 
 
 
