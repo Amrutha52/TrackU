@@ -1,0 +1,106 @@
+package com.happy.tracku.adapters;
+
+import android.content.Context;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.happy.tracku.R;
+import com.happy.tracku.db.DbHelper;
+import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
+import com.happy.tracku.gson.stockoutpurchaseorderitemlist.StockOutPurchaseOrderItem;
+import com.happy.tracku.utils.Fns;
+import com.happy.tracku.viewes.PurchaseOrderItemListActivity;
+import com.happy.tracku.viewes.StockOutPurchaseOrderItemListActivity;
+import com.happy.tracku.viewholders.PurchaseOrderItemListViewHolder;
+
+import java.util.List;
+
+
+public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseOrderItemListViewHolder> implements View.OnClickListener
+{
+    Context context;
+    List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList;
+    DbHelper dbHelper;
+    public StockoutPurchaseOrderItemListAdapter(StockOutPurchaseOrderItemListActivity context, List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList)
+    {
+        this.context = context;
+        this.stockOutPurchaseOrderItemList = stockOutPurchaseOrderItemList;
+        Log.e("Log", "stockOutPurchaseOrderItemList" + stockOutPurchaseOrderItemList);
+
+        dbHelper = new DbHelper(context);
+
+    }
+
+    @NonNull
+    @Override
+    public PurchaseOrderItemListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_purchase_order_item, parent, false);
+        return new PurchaseOrderItemListViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull PurchaseOrderItemListViewHolder holder, int position)
+    {
+        StockOutPurchaseOrderItem purchaseOrderItem = stockOutPurchaseOrderItemList.get(position);
+
+        holder.itemTV.setText(purchaseOrderItem.getItemName());
+        holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());
+        holder.rackNoTV.setText(purchaseOrderItem.getRackNumber().toString());
+        holder.rateTV.setText(purchaseOrderItem.getTotalAmount().toString());
+        holder.floorNoTV.setText(purchaseOrderItem.getFloor().toString());
+
+        holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getStockOutQuantity()));
+
+        holder.acceptedQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
+        holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
+        holder.acceptedQtyOkButton.setOnClickListener(this);
+
+    }
+
+    @Override
+    public int getItemCount()
+    {
+        return stockOutPurchaseOrderItemList.size();
+    }
+
+
+    @Override
+    public void onClick(View view)
+    {
+        switch (view.getId())
+        {
+            case R.id.acceptedQtyOkButton:
+            {
+                PurchaseOrderItem purchaseOrderItem = (PurchaseOrderItem) view.getTag(R.string.key_one);
+                TextInputEditText acceptedQtyTextInput = (TextInputEditText)view.getTag(R.string.key_two);
+
+                double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
+                Log.e("Log","acceptedQtyAdapter" + acceptedQty);
+
+                purchaseOrderItem.setAcceptedQuantity(acceptedQty);
+
+                if (purchaseOrderItem.getOrderQuantity() != acceptedQty)
+                {
+                    Fns.neutralAlert("Alert", "The accepted quantity is different from your order quantity.", context);
+                }
+                else
+                {
+                    dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
+
+                    Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
+                }
+
+
+
+            }
+            break;
+        }
+    }
+}

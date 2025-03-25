@@ -594,6 +594,12 @@ public class MainMenuActivity extends AppCompatActivity {
                 startActivity(new Intent(this, PurchaseOrderListActivity.class));
             }
             break;
+
+            case R.id.stockOutListLL:
+            {
+                startActivity(new Intent(this, StockOutOrderListActivity.class));
+            }
+            break;;
         }
     }
 

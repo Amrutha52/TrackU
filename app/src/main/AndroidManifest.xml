@@ -34,15 +34,21 @@
         android:theme="@style/Theme.Tracku"
         tools:targetApi="31">
         <activity
-            android:name=".viewes.PurchaseOrderItemListActivity"
-            android:parentActivityName=".viewes.PurchaseOrderListActivity"
-            android:theme="@style/AppThemeMaterial"
+            android:name=".viewes.StockOutPurchaseOrderItemListActivity"
             android:exported="false" />
         <activity
-            android:name=".viewes.PurchaseOrderListActivity"
-            android:parentActivityName=".viewes.MainMenuActivity"
-            android:theme="@style/AppThemeMaterial"
+            android:name=".viewes.StockOutOrderListActivity"
             android:exported="false" />
+        <activity
+            android:name=".viewes.PurchaseOrderItemListActivity"
+            android:exported="false"
+            android:parentActivityName=".viewes.PurchaseOrderListActivity"
+            android:theme="@style/AppThemeMaterial" />
+        <activity
+            android:name=".viewes.PurchaseOrderListActivity"
+            android:exported="false"
+            android:parentActivityName=".viewes.MainMenuActivity"
+            android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.TravelLogActivity"
             android:exported="false"

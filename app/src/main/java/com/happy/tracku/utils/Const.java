@@ -35,4 +35,7 @@ public class Const
     public static final String URL_PURCHASE_ORDER_ITEM_LIST= "PurchaseOrderItemList";
     public static final String URL_VENDOR_LIST = "VendorList";
     public static final String URL_SEND_PURCHASE_REQUEST = "SendPurchaseRequest";
+    public static final String URL_STOCKOUT_PURCHASE_ORDER_LIST= "StockOutPurchaseOrderList";
+    public static final String URL_STOCKOUT_PURCHASE_ORDER_ITEM_LIST = "StockOutPurchaseOrderItemList";
+    public static final String URL_STOCKOUT_SEND_PURCHASE_REQUEST = "StockOutSendPurchaseRequest";
 }

@@ -90,7 +90,7 @@
                     android:textSize="18sp"
                     android:layout_marginTop="30dp"
                     android:textColor="@color/white"
-                    android:backgroundTint="@color/yellow"
+                    android:backgroundTint="@color/lightlotouscolor"
                     android:onClick="listeners"
                     app:cornerRadius = "20dp"/>
 
