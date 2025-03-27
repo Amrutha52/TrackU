@@ -599,7 +599,7 @@ public class MainMenuActivity extends AppCompatActivity {
             {
                 startActivity(new Intent(this, StockOutOrderListActivity.class));
             }
-            break;;
+            break;
         }
     }
 

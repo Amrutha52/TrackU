@@ -96,7 +96,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         {
             case R.id.complete_save_button:
             {
-                new PushPurchaseOrderRequest(this, idPurchaseOrder).execute();
+               // new PushPurchaseOrderRequest(this, idPurchaseOrder).execute();
 
             }
             break;
@@ -185,7 +185,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                 stockOutPurchaseOrderItemListJson = gson.fromJson(result, StockOutPurchaseOrderItemListJson.class);
 
                 dbHelper.deletePurchaseOrderRequest();
-                dbHelper.insertPurchaseOrderRequest(stockOutPurchaseOrderItemListJson);
+            //    dbHelper.insertPurchaseOrderRequest(stockOutPurchaseOrderItemListJson);
 
             }
             catch (Exception e)
