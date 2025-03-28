@@ -3,6 +3,7 @@ package com.happy.tracku.viewes;
 import static com.happy.tracku.utils.Const.URL_PURCHASE_ORDER_ITEM_LIST;
 import static com.happy.tracku.utils.Const.URL_SEND_PURCHASE_REQUEST;
 import static com.happy.tracku.utils.Const.URL_STOCKOUT_PURCHASE_ORDER_ITEM_LIST;
+import static com.happy.tracku.utils.Const.URL_STOCKOUT_SEND_PURCHASE_REQUEST;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -35,6 +36,7 @@ import com.happy.tracku.databinding.ActivityStockOutPurchaseOrderItemListBinding
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItemListJson;
 import com.happy.tracku.gson.sendpurchaserequest.SendPurchaseRequestStatusJson;
+import com.happy.tracku.gson.sendstockoutrequest.StockOutSendPurchaseRequestJson;
 import com.happy.tracku.gson.stockoutpurchaseorderitemlist.StockOutPurchaseOrderItemListJson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
@@ -96,7 +98,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         {
             case R.id.complete_save_button:
             {
-               // new PushPurchaseOrderRequest(this, idPurchaseOrder).execute();
+                new PushStockOutRequest(this, idPurchaseOrder).execute();
 
             }
             break;
@@ -184,8 +186,17 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                 Gson gson = new Gson();
                 stockOutPurchaseOrderItemListJson = gson.fromJson(result, StockOutPurchaseOrderItemListJson.class);
 
-                dbHelper.deletePurchaseOrderRequest();
-            //    dbHelper.insertPurchaseOrderRequest(stockOutPurchaseOrderItemListJson);
+                if (stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList() == null || stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().isEmpty() || stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().size() == 0)
+                {
+                    return "nullException";
+                }
+                else
+                {
+                    dbHelper.deleteStockOutRequest();
+                    dbHelper.insertStockOutRequest(stockOutPurchaseOrderItemListJson);
+
+                }
+
 
             }
             catch (Exception e)
@@ -217,6 +228,10 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
 
             }
+            else if (s.equals("nullException"))
+            {
+                Fns.neutralAlert("Alert", "Null Exception from Server Side", context.get());
+            }
             else
             {
                 Fns.neutralAlert("Alert", "Failure", context.get());
@@ -225,22 +240,22 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         }
     }
 
-    private static class PushPurchaseOrderRequest extends AsyncTask<String, String, String>
+    private static class PushStockOutRequest extends AsyncTask<String, String, String>
     {
         ProgressDialog pd;
-        WeakReference<PurchaseOrderItemListActivity> context;
+        WeakReference<StockOutPurchaseOrderItemListActivity> context;
         private OkHttpClient okHttpClient;
         private Request request;
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         String url;
         SharedPreferences shp;
         DbHelper dbHelper;
-        SendPurchaseRequestStatusJson sendPurchaseRequestStatusJson;
+        StockOutSendPurchaseRequestJson stockOutSendPurchaseRequestJson;
         String message;
 
         int idPurchaseOrder;
 
-        public PushPurchaseOrderRequest(PurchaseOrderItemListActivity context, Integer idPurchaseOrder)
+        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder)
         {
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
@@ -277,12 +292,12 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendPurchaseRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder);
+                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder);
 
-                url = Const.USING_IP + URL_SEND_PURCHASE_REQUEST;
+                url = Const.USING_IP + URL_STOCKOUT_SEND_PURCHASE_REQUEST;
 
-                Log.e("Log","sendPurchaseRequest" +url);
-                Log.e("Log","sendPurchaseObject"+pushDataObj.toString());
+                Log.e("Log","sendStockoutRequestRequest" +url);
+                Log.e("Log","sendStockoutObject"+pushDataObj.toString());
 
 
                 RequestBody body = RequestBody.create(pushDataObj.toString(), JSON);
@@ -309,12 +324,12 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
                 Gson gson = new Gson();
 
-                sendPurchaseRequestStatusJson= gson.fromJson(resultString,SendPurchaseRequestStatusJson.class);
-                Log.e("Log", "sendPurchaseRequestStatusJson" + sendPurchaseRequestStatusJson);
+                stockOutSendPurchaseRequestJson = gson.fromJson(resultString,StockOutSendPurchaseRequestJson.class);
+                Log.e("Log", "stockOutSendPurchaseRequestJson" + stockOutSendPurchaseRequestJson);
 
-                int status = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatus();
+                int status = stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus().get(0).getStatus();
                 Log.e("Log", "status" + status);
-                message = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatusMsg();
+                message = stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus().get(0).getStatusMsg();
                 Log.e("Log", "message" + message);
 
                 if(status != 3)

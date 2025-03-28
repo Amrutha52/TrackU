@@ -92,7 +92,7 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
                 }
                 else
                 {
-                    dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
+                    dbHelper.updateStockOutQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
 
                     Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
                 }

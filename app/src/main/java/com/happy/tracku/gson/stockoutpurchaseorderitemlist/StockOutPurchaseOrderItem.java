@@ -50,7 +50,7 @@ public class StockOutPurchaseOrderItem {
 
 
 
-    @SerializedName("stockoutQuantity")
+    @SerializedName("StockOutQuantity")
     @Expose
     private double stockoutQuantity;
 

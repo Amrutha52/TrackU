@@ -91,7 +91,7 @@ public class StockOutOrderListActivity extends AppCompatActivity
         String url;
         SharedPreferences shp;
         StockOutPurchaseOrderListJson stockOutPurchaseOrderListJson;
-        List<StockOutPurchaseOrder> stockOutPurchaseOrderList;
+
         SearchView vendorNameSearchView;
         String employeeCode;
         public PullStockOutOrderListDetails(StockOutOrderListActivity context)
@@ -159,6 +159,10 @@ public class StockOutOrderListActivity extends AppCompatActivity
                 Gson gson = new Gson();
                 stockOutPurchaseOrderListJson = gson.fromJson(result, StockOutPurchaseOrderListJson.class);
 
+                if (stockOutPurchaseOrderListJson.getData().getStockOutPurchaseOrderList().isEmpty() || stockOutPurchaseOrderListJson.getData().getStockOutPurchaseOrderList().size() == 0 || stockOutPurchaseOrderListJson.getData().getStockOutPurchaseOrderList() == null)
+                {
+                    return "nullException";
+                }
 
 
             }
@@ -213,8 +217,10 @@ public class StockOutOrderListActivity extends AppCompatActivity
 
                 });
 
-            }
-            else
+            } else if (s.equals("nullException"))
+            {
+                Fns.neutralAlert("Alert", "Null Exception from Server Side", context.get());
+            } else
             {
                 Fns.neutralAlert("Alert", "Failure", context.get());
             }

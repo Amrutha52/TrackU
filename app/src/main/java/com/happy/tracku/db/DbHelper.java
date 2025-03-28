@@ -12,6 +12,8 @@ import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
 import com.happy.tracku.gson.purchaseorderitemlist.Data;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItemListJson;
+import com.happy.tracku.gson.stockoutpurchaseorderitemlist.StockOutPurchaseOrderItem;
+import com.happy.tracku.gson.stockoutpurchaseorderitemlist.StockOutPurchaseOrderItemListJson;
 import com.happy.tracku.models.DailyTravelModel;
 import com.happy.tracku.utils.Const;
 
@@ -24,11 +26,12 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
     public static final String SAVE_PURCHASE_ORDER_TABLE = "SavePurchaseDetails";
+    public static final String SAVE_STOCKOUT_PURCHASE_ORDER_TABLE = "SaveStockOutPurchaseDetails";
 
     private SharedPreferences shp;
     private Context context;
@@ -48,6 +51,8 @@ public class DbHelper extends SQLiteOpenHelper
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, AcceptedQty Double, CreatedBy Text)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text)");
+
     }
 
     @Override
@@ -63,6 +68,11 @@ public class DbHelper extends SQLiteOpenHelper
         if (oldVersion <= 3)
         {
             db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, AcceptedQty Double, CreatedBy Text)");
+
+        }
+        if (oldVersion <= 4)
+        {
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text)");
 
         }
         onCreate(db);
@@ -337,5 +347,98 @@ public class DbHelper extends SQLiteOpenHelper
         return finalJson;
     }
 
+    public void insertStockOutRequest(StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        com.happy.tracku.gson.stockoutpurchaseorderitemlist.Data data = stockOutPurchaseOrderItemListJson.getData();
+        List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList = data.getStockOutPurchaseOrderItemList();
 
+        for (StockOutPurchaseOrderItem stockOutPurchaseOrderItem:
+                stockOutPurchaseOrderItemList) {
+
+            ContentValues cv = new ContentValues();
+            cv.put("idItem",stockOutPurchaseOrderItem.getIdItem());
+            cv.put("idUnit",stockOutPurchaseOrderItem.getIdUnit());
+            cv.put("idPurchaseOrder",stockOutPurchaseOrderItem.getIdSalesHeader());
+            cv.put("Item",stockOutPurchaseOrderItem.getItemName());
+            cv.put("OrderQty",stockOutPurchaseOrderItem.getOrderQuantity());
+            cv.put("RackNo",stockOutPurchaseOrderItem.getRackNumber());
+            cv.put("Rate",stockOutPurchaseOrderItem.getTotalAmount());
+            cv.put("FloorNo",stockOutPurchaseOrderItem.getFloor());
+            cv.put("StockOutQuantity",stockOutPurchaseOrderItem.getStockOutQuantity());
+            cv.put("CreatedBy",shp.getString(Const.Shp_Employee_Code,""));
+
+
+            Log.e("Log", "stockoutpurchaseOrderItemList" + stockOutPurchaseOrderItemList);
+            db.insert(SAVE_STOCKOUT_PURCHASE_ORDER_TABLE, null, cv);
+
+        }
+        //db.close();
+
+    }
+
+    public void deleteStockOutRequest()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE);
+    }
+
+    public void updateStockOutQuantity(Integer idItem, double stockOutQuantity)
+    {
+        Log.e("Log", "updateStockoutQuantity");
+        Log.e("Log", "stockoutQtyDB" + stockOutQuantity);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set StockOutQuantity="+stockOutQuantity+" where idItem="+idItem);
+
+
+    }
+
+    public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idPurchaseOrder)
+    {
+        JSONObject finalJson = new JSONObject();
+        JSONArray dataArray = new JSONArray();
+        try {
+
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor cur = db.rawQuery("select * from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE +" where idPurchaseOrder="+idPurchaseOrder+" and CreatedBy="+createdBy,null);
+
+            if(cur.getCount() > 0)
+            {
+
+                cur.moveToFirst();
+
+                for (int i = 0; i < cur.getCount(); i++) {
+
+                    JSONObject singleDataObj = new JSONObject();
+                    singleDataObj.put("idItem",cur.getInt(cur.getColumnIndex("idItem")));
+                    singleDataObj.put("idUnit",cur.getInt(cur.getColumnIndex("idUnit")));
+                    singleDataObj.put("Quantity",cur.getInt(cur.getColumnIndex("StockOutQuantity")));
+                    singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idPurchaseOrder")));
+
+
+                    dataArray.put(singleDataObj);
+
+
+                    cur.moveToNext();
+
+                }
+
+            }
+            cur.close();
+
+            finalJson.put("createdBy", createdBy);
+            finalJson.put("idStatus", idStatus);
+            Log.e("Log", "sendstockoutjson" + finalJson);
+            Log.e("Log", "dataarray"+dataArray);
+            finalJson.put("StockInTable",dataArray);
+            Log.e("Log", "finalJsonDB"+finalJson);
+
+        } catch (JSONException e) {
+            Log.e("Log", "exception" + e);
+        }
+
+        return finalJson;
+    }
 }
