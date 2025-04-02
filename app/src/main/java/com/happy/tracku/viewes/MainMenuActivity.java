@@ -24,6 +24,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
@@ -214,8 +215,27 @@ public class MainMenuActivity extends AppCompatActivity {
 //        }
 
 
+
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Do not logout here if the user is simply switching apps
+        // Instead, consider saving any temporary states or pausing background tasks
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Avoid logging out the user when the app stops
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reset any session timeouts if necessary
+    }
   /*  private void getLocation() {
         if (ActivityCompat.checkSelfPermission(MainMenuActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(MainMenuActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
