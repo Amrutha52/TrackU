@@ -11,6 +11,7 @@ public class Const
     public static final String Shp_Is_LoggedIn = "IsLoggedIn";
     public static final String Shp_Version_No = "VersionNo";
     public static final String Shp_Android_Id = "AndroidId";
+    public static final String Shp_NEW_APP_VERSION = "newAppVersion";
 
     public static final int LOCATION_REQUEST = 1000;
     public static final int GPS_REQUEST = 1001;
@@ -20,8 +21,8 @@ public class Const
    // public static final String URL_PUBLIC_LIVE = "https://yardmobapp.maxvalue.co.in:92/api/TrackVeDetails/";
     public static final String URL_PUBLIC_LIVE = "https://tracku.ecopackuae.com/api/TrackVeDetails/";
 
-    // public static String USING_IP = URL_PUBLIC_TEST;
-   public static String USING_IP = URL_PUBLIC_LIVE;
+     public static String USING_IP = URL_PUBLIC_TEST;
+  // public static String USING_IP = URL_PUBLIC_LIVE;
 
     public static final String URL_LOGIN = "TrackVeValidateLogin";
     public static final String URL_Update_Daily_GPS_Data = "UpdateDailyGPSData";

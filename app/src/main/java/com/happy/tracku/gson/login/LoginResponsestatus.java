@@ -32,9 +32,15 @@ public class LoginResponsestatus {
     @SerializedName("employeeCode")
     @Expose
     private String employeeCode;
+
+
+
     @SerializedName("statusMessage")
     @Expose
     private String statusMessage;
+    @SerializedName("version")
+    @Expose
+    private String version;
 
     public Integer getIsAdmin() {
         return isAdmin;
@@ -126,6 +132,14 @@ public class LoginResponsestatus {
 
     public void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
 }

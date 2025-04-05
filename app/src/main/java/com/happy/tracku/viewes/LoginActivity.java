@@ -316,7 +316,19 @@ public class LoginActivity extends AppCompatActivity
                     return "failure";
                 }
 
+                double versionAtServer = Double.parseDouble(loginStatusJson.getData().getLoginResponseStatus().get(0).getVersion());
+                double currentVersion = Double.parseDouble(Fns.getAppVersionName(mContext));
 
+
+                if(versionAtServer > currentVersion)
+                {
+
+                    SharedPreferences.Editor edt = shp.edit();
+                    edt.putString(Const.Shp_NEW_APP_VERSION,loginStatusJson.getData().getLoginResponseStatus().get(0).getVersion());
+                    edt.apply();
+                    return "update";
+
+                }
 
 
             }
@@ -404,9 +416,97 @@ public class LoginActivity extends AppCompatActivity
 
 
             }
+            else if(s.equals("update"))
+            {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+
+                builder.setMessage("New Version of App Released. You have to update to continue");
+
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i)
+                    {
+
+                    }
+                });
+
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        //Goto page saved successfully
+                        //TODO call webservice
+
+                        dialogInterface.dismiss();
+                        //mContext.downloadNewApk();
+
+                        Fns.openInPlayStore(mContext);
 
 
+                    }
+                });
+
+                AlertDialog alertDialog = builder.create();
+
+                alertDialog.show();
+
+
+
+            }
 
         }
     }
 }
+
+
+/*
+  if (versionString > Double.parseDouble(Fns.getAppVersionName(context))) {
+
+                    SharedPreferences.Editor edt = shp.edit();
+                    edt.putString(Const.Shp_NEW_APP_PATHNAME, path);
+                    edt.apply();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+                    builder.setMessage("New Version of App Released. You have to update to continue");
+
+                    if (isCompulsory == 1)
+                    {
+
+                        builder.setCancelable(false);
+
+                    }
+
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            dialogInterface.dismiss();
+
+
+                        }
+                    });
+
+                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            dialogInterface.dismiss();
+                            //downloadNewApk();
+
+                            Fns.openInPlayStore(context);
+
+
+                        }
+                    });
+
+                    AlertDialog alertDialog = builder.create();
+
+                    alertDialog.show();
+
+
+                }
+
+                MainMenu
+ */
