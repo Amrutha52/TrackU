@@ -12,6 +12,8 @@ public class Const
     public static final String Shp_Version_No = "VersionNo";
     public static final String Shp_Android_Id = "AndroidId";
     public static final String Shp_NEW_APP_VERSION = "newAppVersion";
+    public static final String Shp_UserName = "UserName";
+    public static final String Shp_PassWord = "PassWord";
 
     public static final int LOCATION_REQUEST = 1000;
     public static final int GPS_REQUEST = 1001;

@@ -1,5 +1,6 @@
 package com.happy.tracku.viewes;
 
+import static com.happy.tracku.utils.Const.URL_LOGIN;
 import static com.happy.tracku.utils.Const.USING_IP;
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,6 +49,7 @@ import com.happy.tracku.R;
 import com.happy.tracku.databinding.ActivityMainMenuBinding;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.gpsstatusjson.GPSUpdateStatusJson;
+import com.happy.tracku.gson.login.LoginStatusJson;
 import com.happy.tracku.models.DailyTravelModel;
 import com.happy.tracku.service.ForeGroundService;
 import com.happy.tracku.ssl.CustomTrust;
@@ -55,6 +58,8 @@ import com.happy.tracku.utils.Fns;
 
 import org.json.JSONObject;
 
+import java.io.InterruptedIOException;
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -96,6 +101,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private boolean isContinue = false;
     private boolean isGPS = false;
     private static final int PERMISSION_REQUEST_ID = 1000;
+    String userNameString, passwordString;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -198,6 +204,11 @@ public class MainMenuActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, ForeGroundService.class);
             startService(serviceIntent);
         }
+
+        userNameString = shp.getString(Const.Shp_UserName, "");
+        passwordString = shp.getString(Const.Shp_PassWord, "");
+
+        new LoginTaskForVersionCheck(this, userNameString, passwordString).execute();
 
 
 //        LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
@@ -832,6 +843,264 @@ public class MainMenuActivity extends AppCompatActivity {
             {
 
                 Toast.makeText(mContext, "Failed to Push", Toast.LENGTH_LONG).show();
+
+            }
+
+        }
+    }
+
+    private static class LoginTaskForVersionCheck extends AsyncTask<String, String, String>
+    {
+
+        OkHttpClient okHttpClient;
+        String url;
+        Request request;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        MainMenuActivity mContext;
+
+        ProgressDialog pd;
+        SharedPreferences shp;
+        TelephonyManager telephonyManager;
+        String usernameString, passwordString;
+        String failureMsg;
+        boolean exceptionOccured = false,timeOutExceptionOccured = false;
+        String inputAndOutputJson = "";
+        LoginStatusJson loginStatusJson;
+        public LoginTaskForVersionCheck(MainMenuActivity mContext, String userNameString, String passwordString)
+        {
+            this.mContext = mContext;
+            this.usernameString = userNameString;
+            this.passwordString = passwordString;
+
+            Log.e("Log", "usernameStringMainMenu" + usernameString);
+            Log.e("Log", "passwordStringMainMenu" + passwordString);
+
+            CustomTrust customTrust = new CustomTrust(mContext);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+
+            pd = new ProgressDialog(mContext);
+            shp = mContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+
+
+            pd.setTitle("Please wait");
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("wait...");
+            pd.setCancelable(false);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+            try
+            {
+                pd.show();
+
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+            }
+
+        }
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try {
+
+                url = USING_IP + URL_LOGIN;
+
+                Log.e("Log", "loginURL" +url);
+
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("loginId", usernameString);
+                jsonObject.put("password", passwordString);
+                jsonObject.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
+                jsonObject.put("androidId", shp.getString(Const.Shp_Android_Id, ""));
+                jsonObject.put("createdBy", "");
+
+
+                inputAndOutputJson = jsonObject.toString();
+                Log.e("Log", " inputAndOutputJson" + inputAndOutputJson);
+
+                RequestBody bodyOne = RequestBody.create(jsonObject.toString(), JSON);
+                request = new Request.Builder()
+                        //.header("X-Client-Type", "Android")
+                        .url(url)
+                        .post(bodyOne)
+                        .build();
+
+
+                Response responseOne = okHttpClient.newCall(request).execute();
+
+                if (!responseOne.isSuccessful()) {
+
+                    Log.e("Log", "failure");
+                    failureMsg = "Response unsuccessfull";
+                    return "failure";
+                }
+
+                pd.setProgress(25);
+                String resultOne = responseOne.body().string();
+
+                Log.e("Log", resultOne);
+
+                inputAndOutputJson = inputAndOutputJson + "----------" + resultOne;
+
+
+                Gson gsonTwo = new Gson();
+
+
+             /*   if (resultOne.equals("{}")) {
+                    failureMsg = "empty String result";
+                    return "failure";
+                }
+
+                if (resultOne.equals("{\"Status\":[{\"Status\":0,\"StatusMsg\":\"Invalid login\"}]}"))
+                {
+                    failureMsg = "Invalid Login Status";
+                    return "failure";
+
+                }
+
+              */
+
+                loginStatusJson = gsonTwo.fromJson(resultOne, LoginStatusJson.class);
+
+                if (loginStatusJson.getData().getLoginResponseStatus().isEmpty() || loginStatusJson.getData().getLoginResponseStatus().size() == 0)
+                {
+                    return "failure";
+                }
+                else if (loginStatusJson.getData().getLoginResponseStatus().get(0).getStatus() != 1)
+                {
+                    return "failure";
+                }
+
+                double versionAtServer = Double.parseDouble(loginStatusJson.getData().getLoginResponseStatus().get(0).getVersion());
+                double currentVersion = Double.parseDouble(Fns.getAppVersionName(mContext));
+
+
+                if(versionAtServer > currentVersion)
+                {
+
+                    SharedPreferences.Editor edt = shp.edit();
+                    edt.putString(Const.Shp_NEW_APP_VERSION,loginStatusJson.getData().getLoginResponseStatus().get(0).getVersion());
+                    edt.apply();
+                    return "update";
+
+                }
+
+
+            }
+            catch(SocketTimeoutException e)
+            {
+
+                failureMsg = Fns.getErrorMsgFromException(e);
+                Log.e("Log", "FailureMessage" + failureMsg);
+                //throw new RuntimeException(e);
+                timeOutExceptionOccured = true;
+                //exceptionOccured = true;
+                return "failure";
+
+
+            }catch (InterruptedIOException e)
+            {
+
+                failureMsg = Fns.getErrorMsgFromException(e);
+                Log.e("Log", "failureMsgInterruptedIOException" + failureMsg);
+                //throw new RuntimeException(e);
+                timeOutExceptionOccured = true;
+                //exceptionOccured = true;
+                return "failure";
+
+            }
+            catch (Exception e)
+            {
+
+                failureMsg = Fns.getErrorMsgFromException(e);
+                Log.e("Log", "failureMessageException" + failureMsg);
+                //throw new RuntimeException(e);
+                exceptionOccured = true;
+                return "failure";
+
+            }
+
+            return "success";
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+            pd.dismiss();
+
+            if (s.equals("success"))
+            {
+                Toast.makeText(mContext, "Success ", Toast.LENGTH_LONG).show();
+
+            }
+            else if (s.equals("failure"))
+            {
+
+                //Fns.neutralAlert("Failure",failureMsg,mContext);
+                Toast.makeText(mContext, "Failed "+failureMsg, Toast.LENGTH_LONG).show();
+
+              /*  if(timeOutExceptionOccured)
+                {
+                    Fns.neutralAlert("Alert","Timeout ",mContext);
+
+                }
+                else if(exceptionOccured)
+                {
+                    String errorMsg = Fns.getErrorMessage(mContext,failureMsg);
+                    Fns.neutralAlert("Alert","Failed "+errorMsg,mContext);
+                }
+                else
+                {
+                    String message = loginStatusJson.getData().getLoginResponseStatus().get(0).getStatusMessage();
+                    Fns.neutralAlert("Alert",message,mContext);
+                }
+
+               */
+
+
+            }
+            else if(s.equals("update"))
+            {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+
+                builder.setMessage("New Version of App Released. You have to update to continue");
+
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i)
+                    {
+
+                    }
+                });
+
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        //Goto page saved successfully
+                        //TODO call webservice
+
+                        dialogInterface.dismiss();
+                        //mContext.downloadNewApk();
+
+                        Fns.openInPlayStore(mContext);
+
+
+                    }
+                });
+
+                AlertDialog alertDialog = builder.create();
+
+                alertDialog.show();
 
             }
 
