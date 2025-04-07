@@ -2,7 +2,6 @@ package com.happy.tracku.viewes;
 
 import static android.icu.util.MeasureUnit.DOT;
 import static com.google.android.gms.maps.model.JointType.ROUND;
-import static com.happy.tracku.utils.Const.URL_PUBLIC_TEST;
 import static com.happy.tracku.utils.Const.USING_IP;
 
 import androidx.annotation.NonNull;
