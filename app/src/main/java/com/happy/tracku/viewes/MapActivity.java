@@ -131,7 +131,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private PolylineOptions polylineOptions, blackPolylineOptions;
     private Polyline blackPolyline, greyPolyLine;
 
-    private double lat, lng;
+    private double lat = 0.0, lng = 0.0;
     private LinearLayout linearLayout;
     private Disposable disposable;
     private ApiInterface apiInterface;
