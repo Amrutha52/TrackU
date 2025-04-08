@@ -205,6 +205,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                 purchaseOrderItemListRecyclerview.setLayoutManager(layoutManager);
                 purchaseOrderItemListRecyclerview.setItemAnimator(new DefaultItemAnimator());
 
+                Log.e("Log", "PurchaseOderItemListtt" + purchaseOrderItemListJson.getData().getPurchaseOrderItemList().toString());
 
                 PurchaseOrderItemListAdapter purchaseOrderItemListAdapter = new PurchaseOrderItemListAdapter(context.get(), purchaseOrderItemListJson.getData().getPurchaseOrderItemList());
                 purchaseOrderItemListRecyclerview.setAdapter(purchaseOrderItemListAdapter);
