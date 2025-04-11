@@ -1174,6 +1174,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                     }
                                                     else
                                                     {
+                                                        Toast.makeText(MapActivity.this, "Error: animatedPosition is null during animation update", Toast.LENGTH_LONG).show();
                                                         Log.e("MapActivityAnimationError", "Error: animatedPosition is null during animation update.");
                                                     }
                                                 }
