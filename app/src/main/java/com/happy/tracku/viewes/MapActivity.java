@@ -162,6 +162,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         latlngPoints = new ArrayList<>();
 
+        endPosition = new LatLng(lat, lng);
+        startPosition = new LatLng(lat, lng);
 
     }
 
@@ -1041,6 +1043,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             LatLng origin = latlngPoints.get(i);
             LatLng destination = latlngPoints.get(i + 1);
 
+            endPosition = new LatLng(lat, lng);
+            startPosition = new LatLng(lat, lng);
+
+
             String requestURL = null;
             try
             {
@@ -1143,22 +1149,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                             valueAnimator.setInterpolator(new LinearInterpolator());
                                             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                                 @Override
-                                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                                public void onAnimationUpdate(ValueAnimator valueAnimator)
+                                                {
                                                     v = valueAnimator.getAnimatedFraction();
-                                                    lng = v * endPosition.longitude + (1 - v)
-                                                            * startPosition.longitude;
-                                                    lat = v * endPosition.latitude + (1 - v)
-                                                            * startPosition.latitude;
-                                                    LatLng newPos = new LatLng(lat, lng);
-                                                    //     CurrentJourneyEvent currentJourneyEvent = new CurrentJourneyEvent();
-                                                    //   currentJourneyEvent.setCurrentLatLng(newPos);
-                                                    // JourneyEventBus.getInstance().setOnJourneyUpdate(currentJourneyEvent);
-                                                    marker.setPosition(newPos);
-                                                    marker.setAnchor(0.5f, 0.5f);
-                                                    marker.setRotation(getBearing(startPosition, newPos));
-                                                    mMap.moveCamera(CameraUpdateFactory.newCameraPosition
-                                                            (new CameraPosition.Builder().target(newPos)
-                                                                    .zoom(15.5f).build()));
+                                                   // LatLng animatedPosition = (LatLng) valueAnimator.getAnimatedValue();
+                                                  //  Log.e("Log", "animatedPosition" + animatedPosition);
+                                                    if (v != 0.0)
+                                                    {
+
+                                                        lng = v * endPosition.longitude + (1 - v)
+                                                                * startPosition.longitude;
+                                                        lat = v * endPosition.latitude + (1 - v)
+                                                                * startPosition.latitude;
+                                                        LatLng newPos = new LatLng(lat, lng);
+                                                        //     CurrentJourneyEvent currentJourneyEvent = new CurrentJourneyEvent();
+                                                        //   currentJourneyEvent.setCurrentLatLng(newPos);
+                                                        // JourneyEventBus.getInstance().setOnJourneyUpdate(currentJourneyEvent);
+                                                        marker.setPosition(newPos);
+                                                        marker.setAnchor(0.5f, 0.5f);
+                                                        marker.setRotation(getBearing(startPosition, newPos));
+                                                        mMap.moveCamera(CameraUpdateFactory.newCameraPosition
+                                                                (new CameraPosition.Builder().target(newPos)
+                                                                        .zoom(15.5f).build()));
+                                                    }
+                                                    else
+                                                    {
+                                                        Log.e("MapActivityAnimationError", "Error: animatedPosition is null during animation update.");
+                                                    }
                                                 }
                                             });
                                             valueAnimator.start();
