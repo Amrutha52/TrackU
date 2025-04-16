@@ -406,11 +406,11 @@
                                     android:backgroundTint="@color/white"
                                     app:cardElevation="10dp"
                                     app:strokeColor="#004d00"
-                                    android:visibility="visible"
+                                    android:visibility="invisible"
                                     app:strokeWidth="1dp">
 
                                     <LinearLayout
-                                        android:id="@+id/salesRequestLL"
+
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:onClick="listeners"
@@ -421,13 +421,13 @@
                                         <ImageView
                                             android:layout_width="40dp"
                                             android:layout_height="40dp"
-                                            android:src="@drawable/salesrequest" />
+                                            android:src="@drawable/shoppinglist" />
 
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:paddingTop="8dp"
-                                            android:text="Sales\nRequest"
+                                            android:text=""
                                             android:textAlignment="center" />
 
                                     </LinearLayout>
@@ -497,14 +497,14 @@
                 <FrameLayout
                     android:id="@+id/container"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    />
+                    android:layout_height="match_parent" />
 
                 <com.google.android.material.bottomnavigation.BottomNavigationView
                     android:id="@+id/bottomNav"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:layout_marginTop="700dp"
+                    android:layout_height="70dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="20dp"
                     android:visibility="visible"
                     app:menu="@menu/nav_menu"
                     android:scrollIndicators="left"/>

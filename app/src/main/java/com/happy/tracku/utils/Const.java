@@ -23,8 +23,8 @@ public class Const
    // public static final String URL_PUBLIC_LIVE = "https://yardmobapp.maxvalue.co.in:92/api/TrackVeDetails/";
     public static final String URL_PUBLIC_LIVE = "https://tracku.ecopackuae.com/api/TrackVeDetails/";
 
-  //   public static String USING_IP = URL_PUBLIC_TEST;
-   public static String USING_IP = URL_PUBLIC_LIVE;
+     public static String USING_IP = URL_PUBLIC_TEST;
+  // public static String USING_IP = URL_PUBLIC_LIVE;
 
     public static final String URL_LOGIN = "TrackVeValidateLogin";
     public static final String URL_Update_Daily_GPS_Data = "UpdateDailyGPSData";
@@ -41,4 +41,8 @@ public class Const
     public static final String URL_STOCKOUT_PURCHASE_ORDER_LIST= "StockOutPurchaseOrderList";
     public static final String URL_STOCKOUT_PURCHASE_ORDER_ITEM_LIST = "StockOutPurchaseOrderItemList";
     public static final String URL_STOCKOUT_SEND_PURCHASE_REQUEST = "StockOutSendPurchaseRequest";
+    public static final String URL_MASTER_DATA = "MasterData";
+    public static final String URL_SALES_DATA_FILLING = "SalesRequestDataFilling";
+    public static final String URL_SEND_SALES_REQUEST = "SendSalesRequest";
+
 }
