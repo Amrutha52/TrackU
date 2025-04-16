@@ -30,7 +30,6 @@
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="1dp"
-                    app:boxBackgroundColor="@color/quantum_yellow"
                     app:suffixText="▼">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -47,7 +46,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/hub_layout"
+                    android:id="@+id/product_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Select Product"
@@ -115,6 +114,23 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/possibleDeliveryDateInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Select Date"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/possibleDeliveryDateEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Delivery Location"
@@ -131,6 +147,7 @@
                     android:inputType="textEmailAddress"
                     android:importantForAutofill="no"
                     android:gravity="center" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"

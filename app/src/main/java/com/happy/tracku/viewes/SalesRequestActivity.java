@@ -42,4 +42,8 @@ public class SalesRequestActivity extends AppCompatActivity
         getSupportActionBar().setTitle("SalesOrderRequest");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
+    public void listeners(View view)
+    {
+    }
 }
