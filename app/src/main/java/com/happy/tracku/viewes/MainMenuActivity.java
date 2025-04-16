@@ -988,7 +988,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 double currentVersion = Double.parseDouble(Fns.getAppVersionName(mContext));
 
 
-                if(versionAtServer > currentVersion)
+             /*   if(versionAtServer > currentVersion)
                 {
 
                     SharedPreferences.Editor edt = shp.edit();
@@ -997,6 +997,8 @@ public class MainMenuActivity extends AppCompatActivity {
                     return "update";
 
                 }
+
+              */
 
 
             }
