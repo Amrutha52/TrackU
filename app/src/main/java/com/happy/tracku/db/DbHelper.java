@@ -9,6 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
+import com.happy.tracku.gson.masterdata.ItemMaster;
+import com.happy.tracku.gson.masterdata.MasterDataJson;
+import com.happy.tracku.gson.masterdata.VendorMaster;
 import com.happy.tracku.gson.purchaseorderitemlist.Data;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItemListJson;
@@ -26,12 +29,14 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
     public static final String SAVE_PURCHASE_ORDER_TABLE = "SavePurchaseDetails";
     public static final String SAVE_STOCKOUT_PURCHASE_ORDER_TABLE = "SaveStockOutPurchaseDetails";
+    public static final String VENDOR_MASTER = "VendorMaster";
+    public static final String ITEM_MASTER =  "ItemMaster";
 
     private SharedPreferences shp;
     private Context context;
@@ -53,6 +58,10 @@ public class DbHelper extends SQLiteOpenHelper
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+VENDOR_MASTER+" (idVendor INTEGER,vendorName TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+ITEM_MASTER+" (idItem INTEGER,itemName TEXT)");
+
+
     }
 
     @Override
@@ -73,6 +82,12 @@ public class DbHelper extends SQLiteOpenHelper
         if (oldVersion <= 4)
         {
             db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text)");
+
+        }
+        if (oldVersion <= 5)
+        {
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+VENDOR_MASTER+" (idVendor INTEGER,vendorName TEXT)");
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+ITEM_MASTER+" (idItem INTEGER,itemName TEXT)");
 
         }
         onCreate(db);
@@ -440,5 +455,106 @@ public class DbHelper extends SQLiteOpenHelper
         }
 
         return finalJson;
+    }
+
+    public void insertMasterData(MasterDataJson masterDataJson)
+    {
+        Log.e("LogDB", "masterDataJson" + masterDataJson);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (masterDataJson.getData().getVendorMaster() != null)
+        {
+            List<VendorMaster> vendorMasterList = masterDataJson.getData().getVendorMaster();
+
+            for (VendorMaster vendorMaster : vendorMasterList)
+            {
+                ContentValues cv = new ContentValues();
+                cv.put("idVendor", vendorMaster.getIdVendor());
+                cv.put("vendorName", vendorMaster.getVendorName());
+
+                db.insert( VENDOR_MASTER , null, cv);
+                Log.e("LogDB", "vendorMasterCV" + cv);
+            }
+        }
+
+        if (masterDataJson.getData().getItemMaster() != null)
+        {
+            List<ItemMaster> itemMasterList = masterDataJson.getData().getItemMaster();
+
+            for (ItemMaster itemMaster : itemMasterList)
+            {
+                ContentValues cv = new ContentValues();
+                cv.put("idItem", itemMaster.getIdItem());
+                cv.put("itemName", itemMaster.getItemName());
+
+
+                db.insert( ITEM_MASTER , null, cv);
+                Log.e("LogDB", "itemMasterCV" + cv);
+
+            }
+        }
+    }
+
+    public void deleteVendorMaster()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + VENDOR_MASTER);
+    }
+
+    public void deleteItemMaster()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + ITEM_MASTER);
+    }
+
+    public ArrayList<VendorMaster> getVendorMaster()
+    {
+        ArrayList<VendorMaster> vendorMasterArrayList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select idVendor,vendorName from " + VENDOR_MASTER + " order by vendorName asc", null);
+        cur.moveToFirst();
+
+        for (int i = 0; i < cur.getCount(); i++) {
+
+            VendorMaster vendorMaster = new VendorMaster();
+
+            vendorMaster.setIdVendor(cur.getInt(cur.getColumnIndex("idVendor")));
+            vendorMaster.setVendorName(cur.getString(cur.getColumnIndex("vendorName")));
+
+
+            cur.moveToNext();
+
+            vendorMasterArrayList.add(vendorMaster);
+        }
+
+        return vendorMasterArrayList;
+
+    }
+
+    public ArrayList<ItemMaster> getItemMaster()
+    {
+        ArrayList<ItemMaster> itemMasterArrayList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select idItem,itemName from " + ITEM_MASTER + " order by itemName asc", null);
+        cur.moveToFirst();
+
+        for (int i = 0; i < cur.getCount(); i++) {
+
+            ItemMaster itemMaster = new ItemMaster();
+
+            itemMaster.setIdItem(cur.getInt(cur.getColumnIndex("idItem")));
+            itemMaster.setItemName(cur.getString(cur.getColumnIndex("itemName")));
+
+
+            cur.moveToNext();
+
+            itemMasterArrayList.add(itemMaster);
+        }
+
+        return itemMasterArrayList;
+
     }
 }
