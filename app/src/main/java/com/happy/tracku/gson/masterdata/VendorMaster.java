@@ -1,5 +1,7 @@
 package com.happy.tracku.gson.masterdata;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -28,5 +30,10 @@ public class VendorMaster {
         this.vendorName = vendorName;
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return vendorName;
+    }
 }
 

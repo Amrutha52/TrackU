@@ -1,5 +1,7 @@
 package com.happy.tracku.gson.masterdata;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -28,4 +30,10 @@ public class ItemMaster {
         this.itemName = itemName;
     }
 
+    @NonNull
+    @Override
+    public String toString()
+    {
+        return itemName;
+    }
 }

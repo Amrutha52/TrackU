@@ -1,10 +1,12 @@
 package com.happy.tracku.viewes;
 
 import static com.happy.tracku.utils.Const.URL_MASTER_DATA;
+import static com.happy.tracku.utils.Const.URL_SALES_DATA_FILLING;
 import static com.happy.tracku.utils.Const.USING_IP;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -34,6 +36,7 @@ import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.masterdata.ItemMaster;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
 import com.happy.tracku.gson.masterdata.VendorMaster;
+import com.happy.tracku.gson.salesrequestdatafilling.SalesRequestDataFillingJson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 
@@ -53,6 +56,7 @@ public class SalesRequestActivity extends AppCompatActivity
 {
     private ActivitySalesRequestBinding binding;
     MasterDataJson masterDataJson;
+    SalesRequestDataFillingJson salesRequestDataFillingJson;
     DbHelper dbHelper;
     Dialog dialog;
     ArrayList<VendorMaster> vendorMasterArrayList;
@@ -212,7 +216,7 @@ public class SalesRequestActivity extends AppCompatActivity
         dbHelper.insertMasterData(masterDataJson);
 
         /**
-         *  Searchable Hub Spinner
+         *  Searchable Vendor Spinner
          */
 
         binding.vendorMasterDropdown.setOnClickListener(new View.OnClickListener()
@@ -266,6 +270,8 @@ public class SalesRequestActivity extends AppCompatActivity
                         idVendor = adapterVendorMaster.getItem(position).getIdVendor();
                         Log.e("Log", "idVendor : " + idVendor);
 
+                        new PullSalesRequestDataFilling(SalesRequestActivity.this, idVendor).execute();
+
                         Toast.makeText(SalesRequestActivity.this, "Selected:"+ adapterVendorMaster.getItem(position).getVendorName(), Toast.LENGTH_SHORT).show();
                         //dismiss dialog after choose
                         dialog.dismiss();
@@ -275,7 +281,7 @@ public class SalesRequestActivity extends AppCompatActivity
         });
 
         /**
-         * Searchable Branch Spinner
+         * Searchable Product Spinner
          */
 
         binding.productMasterDropdown.setOnClickListener(new View.OnClickListener()
@@ -335,5 +341,152 @@ public class SalesRequestActivity extends AppCompatActivity
             }
         });
 
+    }
+
+    private static class PullSalesRequestDataFilling extends AsyncTask<String, String, String>
+    {
+        WeakReference<SalesRequestActivity> context;
+        ProgressDialog pd;
+        OkHttpClient okHttpClient;
+        String url, resultString;
+        Request request;
+        Response response;
+        SharedPreferences shp;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        SalesRequestDataFillingJson salesRequestDataFillingJson;
+        int idVendor;
+
+
+        public PullSalesRequestDataFilling(SalesRequestActivity context, int idVendor)
+        {
+            this.context = new WeakReference<>(context);
+            this.idVendor = idVendor;
+
+            CustomTrust customTrust = new CustomTrust(context);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+
+            shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+        }
+
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pd = new ProgressDialog(context.get());
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("Loading");
+            pd.setCancelable(false);
+            pd.show();
+        }
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+
+                JSONObject dataFillingObj = new JSONObject();
+                dataFillingObj.put("idVendor", idVendor);
+                dataFillingObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+
+                url = USING_IP + URL_SALES_DATA_FILLING;
+                Log.e("Log", "salesDataFillingURL" + url);
+
+                RequestBody body = RequestBody.create(dataFillingObj.toString(), JSON);
+                Log.e("Log", "dataFillingObj" + dataFillingObj);
+
+                request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "response" + response);
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+                }
+
+                resultString = response.body().string();
+                Log.e("Log", "SalesDataFillingResultString" + resultString);
+
+                Gson gson = new Gson();
+                salesRequestDataFillingJson = gson.fromJson(resultString, SalesRequestDataFillingJson.class);
+                Log.e("Log", "salesRequestDataFillingJson" + salesRequestDataFillingJson);
+
+                if (salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails() == null || salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().size() == 0 || salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().isEmpty())
+                {
+                    return "nullException";
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+                return "failure";
+            }
+            return "success";
+
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+            if (s.equals("success"))
+            {
+                context.get().clearFillingDetails();
+                context.get().setFillingData(salesRequestDataFillingJson);
+                Toast.makeText(context.get(), "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
+            }
+            else if (s.equals("failure"))
+            {
+                Toast.makeText(context.get(), "Pull Failed", Toast.LENGTH_SHORT).show();
+            } else if (s.equals("nullException"))
+            {
+                Toast.makeText(context.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
+            }
+
+            pd.dismiss();
+        }
+
+    }
+
+    private void clearFillingDetails()
+    {
+        binding.vendorMailId.setText("");
+        binding.deliveryLocation.setText("");
+        binding.mobileNumber.setText("");
+        binding.productMasterDropdown.setText("");
+        binding.quantityET.setText("");
+        binding.unitET.setText("");
+        binding.deliveryLocation.setText("");
+        binding.possibleDeliveryDateEditText.setText("");
+    }
+
+    private void setFillingData(SalesRequestDataFillingJson salesRequestDataFillingJson)
+    {
+        this.salesRequestDataFillingJson = salesRequestDataFillingJson;
+
+        if (salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).geteMail().isEmpty())
+        {
+            Toast.makeText(this, "Please Enter Your Email", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            binding.vendorMailId.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).geteMail());
+        }
+
+        if (salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber().isEmpty())
+        {
+            Toast.makeText(this, "Please Enter Your Phone Number", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            binding.vendorMailId.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber());
+        }
     }
 }
