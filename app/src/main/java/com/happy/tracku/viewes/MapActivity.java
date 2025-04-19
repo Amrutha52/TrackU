@@ -77,11 +77,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import io.reactivex.SingleObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -133,7 +128,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private double lat = 0.0, lng = 0.0;
     private LinearLayout linearLayout;
-    private Disposable disposable;
+    //private Disposable disposable;
     private ApiInterface apiInterface;
     private LatLng sydney;
 
