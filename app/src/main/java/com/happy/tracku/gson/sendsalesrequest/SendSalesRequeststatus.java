@@ -8,7 +8,7 @@ public class SendSalesRequeststatus {
     @SerializedName("status")
     @Expose
     private Integer status;
-    @SerializedName("statusMessage")
+    @SerializedName("statusMsg")
     @Expose
     private String statusMsg;
 

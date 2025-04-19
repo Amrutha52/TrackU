@@ -2,11 +2,14 @@ package com.happy.tracku.viewes;
 
 import static com.happy.tracku.utils.Const.URL_MASTER_DATA;
 import static com.happy.tracku.utils.Const.URL_SALES_DATA_FILLING;
+import static com.happy.tracku.utils.Const.URL_SEND_SALES_REQUEST;
 import static com.happy.tracku.utils.Const.USING_IP;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -18,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -37,14 +41,18 @@ import com.happy.tracku.gson.masterdata.ItemMaster;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
 import com.happy.tracku.gson.masterdata.VendorMaster;
 import com.happy.tracku.gson.salesrequestdatafilling.SalesRequestDataFillingJson;
+import com.happy.tracku.gson.sendsalesrequest.SendSalesRequestJson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
+import com.happy.tracku.utils.Fns;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -62,6 +70,9 @@ public class SalesRequestActivity extends AppCompatActivity
     ArrayList<VendorMaster> vendorMasterArrayList;
     ArrayList<ItemMaster> itemMasterArrayList;
     int idVendor, idItemMaster;
+    DatePickerDialog pickUpDatePicker;
+    String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString;
+    int quantityFromET, unitFromET;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -90,12 +101,75 @@ public class SalesRequestActivity extends AppCompatActivity
 
         dbHelper = new DbHelper(this);
 
+        /**
+         * Possible Delivery Date
+         */
+
+        binding.possibleDeliveryDateEditText.setText(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
+
+        binding.possibleDeliveryDateEditText.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Calendar c = Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR);
+                int mMonth = c.get(Calendar.MONTH);
+                int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                // date picker dialog
+
+                pickUpDatePicker = new DatePickerDialog(SalesRequestActivity.this,
+                        new DatePickerDialog.OnDateSetListener()
+                        {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                month = month + 1;
+
+                                String monthString = "" + month, dayString = "" + dayOfMonth;
+                                if (month < 10) {
+                                    monthString = "0" + monthString;
+                                }
+                                if (dayOfMonth < 10) {
+                                    dayString = "0" + dayString;
+                                }
+
+                                binding.possibleDeliveryDateEditText.setText(year + "-" + monthString + "-" + dayString);
+                                Log.e("pickUpDate", binding.possibleDeliveryDateEditText.getText().toString());
+
+                            }
+                        }, mYear, mMonth, mDay);
+
+                //Date minDateObj = Calendar.getInstance().getTime();
+                //pickUpDatePicker.getDatePicker().setMinDate(minDateObj.getTime());
+                //pickUpDatePicker.getDatePicker().setMaxDate(minDateObj.getTime()+(365*24*60*60));
+                pickUpDatePicker.show();
+            }
+        });
+
         new PullMasterData(this).execute();
     }
 
     public void listeners(View view)
     {
+        switch (view.getId())
+        {
+            case R.id.submit_button:
+            {
 
+                possibleDeliveryDateString = binding.possibleDeliveryDateEditText.getText().toString();
+                deliveryLocationString = binding.deliveryLocation.getText().toString();
+                mailIdString = binding.vendorMailId.getText().toString();
+                mobileNumberString = binding.mobileNumber.getText().toString();
+                quantityFromET = Integer.parseInt(binding.quantityET.getText().toString());
+                unitFromET = Integer.parseInt(binding.unitET.getText().toString());
+
+                new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString).execute();
+
+
+            }
+            break;
+        }
     }
 
     private static class PullMasterData extends AsyncTask<String, String, String>
@@ -472,6 +546,9 @@ public class SalesRequestActivity extends AppCompatActivity
     {
         this.salesRequestDataFillingJson = salesRequestDataFillingJson;
 
+        /**
+         * Filling Email
+         */
         if (salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).geteMail().isEmpty())
         {
             Toast.makeText(this, "Please Enter Your Email", Toast.LENGTH_LONG).show();
@@ -481,6 +558,9 @@ public class SalesRequestActivity extends AppCompatActivity
             binding.vendorMailId.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).geteMail());
         }
 
+        /**
+         * Filling MobileNumber
+         */
         if (salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber().isEmpty())
         {
             Toast.makeText(this, "Please Enter Your Phone Number", Toast.LENGTH_LONG).show();
@@ -488,6 +568,149 @@ public class SalesRequestActivity extends AppCompatActivity
         else
         {
             binding.vendorMailId.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber());
+        }
+
+    }
+
+    private static class PushSalesRequest extends AsyncTask<String, String, String>
+    {
+        WeakReference<SalesRequestActivity> context;
+        ProgressDialog pd;
+        OkHttpClient okHttpClient;
+        String url, resultString;
+        Request request;
+        Response response;
+        SharedPreferences shp;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        SendSalesRequestJson sendSalesRequestJson;
+        int status;
+        String statusMessage;
+        int idVendor, idItemMaster, quantityFromET, unitFromET;
+        String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString;
+        public PushSalesRequest(SalesRequestActivity context, int idVendor, int idItemMaster, int quantityFromET, int unitFromET, String possibleDeliveryDateString, String deliveryLocationString, String mailIdString, String mobileNumberString)
+        {
+            this.context = new WeakReference<>(context);
+            this.idVendor = idVendor;
+            this.idItemMaster = idItemMaster;
+            this.quantityFromET = quantityFromET;
+            this.unitFromET = unitFromET;
+            this.deliveryLocationString = deliveryLocationString;
+            this.possibleDeliveryDateString = possibleDeliveryDateString;
+            this.mailIdString = mailIdString;
+            this.mobileNumberString = mobileNumberString;
+
+            CustomTrust customTrust = new CustomTrust(context);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+
+            shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pd = new ProgressDialog(context.get());
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("Loading");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+
+                JSONObject sendSalesRequestObj = new JSONObject();
+                sendSalesRequestObj.put("requestDate", possibleDeliveryDateString);
+                sendSalesRequestObj.put("idItem", idItemMaster);
+                sendSalesRequestObj.put("orderQty", quantityFromET);
+                sendSalesRequestObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+
+                url = USING_IP + URL_SEND_SALES_REQUEST;
+                Log.e("Log", "sendSalesRequestURL" + url);
+
+                RequestBody body = RequestBody.create(sendSalesRequestObj.toString(), JSON);
+                Log.e("Log", "sendSalesRequestObj" + sendSalesRequestObj);
+
+                request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "response" + response);
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+                }
+
+                resultString = response.body().string();
+                Log.e("Log", "sendSalesRequestResultString" + resultString);
+
+                Gson gson = new Gson();
+                sendSalesRequestJson = gson.fromJson(resultString, SendSalesRequestJson.class);
+                Log.e("Log", "sendSalesRequestJson" + sendSalesRequestJson);
+
+                if (sendSalesRequestJson.getData().getSendSalesRequestStatus() == null || sendSalesRequestJson.getData().getSendSalesRequestStatus().size() == 0 || sendSalesRequestJson.getData().getSendSalesRequestStatus().isEmpty())
+                {
+                    return "nullException";
+                }
+                else
+                {
+                    status = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatus();
+
+                    if (status != 1)
+                    {
+                        return "failure";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+                return "failure";
+            }
+            return "success";
+
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+            if (s.equals("success"))
+            {
+                statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
+                Fns.neutralAlert("Alert", statusMessage, context.get());
+            }
+            else if (s.equals("failure"))
+            {
+
+                statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
+                Fns.neutralAlert("Alert", statusMessage, context.get());
+
+                if (sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatus() == 1)
+                {
+                    context.get().clearFillingDetails();
+
+                    Intent intent = new Intent(context.get(), MainMenuActivity.class);
+                    context.get().startActivity(intent);
+
+                }
+
+            }
+            else if (s.equals("nullException"))
+            {
+                Toast.makeText(context.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
+            }
+
+            pd.dismiss();
         }
     }
 }
