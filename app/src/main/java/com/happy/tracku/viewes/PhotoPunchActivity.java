@@ -302,7 +302,7 @@ public class PhotoPunchActivity extends AppCompatActivity
                 adb.setCustomTitle(titletxtview);
 
                 TextView messagetxtview = new TextView(mContext);
-                messagetxtview.setText(photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMsg());
+                messagetxtview.setText(photopunchingjson.getData().getPhotoPunchStatus().get(0).getStatusMessage());
                 messagetxtview.setBackgroundColor(Color.WHITE);
                 messagetxtview.setPadding(10, 24, 10, 10);
                 messagetxtview.setGravity(Gravity.CENTER);

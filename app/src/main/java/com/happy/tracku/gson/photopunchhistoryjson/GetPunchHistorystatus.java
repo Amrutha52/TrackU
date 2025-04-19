@@ -8,7 +8,7 @@ public class GetPunchHistorystatus {
     @SerializedName("status")
     @Expose
     private Integer status;
-    @SerializedName("msg")
+    @SerializedName("statusMessage")
     @Expose
     private String msg;
     @SerializedName("employeeCode")

@@ -8,21 +8,16 @@ public class PhotoPunchstatus {
     @SerializedName("status")
     @Expose
     private Integer status;
-    @SerializedName("statusMsg")
+    @SerializedName("statusMessage")
     @Expose
-    private String statusMsg;
+    private String statusMessage;
 
     public String getStatusMessage() {
         return statusMessage;
     }
-
     public void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
     }
-
-    @SerializedName("statusMessage")
-    @Expose
-    private String statusMessage;
 
     public Integer getStatus() {
         return status;
@@ -32,12 +27,5 @@ public class PhotoPunchstatus {
         this.status = status;
     }
 
-    public String getStatusMsg() {
-        return statusMsg;
-    }
-
-    public void setStatusMsg(String statusMsg) {
-        this.statusMsg = statusMsg;
-    }
 
 }
