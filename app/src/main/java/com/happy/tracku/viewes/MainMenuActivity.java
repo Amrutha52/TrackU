@@ -1,6 +1,7 @@
 package com.happy.tracku.viewes;
 
 import static com.happy.tracku.utils.Const.URL_LOGIN;
+import static com.happy.tracku.utils.Const.URL_LOGOUT_TRACK;
 import static com.happy.tracku.utils.Const.USING_IP;
 
 import androidx.annotation.NonNull;
@@ -50,6 +51,7 @@ import com.happy.tracku.databinding.ActivityMainMenuBinding;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.gpsstatusjson.GPSUpdateStatusJson;
 import com.happy.tracku.gson.login.LoginStatusJson;
+import com.happy.tracku.gson.logouttrackjson.LogoutTrackJson;
 import com.happy.tracku.models.DailyTravelModel;
 import com.happy.tracku.service.ForeGroundService;
 import com.happy.tracku.ssl.CustomTrust;
@@ -59,6 +61,7 @@ import com.happy.tracku.utils.Fns;
 import org.json.JSONObject;
 
 import java.io.InterruptedIOException;
+import java.lang.ref.WeakReference;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -557,6 +560,8 @@ public class MainMenuActivity extends AppCompatActivity {
                     SharedPreferences.Editor edt = shp.edit();
                     edt.putBoolean(Const.Shp_Is_LoggedIn, false);
                     edt.apply();
+
+                    new LogoutTrack(MainMenuActivity.this).execute();
 
                     startActivity(new Intent(MainMenuActivity.this, LoginActivity.class));
 
@@ -1113,5 +1118,127 @@ public class MainMenuActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+
+    private static class LogoutTrack extends AsyncTask<String, String, String>
+    {
+        WeakReference<MainMenuActivity> context;
+        ProgressDialog pd;
+        OkHttpClient okHttpClient;
+        String url, resultString;
+        Request request;
+        Response response;
+        SharedPreferences shp;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        LogoutTrackJson logoutTrackJson;
+        int status;
+        String statusMessage;
+
+        public LogoutTrack(MainMenuActivity context)
+        {
+            this.context = new WeakReference<>(context);
+
+            CustomTrust customTrust = new CustomTrust(context);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+
+            shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pd = new ProgressDialog(context.get());
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("Loading");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+
+                JSONObject logoutTrackObj = new JSONObject();
+                logoutTrackObj.put("imeiNumber", shp.getString(Const.Shp_Android_Id, ""));
+                logoutTrackObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+
+                url = USING_IP + URL_LOGOUT_TRACK;
+                Log.e("Log", "logoutTrackURL" + url);
+
+                RequestBody body = RequestBody.create(logoutTrackObj.toString(), JSON);
+                Log.e("Log", "logoutTrackObj" + logoutTrackObj);
+
+                request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "response" + response);
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+                }
+
+                resultString = response.body().string();
+                Log.e("Log", "SalesDataFillingResultString" + resultString);
+
+                Gson gson = new Gson();
+                logoutTrackJson = gson.fromJson(resultString, LogoutTrackJson.class);
+                Log.e("Log", "logoutTrackJson" + logoutTrackJson);
+
+                if (logoutTrackJson.getData().getLogoutTrackStatus() == null || logoutTrackJson.getData().getLogoutTrackStatus().size() == 0 || logoutTrackJson.getData().getLogoutTrackStatus().isEmpty())
+                {
+                    return "nullException";
+                }
+                else
+                {
+                    status = logoutTrackJson.getData().getLogoutTrackStatus().get(0).getStatus();
+
+                    if (status != 1)
+                    {
+                        return "failure";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+                return "failure";
+            }
+            return "success";
+
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+            if (s.equals("success"))
+            {
+                statusMessage = logoutTrackJson.getData().getLogoutTrackStatus().get(0).getStatusMessage();
+                Fns.neutralAlert("Alert", statusMessage, context.get());
+            }
+            else if (s.equals("failure"))
+            {
+                statusMessage = logoutTrackJson.getData().getLogoutTrackStatus().get(0).getStatusMessage();
+                Fns.neutralAlert("Alert", statusMessage, context.get());
+            } else if (s.equals("nullException"))
+            {
+                Toast.makeText(context.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
+            }
+
+            pd.dismiss();
+        }
+
     }
 }

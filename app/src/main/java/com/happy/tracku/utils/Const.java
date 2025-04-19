@@ -44,5 +44,6 @@ public class Const
     public static final String URL_MASTER_DATA = "MasterData";
     public static final String URL_SALES_DATA_FILLING = "SalesRequestDataFilling";
     public static final String URL_SEND_SALES_REQUEST = "SendSalesRequest";
+    public static final String URL_LOGOUT_TRACK = "LogoutTrack";
 
 }
