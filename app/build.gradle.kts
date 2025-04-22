@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "com.happy.tracku"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.happy.tracku"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 10
         versionName = "1.10"
 
@@ -79,4 +79,5 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-scalars:2.3.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:adapter-rxjava3:2.9.0")
+    implementation("androidx.work:work-runtime:2.10.0")
 }

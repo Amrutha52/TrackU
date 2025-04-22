@@ -193,10 +193,12 @@ public class LoginActivity extends AppCompatActivity
         String inputAndOutputJson = "";
         LoginStatusJson loginStatusJson;
 
-        public LoginTask(LoginActivity mContext, String username, String password)
+        public LoginTask(LoginActivity mContext, String usernameString, String passwordString)
         {
 
             this.mContext = mContext;
+            this.usernameString = usernameString;
+            this.passwordString = passwordString;
 
             CustomTrust customTrust = new CustomTrust(mContext);
             OkHttpClient client = customTrust.getClient();
@@ -209,8 +211,7 @@ public class LoginActivity extends AppCompatActivity
             pd = new ProgressDialog(mContext);
             shp = mContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
 
-            usernameString = username;
-            passwordString = password;
+
 
             pd.setTitle("Please wait");
             pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -381,6 +382,7 @@ public class LoginActivity extends AppCompatActivity
             if (s.equals("success"))
             {
 
+                Log.e("Log", "username" + usernameString);
                 SharedPreferences.Editor edt = shp.edit();
                 edt.putInt(Const.Shp_Id_Employee,loginStatusJson.getData().getLoginResponseStatus().get(0).getIdEmployee());
                 edt.putString(Const.Shp_Employee_Code, usernameString);

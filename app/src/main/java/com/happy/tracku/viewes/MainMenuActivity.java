@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -57,6 +59,7 @@ import com.happy.tracku.service.ForeGroundService;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
+import com.happy.tracku.workmanager.PeriodicNotificationWorker;
 
 import org.json.JSONObject;
 
@@ -69,6 +72,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -147,49 +151,7 @@ public class MainMenuActivity extends AppCompatActivity {
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(300000); // 5 minutes
         locationRequest.setFastestInterval(300000); // 5 minutes
-//
-//        new GpsUtils(this).turnGPSOn(new GpsUtils.onGpsListener() {
-//            @Override
-//            public void gpsStatus(boolean isGPSEnable) {
-//                // turn on GPS
-//                isGPS = isGPSEnable;
-//            }
-//        });
-//
-//        locationCallback = new LocationCallback() {
-//            @Override
-//            public void onLocationResult(LocationResult locationResult) {
-//                Log.e("Log", "LocationResult" + locationResult);
-//                if (locationResult == null) {
-//                    return;
-//                }
-//                for (Location location : locationResult.getLocations()) {
-//                    if (location != null) {
-//                        wayLatitude = location.getLatitude();
-//                        wayLongitude = location.getLongitude();
-//                        Log.e("Log", "wayLatitude" + wayLatitude);
-//                        Log.e("Log", "wayLongitude" + wayLongitude);
-//                        if (!isContinue) {
-//                            txtLocation.setText(String.format(Locale.US, "%s - %s", wayLatitude, wayLongitude));
-//                        } else {
-//                            stringBuilder.append(wayLatitude);
-//                            stringBuilder.append("-");
-//                            stringBuilder.append(wayLongitude);
-//                            stringBuilder.append("\n\n");
-//                            txtContinueLocation.setText(stringBuilder.toString());
-//                        }
-//                        if (!isContinue && mFusedLocationClient != null) {
-//                            mFusedLocationClient.removeLocationUpdates(locationCallback);
-//                        }
-//                    }
-//                }
-//            }
-//        };
-//
-//        // method to get the location
-//        getLocation();
 
-        // method to get the location
         getLastLocation();
 
         /**
@@ -213,20 +175,14 @@ public class MainMenuActivity extends AppCompatActivity {
 
         new LoginTaskForVersionCheck(this, userNameString, passwordString).execute();
 
+        /**
+         * WorkManager Implementation
+         */
 
-//        LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-//
-//        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) || location == null) {
-//           // buildAlertMessageNoGps();
-//          //  return;
-//        }
-//
-//        if(!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) || location == null || latitude == 0 || longitude == 0)
-//        {
-//
-//            Toast.makeText(this, "Please Turn On GPS and wait some minutes before submitting", Toast.LENGTH_LONG).show();
-//            //return;
-//        }
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(PeriodicNotificationWorker.class,15, TimeUnit.MINUTES)
+                .build();
+
+        WorkManager.getInstance(this).enqueue(request);
 
 
 
