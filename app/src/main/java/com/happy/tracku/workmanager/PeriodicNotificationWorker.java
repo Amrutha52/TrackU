@@ -7,20 +7,29 @@ import static com.happy.tracku.utils.Const.USING_IP;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -30,12 +39,14 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
+import com.happy.tracku.R;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.gpsstatusjson.GPSUpdateStatusJson;
 import com.happy.tracku.models.DailyTravelModel;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
+import com.happy.tracku.viewes.MainMenuActivity;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -132,6 +143,47 @@ public class PeriodicNotificationWorker extends Worker
 
                         if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
                         {
+                          /*  NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                            // If above android api level 26
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                NotificationChannel channel = new NotificationChannel(
+                                        "my_channel_id",
+                                        "My Notifications",
+                                        NotificationManager.IMPORTANCE_DEFAULT
+                                );
+                                notificationManager.createNotificationChannel(channel);
+                            }
+
+                            Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+                            //Define sound URI
+                            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "my_channel_id")
+                                    //.setSmallIcon(R.drawable.vector_bell)
+                                    .setContentTitle("TrackU")
+                                    //.setContentText("")
+                                    //.setWhen(System.currentTimeMillis())
+                                    .setContentIntent(pendingIntent)
+                                    .setSound(soundUri)
+                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+                            {
+                                // TODO: Consider calling
+                                //    ActivityCompat#requestPermissions
+                                // here to request the missing permissions, and then overriding
+                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                //                                          int[] grantResults)
+                                // to handle the case where the user grants the permission. See the documentation
+                                // for ActivityCompat#requestPermissions for more details.
+                                return;
+                            }
+                            notificationManager.notify(0,builder.build());
+
+                           */
+
                             new UploadEmployeeTravelGPSDataForWorkManager(getApplicationContext()).execute();
                         }
 
