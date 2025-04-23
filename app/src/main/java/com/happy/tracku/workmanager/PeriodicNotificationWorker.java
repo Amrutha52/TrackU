@@ -63,12 +63,85 @@ public class PeriodicNotificationWorker extends Worker
     String locationAddress;
 
     private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
 
     public PeriodicNotificationWorker(@NonNull Context context, @NonNull WorkerParameters params)
     {
         super(context, params);
         Log.e("Log", "InsidePeriodicNotification");
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+
+        DbHelper dbHelper = new DbHelper(getApplicationContext());
+        SharedPreferences shp = getApplicationContext().getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // Adjust as needed
+        locationRequest.setInterval(10000); // Update interval (adjust as needed)
+        locationRequest.setFastestInterval(5000); // Fastest update interval
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull com.google.android.gms.location.LocationResult locationResult)
+            {
+                if (locationResult != null && locationResult.getLastLocation() != null)
+                {
+                    double latitude = locationResult.getLastLocation().getLatitude();
+                    double longitude = locationResult.getLastLocation().getLongitude();
+                    Log.e("Log", "latitudeWorkManager" + latitude);
+                    Log.e("Log", "longitudeWorkManager" + longitude);
+                    // Process latitude and longitude as needed
+
+                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                    try {
+                        // throw new RuntimeException("Exception For Testing");
+
+                        List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                        Log.e("Log", latitude + "" + longitude);
+
+                        if (addresses != null && addresses.size() != 0) {
+                            locationAddress = addresses.get(0).getAddressLine(0);
+                            Log.e("address", locationAddress);
+                        }
+
+                    } catch (Exception e) {
+                        locationAddress = "Not Able To Get Address";
+                        Log.e("ExceptionAddress", locationAddress);
+                        Log.e("Log", "Exception", e);
+                    }
+
+                    Calendar cal = Calendar.getInstance();
+                    Date dateNow = cal.getTime();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateTimeString = sdf.format(dateNow);
+
+                    DailyTravelModel dailyTravelModel = new DailyTravelModel();
+                    dailyTravelModel.setIdLocation(String.valueOf(dateNow.getTime()));
+                    dailyTravelModel.setLatitude(latitude);
+                    dailyTravelModel.setLongitude(longitude);
+                    dailyTravelModel.setAddress(locationAddress);
+                    dailyTravelModel.setDateTime(dateTimeString);
+                    dailyTravelModel.setIdEmployee(shp.getInt(Const.Shp_Id_Employee, 0));
+                    dailyTravelModel.setIsForUpload(0);
+                    dailyTravelModel.setIsSynced(0);
+
+                    dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
+
+                    try{
+
+                        if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
+                        {
+                            new UploadEmployeeTravelGPSDataForWorkManager(getApplicationContext()).execute();
+                        }
+
+
+                    }catch (Exception e)
+                    {
+                        Log.e("Log","Exception",e);
+
+                    }
+                }
+            }
+        };
     }
 
     @NonNull
@@ -82,93 +155,34 @@ public class PeriodicNotificationWorker extends Worker
 
     private void getLocation(Context appContext)
     {
-        LocationRequest mLocationRequestHighAccuracy = new LocationRequest();
 
-        mLocationRequestHighAccuracy.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequestHighAccuracy.setInterval(UPDATE_INTERVAL_IN_MILLI_SECONDS);
-        mLocationRequestHighAccuracy.setFastestInterval(UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS);
-        if (ActivityCompat.checkSelfPermission(appContext,
-                Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions((Activity) getApplicationContext(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    PERMISSION_REQUEST_ID);
-            Log.e("Log", "Permission not granted");
-            // Handle permission not granted
+        if (ActivityCompat.checkSelfPermission(
+                appContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            try {
+                mFusedLocationClient.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.getMainLooper() // Provide the main thread's looper
+                );
+            }
+            catch (SecurityException e)
+            {
+                // Handle security exception if permissions are revoked
+                e.printStackTrace();
+                return;
+            }
+        }
+        else
+        {
+            // Handle the case where location permission is not granted
+            // ...
         }
 
-        DbHelper dbHelper = new DbHelper(appContext);
-        SharedPreferences shp = appContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
 
-       // FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
-
-        mFusedLocationClient.requestLocationUpdates(mLocationRequestHighAccuracy,
-                new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult)
-                    {
-                        Location location = locationResult.getLastLocation();
-                        if (location != null)
-                        {
-                            double latitude = location.getLatitude();
-                            double longitude = location.getLongitude();
-                            Log.e("Log", "latitudeForeGround" + latitude);
-                            Log.e("Log", "longitudeForeGround" + longitude);
-                            // Process latitude and longitude as needed
-
-                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                            try {
-                                // throw new RuntimeException("Exception For Testing");
-
-                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                                Log.e("Log", latitude + "" + longitude);
-
-                                if (addresses != null && addresses.size() != 0) {
-                                    locationAddress = addresses.get(0).getAddressLine(0);
-                                    Log.e("address", locationAddress);
-                                }
-
-                            } catch (Exception e) {
-                                locationAddress = "Not Able To Get Address";
-                                Log.e("ExceptionAddress", locationAddress);
-                                Log.e("Log", "Exception", e);
-                            }
-
-                            Calendar cal = Calendar.getInstance();
-                            Date dateNow = cal.getTime();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            String dateTimeString = sdf.format(dateNow);
-
-                            DailyTravelModel dailyTravelModel = new DailyTravelModel();
-                            dailyTravelModel.setIdLocation(String.valueOf(dateNow.getTime()));
-                            dailyTravelModel.setLatitude(latitude);
-                            dailyTravelModel.setLongitude(longitude);
-                            dailyTravelModel.setAddress(locationAddress);
-                            dailyTravelModel.setDateTime(dateTimeString);
-                            dailyTravelModel.setIdEmployee(shp.getInt(Const.Shp_Id_Employee, 0));
-                            dailyTravelModel.setIsForUpload(0);
-                            dailyTravelModel.setIsSynced(0);
-
-                            dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
-
-                            try{
-
-                                if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
-                                {
-                                    new UploadEmployeeTravelGPSDataForWorkManager(appContext).execute();
-                                }
+        //********************************
 
 
-                            }catch (Exception e)
-                            {
-                                Log.e("Log","Exception",e);
-
-                            }
-                        }
-                    }
-                },
-                Looper.myLooper());
     }
 
 
