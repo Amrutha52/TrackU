@@ -7,29 +7,20 @@ import static com.happy.tracku.utils.Const.USING_IP;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -42,7 +33,6 @@ import com.google.gson.Gson;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.gpsstatusjson.GPSUpdateStatusJson;
 import com.happy.tracku.models.DailyTravelModel;
-import com.happy.tracku.service.ForeGroundService;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
@@ -69,31 +59,35 @@ public class PeriodicNotificationWorker extends Worker
     private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 300000; // 5 minutes
     private static final int UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS = 300000;
     private static final int PERMISSION_REQUEST_ID = 44;
-    Context context;
+
     String locationAddress;
+
+    private FusedLocationProviderClient mFusedLocationClient;
 
     public PeriodicNotificationWorker(@NonNull Context context, @NonNull WorkerParameters params)
     {
         super(context, params);
         Log.e("Log", "InsidePeriodicNotification");
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
     @NonNull
     @Override
     public Result doWork()
     {
-        getLocation();
+        Context appContext  = getApplicationContext();
+        getLocation(appContext);
         return Result.success();
     }
 
-    private void getLocation()
+    private void getLocation(Context appContext)
     {
         LocationRequest mLocationRequestHighAccuracy = new LocationRequest();
 
         mLocationRequestHighAccuracy.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequestHighAccuracy.setInterval(UPDATE_INTERVAL_IN_MILLI_SECONDS);
         mLocationRequestHighAccuracy.setFastestInterval(UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS);
-        if (ActivityCompat.checkSelfPermission(context,
+        if (ActivityCompat.checkSelfPermission(appContext,
                 Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
 
@@ -104,11 +98,10 @@ public class PeriodicNotificationWorker extends Worker
             // Handle permission not granted
         }
 
-        DbHelper dbHelper = new DbHelper(context);
-        SharedPreferences shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+        DbHelper dbHelper = new DbHelper(appContext);
+        SharedPreferences shp = appContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
 
-        FusedLocationProviderClient mFusedLocationClient = LocationServices
-                .getFusedLocationProviderClient(getApplicationContext());
+       // FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
 
         mFusedLocationClient.requestLocationUpdates(mLocationRequestHighAccuracy,
                 new LocationCallback() {
@@ -163,7 +156,7 @@ public class PeriodicNotificationWorker extends Worker
 
                                 if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
                                 {
-                                    new UploadEmployeeTravelGPSDataForWorkManager(context).execute();
+                                    new UploadEmployeeTravelGPSDataForWorkManager(appContext).execute();
                                 }
 
 
