@@ -77,8 +77,8 @@ public class PeriodicNotificationWorker extends Worker
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // Adjust as needed
-        locationRequest.setInterval(10000); // Update interval (adjust as needed)
-        locationRequest.setFastestInterval(5000); // Fastest update interval
+        locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLI_SECONDS); // Update interval (adjust as needed)
+        locationRequest.setFastestInterval(UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS); // Fastest update interval
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull com.google.android.gms.location.LocationResult locationResult)
@@ -100,12 +100,14 @@ public class PeriodicNotificationWorker extends Worker
 
                         if (addresses != null && addresses.size() != 0) {
                             locationAddress = addresses.get(0).getAddressLine(0);
-                            Log.e("address", locationAddress);
+                            Log.e("addressWorkManager", locationAddress);
                         }
 
-                    } catch (Exception e) {
-                        locationAddress = "Not Able To Get Address";
-                        Log.e("ExceptionAddress", locationAddress);
+                    }
+                    catch (Exception e)
+                    {
+                        locationAddress = "NotAbleToGetAddress";
+                        Log.e("ExceptionAddressWorkManager", locationAddress);
                         Log.e("Log", "Exception", e);
                     }
 
@@ -136,7 +138,7 @@ public class PeriodicNotificationWorker extends Worker
 
                     }catch (Exception e)
                     {
-                        Log.e("Log","Exception",e);
+                        Log.e("Log","ExceptionWorkManager",e);
 
                     }
                 }

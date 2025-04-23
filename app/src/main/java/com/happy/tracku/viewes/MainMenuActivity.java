@@ -158,7 +158,7 @@ public class MainMenuActivity extends AppCompatActivity {
         /**
          * ForeGround Service
          */
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+     /*   if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -170,6 +170,8 @@ public class MainMenuActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, ForeGroundService.class);
             startService(serviceIntent);
         }
+
+      */
 
         userNameString = shp.getString(Const.Shp_UserName, "");
         passwordString = shp.getString(Const.Shp_PassWord, "");
