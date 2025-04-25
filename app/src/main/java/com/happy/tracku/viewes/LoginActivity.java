@@ -7,6 +7,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -61,6 +63,19 @@ public class LoginActivity extends AppCompatActivity
         activityLoginBinding = ActivityLoginBinding.inflate(getLayoutInflater());
         View view = activityLoginBinding.getRoot();
         setContentView(view);
+
+        View rootView = findViewById(android.R.id.content); // Get root view
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+            WindowInsetsCompat insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets.toWindowInsets());
+            int systemBarsInsetsTop = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            int systemBarsInsetsBottom = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+
+            // Apply padding to your main content view
+            v.setPadding(v.getPaddingLeft(), systemBarsInsetsTop, v.getPaddingRight(), systemBarsInsetsBottom);
+
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         Log.e("Log", "versionNo" + Fns.getAppVersionName(this));
         activityLoginBinding.versionNo.setText("Ver"+Fns.getAppVersionName(this));

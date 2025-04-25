@@ -1,8 +1,12 @@
 package com.happy.tracku.viewes;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -45,6 +49,19 @@ public class PolyActivity extends AppCompatActivity
 
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_map);
+
+        View rootView = findViewById(android.R.id.content); // Get root view
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+            WindowInsetsCompat insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets.toWindowInsets());
+            int systemBarsInsetsTop = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            int systemBarsInsetsBottom = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+
+            // Apply padding to your main content view
+            v.setPadding(v.getPaddingLeft(), systemBarsInsetsTop, v.getPaddingRight(), systemBarsInsetsBottom);
+
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         // Get the SupportMapFragment and request notification when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

@@ -9,6 +9,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
@@ -119,6 +121,19 @@ public class MainMenuActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
+        View rootView = findViewById(android.R.id.content); // Get root view
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+            WindowInsetsCompat insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets.toWindowInsets());
+            int systemBarsInsetsTop = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            int systemBarsInsetsBottom = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+
+            // Apply padding to your main content view
+            v.setPadding(v.getPaddingLeft(), systemBarsInsetsTop, v.getPaddingRight(), systemBarsInsetsBottom);
+
+            return WindowInsetsCompat.CONSUMED;
+        });
+
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
@@ -158,7 +173,7 @@ public class MainMenuActivity extends AppCompatActivity {
         /**
          * ForeGround Service
          */
-     /*   if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -171,7 +186,7 @@ public class MainMenuActivity extends AppCompatActivity {
             startService(serviceIntent);
         }
 
-      */
+
 
         userNameString = shp.getString(Const.Shp_UserName, "");
         passwordString = shp.getString(Const.Shp_PassWord, "");

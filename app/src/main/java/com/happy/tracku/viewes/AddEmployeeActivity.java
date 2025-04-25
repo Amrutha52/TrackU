@@ -4,6 +4,8 @@ import static com.happy.tracku.utils.Const.URL_CREATE_EMPLOYEE;
 import static com.happy.tracku.utils.Const.USING_IP;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -55,6 +57,19 @@ public class AddEmployeeActivity extends AppCompatActivity
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Add Employee");
+
+        View rootView = findViewById(android.R.id.content); // Get root view
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+            WindowInsetsCompat insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets.toWindowInsets());
+            int systemBarsInsetsTop = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            int systemBarsInsetsBottom = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+
+            // Apply padding to your main content view
+            v.setPadding(v.getPaddingLeft(), systemBarsInsetsTop, v.getPaddingRight(), systemBarsInsetsBottom);
+
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         employeeNameET = findViewById(R.id.employeeNameET);
         employeeAddressET = findViewById(R.id.employeeAddressET);

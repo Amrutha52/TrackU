@@ -28,6 +28,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.gson.Gson;
 import com.happy.tracku.R;
@@ -69,6 +71,18 @@ public class PhotoPunchActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_punch);
 
+        View rootView = findViewById(android.R.id.content); // Get root view
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+            WindowInsetsCompat insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets.toWindowInsets());
+            int systemBarsInsetsTop = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            int systemBarsInsetsBottom = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+
+            // Apply padding to your main content view
+            v.setPadding(v.getPaddingLeft(), systemBarsInsetsTop, v.getPaddingRight(), systemBarsInsetsBottom);
+
+            return WindowInsetsCompat.CONSUMED;
+        });
         // By ID we can get each component which id is assigned in XML file get Buttons and imageview.
         camera_open_id = findViewById(R.id.camera_button);
         click_image_id = findViewById(R.id.click_image);

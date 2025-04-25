@@ -6,6 +6,8 @@ import static com.happy.tracku.utils.Const.USING_IP;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
@@ -22,6 +24,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -137,6 +140,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        View rootView = findViewById(android.R.id.content); // Get root view
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+            WindowInsetsCompat insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets.toWindowInsets());
+            int systemBarsInsetsTop = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            int systemBarsInsetsBottom = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+
+            // Apply padding to your main content view
+            v.setPadding(v.getPaddingLeft(), systemBarsInsetsTop, v.getPaddingRight(), systemBarsInsetsBottom);
+
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         intent = getIntent();
 
