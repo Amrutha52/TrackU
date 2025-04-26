@@ -109,9 +109,30 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:importantForAutofill="no"
-                        android:inputType="number" />
+                        android:inputType="text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/description_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:hint="Description"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="1dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/descriptionET"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:maxLength="6"
+                        android:inputType="text"
+                        android:gravity="center" />
+
+                </com.google.android.material.textfield.TextInputLayout>
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/possibleDeliveryDateInputLayout"
                     android:layout_width="match_parent"

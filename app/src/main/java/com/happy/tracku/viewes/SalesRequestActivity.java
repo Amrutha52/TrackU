@@ -5,10 +5,12 @@ import static com.happy.tracku.utils.Const.URL_SALES_DATA_FILLING;
 import static com.happy.tracku.utils.Const.URL_SEND_SALES_REQUEST;
 import static com.happy.tracku.utils.Const.USING_IP;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -17,17 +19,21 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -71,8 +77,9 @@ public class SalesRequestActivity extends AppCompatActivity
     ArrayList<ItemMaster> itemMasterArrayList;
     int idVendor, idItemMaster;
     DatePickerDialog pickUpDatePicker;
-    String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString;
-    int quantityFromET, unitFromET;
+    String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
+    int quantityFromET;
+    String descriptionETString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -162,9 +169,10 @@ public class SalesRequestActivity extends AppCompatActivity
                 mailIdString = binding.vendorMailId.getText().toString();
                 mobileNumberString = binding.mobileNumber.getText().toString();
                 quantityFromET = Integer.parseInt(binding.quantityET.getText().toString());
-                unitFromET = Integer.parseInt(binding.unitET.getText().toString());
+                unitFromET = binding.unitET.getText().toString();
+                descriptionETString = binding.descriptionET.getText().toString();
 
-                new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString).execute();
+                new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString).execute();
 
 
             }
@@ -585,9 +593,10 @@ public class SalesRequestActivity extends AppCompatActivity
         SendSalesRequestJson sendSalesRequestJson;
         int status;
         String statusMessage;
-        int idVendor, idItemMaster, quantityFromET, unitFromET;
-        String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString;
-        public PushSalesRequest(SalesRequestActivity context, int idVendor, int idItemMaster, int quantityFromET, int unitFromET, String possibleDeliveryDateString, String deliveryLocationString, String mailIdString, String mobileNumberString)
+        int idVendor, idItemMaster, quantityFromET;
+        String descriptionETString;
+        String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
+        public PushSalesRequest(SalesRequestActivity context, int idVendor, int idItemMaster, int quantityFromET, String unitFromET, String possibleDeliveryDateString, String deliveryLocationString, String mailIdString, String mobileNumberString, String descriptionETString)
         {
             this.context = new WeakReference<>(context);
             this.idVendor = idVendor;
@@ -598,11 +607,11 @@ public class SalesRequestActivity extends AppCompatActivity
             this.possibleDeliveryDateString = possibleDeliveryDateString;
             this.mailIdString = mailIdString;
             this.mobileNumberString = mobileNumberString;
+            this.descriptionETString = descriptionETString;
 
             CustomTrust customTrust = new CustomTrust(context);
             OkHttpClient client = customTrust.getClient();
             okHttpClient = client;
-
             shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
         }
 
@@ -628,6 +637,7 @@ public class SalesRequestActivity extends AppCompatActivity
                 sendSalesRequestObj.put("idItem", idItemMaster);
                 sendSalesRequestObj.put("orderQty", quantityFromET);
                 sendSalesRequestObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+                sendSalesRequestObj.put("description", descriptionETString);
 
                 url = USING_IP + URL_SEND_SALES_REQUEST;
                 Log.e("Log", "sendSalesRequestURL" + url);
@@ -687,22 +697,76 @@ public class SalesRequestActivity extends AppCompatActivity
             if (s.equals("success"))
             {
                 statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
-                Fns.neutralAlert("Alert", statusMessage, context.get());
+               // Fns.neutralAlert("Alert", statusMessage, context.get());
+
+                AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
+
+                TextView titletxtview = new TextView(context.get());
+                titletxtview.setText("Alert");
+                titletxtview.setBackgroundColor(ContextCompat.getColor(context.get(), R.color.yellow));
+                titletxtview.setPadding(10, 10, 10, 10);
+                titletxtview.setGravity(Gravity.CENTER);
+                titletxtview.setTextColor(Color.WHITE);
+                titletxtview.setTextSize(20);
+
+                adb.setCustomTitle(titletxtview);
+
+                TextView messagetxtview = new TextView(context.get());
+                messagetxtview.setText(statusMessage);
+                messagetxtview.setBackgroundColor(Color.WHITE);
+                messagetxtview.setPadding(10, 24, 10, 10);
+                messagetxtview.setGravity(Gravity.CENTER);
+                messagetxtview.setTextColor(Color.BLACK);
+                messagetxtview.setTextSize(18);
+                messagetxtview.setVerticalScrollBarEnabled(true);
+                messagetxtview.setMaxHeight(750);
+                messagetxtview.setMovementMethod(new ScrollingMovementMethod());
+
+                adb.setView(messagetxtview);
+
+                adb.setNegativeButton("OK", new DialogInterface.OnClickListener()
+                {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        if (sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatus() == 1)
+                        {
+                            context.get().clearFillingDetails();
+
+                            Intent intent = new Intent(context.get(), MainMenuActivity.class);
+                            context.get().startActivity(intent);
+
+                        }
+
+                    }
+                });
+
+                adb.setPositiveButton("Share", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                        String shareBody = statusMessage;
+                        Log.e("LogFns", "fns message" + shareBody);
+                        intent.setType("text/plain");
+                        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Share");
+                        intent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                        context.get().startActivity(Intent.createChooser(intent, "Share using"));
+
+                    }
+                });
+                AlertDialog ad = adb.create();
+                ad.show();
+
+
             }
             else if (s.equals("failure"))
             {
 
                 statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
                 Fns.neutralAlert("Alert", statusMessage, context.get());
-
-                if (sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatus() == 1)
-                {
-                    context.get().clearFillingDetails();
-
-                    Intent intent = new Intent(context.get(), MainMenuActivity.class);
-                    context.get().startActivity(intent);
-
-                }
 
             }
             else if (s.equals("nullException"))
