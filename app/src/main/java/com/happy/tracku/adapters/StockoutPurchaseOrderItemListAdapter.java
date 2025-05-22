@@ -78,13 +78,13 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
         {
             case R.id.acceptedQtyOkButton:
             {
-                PurchaseOrderItem purchaseOrderItem = (PurchaseOrderItem) view.getTag(R.string.key_one);
+                StockOutPurchaseOrderItem purchaseOrderItem = (StockOutPurchaseOrderItem) view.getTag(R.string.key_one);
                 TextInputEditText acceptedQtyTextInput = (TextInputEditText)view.getTag(R.string.key_two);
 
                 double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
                 Log.e("Log","acceptedQtyAdapter" + acceptedQty);
 
-                purchaseOrderItem.setAcceptedQuantity(acceptedQty);
+                purchaseOrderItem.setStockOutQuantity(acceptedQty);
 
                 if (purchaseOrderItem.getOrderQuantity() != acceptedQty)
                 {
