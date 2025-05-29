@@ -21,11 +21,14 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.happy.tracku.R;
+import com.happy.tracku.gson.masterdata.ItemMaster;
+import com.happy.tracku.gson.masterdata.VendorMaster;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -159,6 +162,50 @@ public class Fns {
         } catch (android.content.ActivityNotFoundException anfe) {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
         }
+
+    }
+
+    public static int getVendorPositionFromId(int id, ArrayList<VendorMaster> spinnerModelList)
+    {
+        Log.e("Log", "id" + id);
+
+        int position = 0;
+        int count = 0;
+        for (VendorMaster generalSpinnerModel :
+                spinnerModelList) {
+            Log.e("Log", "generalSpinnerModel.getIdVendor()" + generalSpinnerModel.getIdVendor());
+            if (generalSpinnerModel.getIdVendor() == id) {
+
+                position = count;
+
+            }
+
+            count++;
+        }
+
+        Log.e("Log","Position" + position);
+        return position;
+
+    }
+
+    public static int getItemPositionFromId(int id, ArrayList<ItemMaster> spinnerModelList)
+    {
+        int position = 0;
+        int count = 0;
+        for (ItemMaster generalSpinnerModel :
+                spinnerModelList) {
+
+            if (generalSpinnerModel.getIdItem() == id)
+            {
+
+                position = count;
+
+            }
+
+            count++;
+        }
+
+        return position;
 
     }
 }
