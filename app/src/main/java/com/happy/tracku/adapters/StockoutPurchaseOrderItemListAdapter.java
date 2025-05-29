@@ -86,16 +86,18 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
 
                 purchaseOrderItem.setStockOutQuantity(acceptedQty);
 
-                if (purchaseOrderItem.getOrderQuantity() != acceptedQty)
+              /*  if (purchaseOrderItem.getOrderQuantity() != acceptedQty)
                 {
                     Fns.neutralAlert("Alert", "The accepted quantity is different from your order quantity.", context);
                 }
                 else
                 {
+
+               */
                     dbHelper.updateStockOutQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
 
                     Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
-                }
+               // }
 
 
 
