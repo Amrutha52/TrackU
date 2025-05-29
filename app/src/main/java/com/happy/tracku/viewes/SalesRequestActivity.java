@@ -404,7 +404,7 @@ public class SalesRequestActivity extends AppCompatActivity
          *  Searchable Vendor Spinner
          */
 
-        binding.vendorMasterDropdown.setOnClickListener(new View.OnClickListener()
+      /*  binding.vendorMasterDropdown.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
@@ -465,6 +465,44 @@ public class SalesRequestActivity extends AppCompatActivity
                         dialog.dismiss();
                     }
                 });
+            }
+        });
+
+       */
+
+
+        vendorMasterArrayList = dbHelper.getVendorMaster();
+        Log.e("Log", "vendorMasterArrayList" + vendorMasterArrayList);
+
+        ArrayAdapter<VendorMaster> vendorMasterArrayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, vendorMasterArrayList);
+
+        binding.vendorMasterDropdown.setAdapter(vendorMasterArrayAdapter);
+
+        binding.vendorMasterDropdown.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                binding.vendorMasterDropdown.showDropDown();
+            }
+        });
+
+        binding.vendorMasterDropdown.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                idVendor = vendorMasterArrayAdapter.getItem(position).getIdVendor();
+                Log.e("Log", "idVendor : " + idVendor);
+
+                vendorName = vendorMasterArrayAdapter.getItem(position).getVendorName();
+                Log.e("Log", "vendorName" + vendorName);
+
+                new PullSalesRequestDataFilling(SalesRequestActivity.this, idVendor).execute();
+
+                Toast.makeText(SalesRequestActivity.this, "Selected:"+ vendorMasterArrayAdapter.getItem(position).getVendorName(), Toast.LENGTH_SHORT).show();
+                //dismiss dialog after choose
+//                dialog.dismiss();
+
             }
         });
 

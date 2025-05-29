@@ -111,7 +111,20 @@ public class AddSalesRequestActivity extends AppCompatActivity
         binding.vendorMasterDropdown.setAdapter(adapterVendorMaster);
 
         Log.e("Log", "FnsGetVendorPositionFromId()"+ Fns.getVendorPositionFromId(idVendor, vendorMasterArrayList));
-        binding.vendorMasterDropdown.setSelection(Fns.getVendorPositionFromId(idVendor, vendorMasterArrayList));
+        binding.vendorMasterDropdown.setText("select");
+
+        // Now, safely set the selection:
+        if (binding.vendorMasterDropdown.getText() != null && binding.vendorMasterDropdown.getText().length() > 0) {
+            // If you specifically need to set it to index 1, ensure length is at least 1.
+            // A common pattern is to set it to the end of the text.
+            Log.e("Log", "insidebind");
+            binding.vendorMasterDropdown.setSelection(Fns.getVendorPositionFromId(idVendor, vendorMasterArrayList));
+
+        } else {
+            Log.e("Log", "insideelse");
+            // If the EditText is empty, setting selection to 0 is safe.
+            binding.vendorMasterDropdown.setSelection(0);
+        }
 
         binding.possibleDeliveryDateEditText.setText(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
 
