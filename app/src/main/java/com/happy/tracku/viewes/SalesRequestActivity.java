@@ -267,6 +267,8 @@ public class SalesRequestActivity extends AppCompatActivity
                 Intent intent = new Intent(this, AddSalesRequestActivity.class);
                 intent.putExtra("idVendor", idVendor);
                 intent.putExtra("idItemMaster", idItemMaster);
+                intent.putExtra("vendorName", vendorName);
+                intent.putExtra("itemName", itemName);
                 startActivity(intent);
             }
             break;
@@ -404,7 +406,7 @@ public class SalesRequestActivity extends AppCompatActivity
          *  Searchable Vendor Spinner
          */
 
-      /*  binding.vendorMasterDropdown.setOnClickListener(new View.OnClickListener()
+        binding.vendorMasterDropdown.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
@@ -468,10 +470,10 @@ public class SalesRequestActivity extends AppCompatActivity
             }
         });
 
-       */
 
 
-        vendorMasterArrayList = dbHelper.getVendorMaster();
+
+     /*   vendorMasterArrayList = dbHelper.getVendorMaster();
         Log.e("Log", "vendorMasterArrayList" + vendorMasterArrayList);
 
         ArrayAdapter<VendorMaster> vendorMasterArrayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, vendorMasterArrayList);
@@ -505,6 +507,8 @@ public class SalesRequestActivity extends AppCompatActivity
 
             }
         });
+
+      */
 
         /**
          * Searchable Product Spinner

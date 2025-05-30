@@ -2,35 +2,50 @@ package com.happy.tracku.viewes;
 
 import static com.happy.tracku.utils.Const.URL_MASTER_DATA;
 import static com.happy.tracku.utils.Const.URL_SALES_DATA_FILLING;
+import static com.happy.tracku.utils.Const.URL_SEND_SALES_REQUEST;
 import static com.happy.tracku.utils.Const.USING_IP;
 import static com.happy.tracku.utils.Fns.getVendorPositionFromId;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.databinding.ActivityAddSalesRequestBinding;
@@ -40,12 +55,16 @@ import com.happy.tracku.gson.masterdata.ItemMaster;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
 import com.happy.tracku.gson.masterdata.VendorMaster;
 import com.happy.tracku.gson.salesrequestdatafilling.SalesRequestDataFillingJson;
+import com.happy.tracku.gson.sendsalesrequest.SendSalesRequestJson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,6 +88,28 @@ public class AddSalesRequestActivity extends AppCompatActivity
     ArrayList<ItemMaster> itemMasterArrayList;
     SalesRequestDataFillingJson salesRequestDataFillingJson;
     Intent intent;
+    MaterialAutoCompleteTextView vendorMasterET;
+
+    ArrayAdapter<VendorMaster> adapterVendorMaster;
+
+    ArrayAdapter<ItemMaster> adapterItemMaster;
+    String vendorName, itemName;
+
+    /**
+     *
+     *  Camera Section
+     *
+     */
+    // Define the pic id
+    private static final int pic_id = 123;
+    // Define the button and imageview type variable
+    Button camera_open_id;
+    ImageView click_image_id;
+    Bitmap photo, resizedBitmapBig;
+    String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
+    int quantityFromET = 0;
+    String descriptionETString;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -95,6 +136,8 @@ public class AddSalesRequestActivity extends AppCompatActivity
         getSupportActionBar().setTitle("AddSalesRequest");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        vendorMasterET = findViewById(R.id.vendor_master_dropdown);
+
         intent = getIntent();
 
         idVendor = intent.getIntExtra("idVendor",0);
@@ -103,28 +146,28 @@ public class AddSalesRequestActivity extends AppCompatActivity
         idItemMaster = intent.getIntExtra("idItemMaster",0);
         Log.e("Log", "idItemMasterAddSales" + idItemMaster);
 
+        vendorName = intent.getStringExtra("vendorName");
+        Log.e("Log", "vendorName" + vendorName);
+
+        itemName = intent.getStringExtra("itemName");
+        Log.e("Log", "itemName" + itemName);
+
         dbHelper = new DbHelper(this);
 
         vendorMasterArrayList = dbHelper.getVendorMaster();
         Log.e("Log", "vendorMasterArrayList" + vendorMasterArrayList);
-        ArrayAdapter<VendorMaster> adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, vendorMasterArrayList);
+        adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, vendorMasterArrayList);
         binding.vendorMasterDropdown.setAdapter(adapterVendorMaster);
+        binding.vendorMasterDropdown.setText(vendorName);
 
-        Log.e("Log", "FnsGetVendorPositionFromId()"+ Fns.getVendorPositionFromId(idVendor, vendorMasterArrayList));
-        binding.vendorMasterDropdown.setText("select");
+        itemMasterArrayList = dbHelper.getItemMaster();
+        Log.e("Log", "itemMasterArrayList" + itemMasterArrayList);
+        adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, itemMasterArrayList);
+        binding.productMasterDropdown.setAdapter(adapterItemMaster);
+        binding.productMasterDropdown.setText(itemName);
 
-        // Now, safely set the selection:
-        if (binding.vendorMasterDropdown.getText() != null && binding.vendorMasterDropdown.getText().length() > 0) {
-            // If you specifically need to set it to index 1, ensure length is at least 1.
-            // A common pattern is to set it to the end of the text.
-            Log.e("Log", "insidebind");
-            binding.vendorMasterDropdown.setSelection(Fns.getVendorPositionFromId(idVendor, vendorMasterArrayList));
-
-        } else {
-            Log.e("Log", "insideelse");
-            // If the EditText is empty, setting selection to 0 is safe.
-            binding.vendorMasterDropdown.setSelection(0);
-        }
+        int someValue = 0;
+        binding.quantityET.setText(someValue);
 
         binding.possibleDeliveryDateEditText.setText(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
 
@@ -167,126 +210,6 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 pickUpDatePicker.show();
             }
         });
-
-        new PullMasterData(this).execute();
-    }
-
-    private static class PullMasterData extends AsyncTask<String, String, String>
-    {
-
-        WeakReference<AddSalesRequestActivity> context;
-        ProgressDialog pd;
-        OkHttpClient okHttpClient;
-        String url, resultString;
-        Request request;
-        Response response;
-        SharedPreferences shp;
-        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        MasterDataJson masterDataJson;
-        DbHelper dbHelper;
-
-        public PullMasterData(AddSalesRequestActivity context)
-        {
-            this.context = new WeakReference<>(context);
-
-            CustomTrust customTrust = new CustomTrust(context);
-            OkHttpClient client = customTrust.getClient();
-            okHttpClient = client;
-
-            shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
-            dbHelper = new DbHelper(context);
-
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-            pd = new ProgressDialog(context.get());
-            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            pd.setMessage("Loading");
-            pd.setCancelable(false);
-            pd.show();
-        }
-
-        @Override
-        protected String doInBackground(String... strings)
-        {
-            try
-            {
-
-                JSONObject masterDataDetailsObj = new JSONObject();
-                masterDataDetailsObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
-
-                url = USING_IP + URL_MASTER_DATA;
-                Log.e("Log", "masterurl" + url);
-
-                RequestBody body = RequestBody.create(masterDataDetailsObj.toString(), JSON);
-                Log.e("Log", "masterDataDetailsObj" + masterDataDetailsObj);
-
-                request = new Request.Builder()
-                        .url(url)
-                        .post(body)
-                        .build();
-                Log.e("Log", "request" + request);
-
-                response = okHttpClient.newCall(request).execute();
-                Log.e("Log", "response" + response);
-
-                if (!response.isSuccessful())
-                {
-                    return "failure";
-                }
-
-                resultString = response.body().string();
-                Log.e("Log", "MasterResultString" + resultString);
-
-                Gson gson = new Gson();
-                masterDataJson = gson.fromJson(resultString, MasterDataJson.class);
-                Log.e("Log", "masterDataJson" + masterDataJson);
-
-                if (masterDataJson.getData().getVendorMaster() == null || masterDataJson.getData().getVendorMaster().size() == 0 || masterDataJson.getData().getVendorMaster().isEmpty() || masterDataJson.getData().getItemMaster().isEmpty() || masterDataJson.getData().getItemMaster() == null || masterDataJson.getData().getItemMaster().size() == 0)
-                {
-                    return "nullException";
-                }
-            }
-            catch (Exception e)
-            {
-                Log.e("Log", "Exception", e);
-                return "failure";
-            }
-            return "success";
-        }
-
-        @Override
-        protected void onPostExecute(String s)
-        {
-            super.onPostExecute(s);
-
-            if (s.equals("success"))
-            {
-                context.get().setMasterData(masterDataJson);
-
-            }
-            else if (s.equals("failure"))
-            {
-                Toast.makeText(context.get(), "Pull Failed", Toast.LENGTH_SHORT).show();
-            } else if (s.equals("nullException"))
-            {
-                Toast.makeText(context.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
-            }
-
-            pd.dismiss();
-        }
-    }
-
-    private void setMasterData(MasterDataJson masterDataJson)
-    {
-        this.masterDataJson = masterDataJson;
-
-        dbHelper.deleteVendorMaster();
-        dbHelper.deleteItemMaster();
-        dbHelper.insertMasterData(masterDataJson);
 
         /**
          *  Searchable Vendor Spinner
@@ -342,6 +265,9 @@ public class AddSalesRequestActivity extends AppCompatActivity
 
                         idVendor = adapterVendorMaster.getItem(position).getIdVendor();
                         Log.e("Log", "idVendor : " + idVendor);
+
+                        vendorName = adapterVendorMaster.getItem(position).getVendorName();
+                        Log.e("Log", "vendorName" + vendorName);
 
                         new PullSalesRequestDataFilling(AddSalesRequestActivity.this, idVendor).execute();
 
@@ -406,6 +332,9 @@ public class AddSalesRequestActivity extends AppCompatActivity
                         idItemMaster = adapterItemMaster.getItem(position).getIdItem();
                         Log.e("Log", "idItemMaster : " + idItemMaster);
 
+                        itemName = adapterItemMaster.getItem(position).getItemName();
+                        Log.e("Log", "itemName" + itemName);
+
                         Toast.makeText(AddSalesRequestActivity.this, "Selected:"+ adapterItemMaster.getItem(position).getItemName(), Toast.LENGTH_SHORT).show();
                         //dismiss dialog after choose
                         dialog.dismiss();
@@ -415,6 +344,100 @@ public class AddSalesRequestActivity extends AppCompatActivity
         });
 
 
+    }
+
+    // This method will help to retrieve the image
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Match the request 'pic id with requestCode
+        if (requestCode == pic_id) {
+            // BitMap is data structure of image file which store the image in memory
+            photo = (Bitmap) data.getExtras().get("data");
+            // Set the image in imageview for display
+            click_image_id.setImageBitmap(photo);
+        }
+    }
+
+    public void listeners(View view)
+    {
+        switch (view.getId())
+        {
+            case R.id.submit_button:
+            {
+
+                possibleDeliveryDateString = binding.possibleDeliveryDateEditText.getText().toString();
+                deliveryLocationString = binding.deliveryLocation.getText().toString();
+                mailIdString = binding.vendorMailId.getText().toString();
+                mobileNumberString = binding.mobileNumber.getText().toString();
+                quantityFromET = Integer.parseInt(binding.quantityET.getText().toString());
+                unitFromET = binding.unitET.getText().toString();
+                descriptionETString = binding.descriptionET.getText().toString();
+
+                if (idVendor == 0)
+                {
+                    vendorName = binding.vendorNameET.getText().toString();
+                }
+                if (idItemMaster == 0)
+                {
+                    itemName = binding.productNameET.getText().toString();
+                }
+                /**
+                 * Today's Date
+                 */
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String currentDateAndTime = sdf.format(calendar.getTime());
+                Log.e("Log", "currentDateAndTime" + currentDateAndTime);
+
+                /**
+                 * Bitmap to base64
+                 */
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] bytearray = stream.toByteArray();
+
+                InputStream myInputStream = new ByteArrayInputStream(bytearray);
+                Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+                //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+                //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+
+
+                //previewImageView.setImageDrawable(image);
+                resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+                if(bytearray.length<=1024)
+                {
+
+                    resizedBitmapBig = bitmap;
+
+                }
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+                String fileName = mobileNumberString+"_"+currentDateAndTime+".jpg";
+
+                String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+                new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString, fileName, base64, vendorName, itemName).execute();
+
+
+            }
+            break;
+
+
+
+            case R.id.camera_button:
+            {
+
+                Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                // Start the activity with camera_intent, and request pic id
+                startActivityForResult(camera_intent, pic_id);
+            }
+            break;
+
+        }
     }
 
     private static class PullSalesRequestDataFilling extends AsyncTask<String, String, String>
@@ -529,18 +552,6 @@ public class AddSalesRequestActivity extends AppCompatActivity
 
     }
 
-    private void clearFillingDetails()
-    {
-        binding.vendorMailId.setText("");
-        binding.deliveryLocation.setText("");
-        binding.mobileNumber.setText("");
-        // binding.productMasterDropdown.setText("");
-        binding.quantityET.setText("");
-        binding.unitET.setText("");
-        binding.deliveryLocation.setText("");
-        binding.possibleDeliveryDateEditText.setText("");
-    }
-
     private void setFillingData(SalesRequestDataFillingJson salesRequestDataFillingJson)
     {
         this.salesRequestDataFillingJson = salesRequestDataFillingJson;
@@ -569,5 +580,225 @@ public class AddSalesRequestActivity extends AppCompatActivity
             binding.vendorMailId.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber());
         }
 
+    }
+
+    private void clearFillingDetails()
+    {
+        binding.vendorMailId.setText("");
+        binding.deliveryLocation.setText("");
+        binding.mobileNumber.setText("");
+        // binding.productMasterDropdown.setText("");
+        binding.quantityET.setText("");
+        binding.unitET.setText("");
+        binding.deliveryLocation.setText("");
+        binding.possibleDeliveryDateEditText.setText("");
+    }
+
+    private static class PushSalesRequest extends AsyncTask<String, String, String>
+    {
+        WeakReference<AddSalesRequestActivity> context;
+        ProgressDialog pd;
+        OkHttpClient okHttpClient;
+        String url, resultString;
+        Request request;
+        Response response;
+        SharedPreferences shp;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        SendSalesRequestJson sendSalesRequestJson;
+        int status;
+        String statusMessage;
+        int idVendor, idItemMaster, quantityFromET;
+        String descriptionETString;
+        String fileName, base64;
+        String vendorName, itemName;
+        String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
+        public PushSalesRequest(AddSalesRequestActivity context, int idVendor, int idItemMaster, int quantityFromET, String unitFromET, String possibleDeliveryDateString, String deliveryLocationString, String mailIdString, String mobileNumberString, String descriptionETString, String fileName, String base64, String vendorName, String itemName)
+        {
+            this.context = new WeakReference<>(context);
+            this.idVendor = idVendor;
+            this.idItemMaster = idItemMaster;
+            this.quantityFromET = quantityFromET;
+            this.unitFromET = unitFromET;
+            this.deliveryLocationString = deliveryLocationString;
+            this.possibleDeliveryDateString = possibleDeliveryDateString;
+            this.mailIdString = mailIdString;
+            this.mobileNumberString = mobileNumberString;
+            this.descriptionETString = descriptionETString;
+            this.base64 = base64;
+            this.fileName = fileName;
+            this.vendorName = vendorName;
+            this.itemName = itemName;
+
+            CustomTrust customTrust = new CustomTrust(context);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+            shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pd = new ProgressDialog(context.get());
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("Loading");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+
+                JSONObject sendSalesRequestObj = new JSONObject();
+                sendSalesRequestObj.put("requestDate", possibleDeliveryDateString);
+                sendSalesRequestObj.put("idItem", idItemMaster);
+                sendSalesRequestObj.put("orderQty", quantityFromET);
+                sendSalesRequestObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+                sendSalesRequestObj.put("description", descriptionETString);
+                sendSalesRequestObj.put("vendorName", vendorName);
+                sendSalesRequestObj.put("itemName", itemName);
+                sendSalesRequestObj.put("fileName", fileName);
+                sendSalesRequestObj.put("customerPhoto", base64);
+
+                url = USING_IP + URL_SEND_SALES_REQUEST;
+                Log.e("Log", "sendSalesRequestURL" + url);
+
+                RequestBody body = RequestBody.create(sendSalesRequestObj.toString(), JSON);
+                Log.e("Log", "sendSalesRequestObj" + sendSalesRequestObj);
+
+                request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "response" + response);
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+                }
+
+                resultString = response.body().string();
+                Log.e("Log", "sendSalesRequestResultString" + resultString);
+
+                Gson gson = new Gson();
+                sendSalesRequestJson = gson.fromJson(resultString, SendSalesRequestJson.class);
+                Log.e("Log", "sendSalesRequestJson" + sendSalesRequestJson);
+
+                if (sendSalesRequestJson.getData().getSendSalesRequestStatus() == null || sendSalesRequestJson.getData().getSendSalesRequestStatus().size() == 0 || sendSalesRequestJson.getData().getSendSalesRequestStatus().isEmpty())
+                {
+                    return "nullException";
+                }
+                else
+                {
+                    status = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatus();
+
+                    if (status != 1)
+                    {
+                        return "failure";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+                return "failure";
+            }
+            return "success";
+
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+            if (s.equals("success"))
+            {
+                statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
+                // Fns.neutralAlert("Alert", statusMessage, context.get());
+
+                AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
+
+                TextView titletxtview = new TextView(context.get());
+                titletxtview.setText("Alert");
+                titletxtview.setBackgroundColor(ContextCompat.getColor(context.get(), R.color.yellow));
+                titletxtview.setPadding(10, 10, 10, 10);
+                titletxtview.setGravity(Gravity.CENTER);
+                titletxtview.setTextColor(Color.WHITE);
+                titletxtview.setTextSize(20);
+
+                adb.setCustomTitle(titletxtview);
+
+                TextView messagetxtview = new TextView(context.get());
+                messagetxtview.setText(statusMessage);
+                messagetxtview.setBackgroundColor(Color.WHITE);
+                messagetxtview.setPadding(10, 24, 10, 10);
+                messagetxtview.setGravity(Gravity.CENTER);
+                messagetxtview.setTextColor(Color.BLACK);
+                messagetxtview.setTextSize(18);
+                messagetxtview.setVerticalScrollBarEnabled(true);
+                messagetxtview.setMaxHeight(750);
+                messagetxtview.setMovementMethod(new ScrollingMovementMethod());
+
+                adb.setView(messagetxtview);
+
+                adb.setNegativeButton("OK", new DialogInterface.OnClickListener()
+                {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        if (sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatus() == 1)
+                        {
+                            context.get().clearFillingDetails();
+
+                            Intent intent = new Intent(context.get(), MainMenuActivity.class);
+                            context.get().startActivity(intent);
+
+                        }
+
+                    }
+                });
+
+                adb.setPositiveButton("Share", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                        String shareBody = statusMessage;
+                        Log.e("LogFns", "fns message" + shareBody);
+                        intent.setType("text/plain");
+                        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Share");
+                        intent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                        context.get().startActivity(Intent.createChooser(intent, "Share using"));
+
+                    }
+                });
+                AlertDialog ad = adb.create();
+                ad.show();
+
+
+            }
+            else if (s.equals("failure"))
+            {
+
+                statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
+                Fns.neutralAlert("Alert", statusMessage, context.get());
+
+            }
+            else if (s.equals("nullException"))
+            {
+                Toast.makeText(context.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
+            }
+
+            pd.dismiss();
+        }
     }
 }

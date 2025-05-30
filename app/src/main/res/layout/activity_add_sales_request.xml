@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".viewes.SalesRequestActivity">
+    tools:context=".viewes.AddSalesRequestActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,6 +46,26 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/vendorname_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:hint="Vendor Name"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="1dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/vendorNameET"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/product_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -68,6 +88,26 @@
                         android:cursorVisible="false"
                         android:textIsSelectable="false"
                         android:focusable="false" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/productname_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:hint="Product Name"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="1dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/productNameET"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -215,6 +255,28 @@
                         android:gravity="center" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+
+                <!-- add Camera Button to open the Camera -->
+                <Button
+                    android:id="@+id/camera_button"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="150dp"
+                    android:layout_marginTop="20dp"
+                    android:onClick="listeners"
+                    android:backgroundTint="@color/lightish_grey"
+                    android:textColor="@color/black"
+                    android:text="Camera" />
+
+                <!-- add ImageView to display the captured image -->
+                <ImageView
+                    android:id="@+id/click_image"
+                    android:layout_width="350dp"
+                    android:layout_height="450dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="100dp"
+                    android:layout_marginBottom="10dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
