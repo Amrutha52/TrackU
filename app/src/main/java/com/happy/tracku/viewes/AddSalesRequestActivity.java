@@ -110,6 +110,8 @@ public class AddSalesRequestActivity extends AppCompatActivity
     int quantityFromET = 0;
     String descriptionETString;
 
+    String fileName, base64;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -166,8 +168,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
         binding.productMasterDropdown.setAdapter(adapterItemMaster);
         binding.productMasterDropdown.setText(itemName);
 
-        int someValue = 0;
-        binding.quantityET.setText(someValue);
+
 
         binding.possibleDeliveryDateEditText.setText(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
 
@@ -393,34 +394,42 @@ public class AddSalesRequestActivity extends AppCompatActivity
                  * Bitmap to base64
                  */
 
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] bytearray = stream.toByteArray();
 
-                InputStream myInputStream = new ByteArrayInputStream(bytearray);
-                Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
-                //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
-                //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
-
-
-                //previewImageView.setImageDrawable(image);
-                resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
-                if(bytearray.length<=1024)
+                if (photo != null)
                 {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] bytearray = stream.toByteArray();
 
-                    resizedBitmapBig = bitmap;
+                    InputStream myInputStream = new ByteArrayInputStream(bytearray);
+                    Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+                    //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+                    //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+
+                    resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+                    if(bytearray.length<=1024)
+                    {
+
+                        resizedBitmapBig = bitmap;
+
+                    }
+
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+                    fileName = mobileNumberString+"_"+currentDateAndTime+".jpg";
+
+                    base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                 }
-
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                byte[] byteArray = byteArrayOutputStream .toByteArray();
-
-                String fileName = mobileNumberString+"_"+currentDateAndTime+".jpg";
-
-                String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
+                else
+                {
+                    Toast.makeText(this, "No image selected or captured.", Toast.LENGTH_SHORT).show();
+                }
                 new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString, fileName, base64, vendorName, itemName).execute();
+
+                //previewImageView.setImageDrawable(image);
 
 
             }
