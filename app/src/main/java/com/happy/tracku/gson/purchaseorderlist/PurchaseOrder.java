@@ -16,7 +16,7 @@ public class PurchaseOrder {
     private String purchaseOrderDate;
     @SerializedName("totalAmount")
     @Expose
-    private String totalAmount;
+    private Double totalAmount;
 
     @SerializedName("idPurchaseOrderHeader")
     @Expose
@@ -46,11 +46,11 @@ public class PurchaseOrder {
         this.purchaseOrderDate = purchaseOrderDate;
     }
 
-    public String getTotalAmount() {
+    public Double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(String totalAmount) {
+    public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
     }
 

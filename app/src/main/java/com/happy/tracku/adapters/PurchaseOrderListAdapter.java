@@ -87,7 +87,7 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
 
             holder.purchaseOrderNoTV.setText(purchaseOrder.getPurchaseOrderNumber().toString());
             holder.purchaseOrderDateTV.setText(purchaseOrder.getPurchaseOrderDate());
-            holder.amountTV.setText(purchaseOrder.getTotalAmount());
+            holder.amountTV.setText(purchaseOrder.getTotalAmount().toString());
             holder.vendorNameTV.setText(purchaseOrder.getVendorName());
 
             holder.viewTV.setOnClickListener(this);

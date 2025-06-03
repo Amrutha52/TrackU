@@ -16,7 +16,7 @@ public class StockOutPurchaseOrderItem {
     private String purchaseOrderDate;
     @SerializedName("totalAmount")
     @Expose
-    private Integer totalAmount;
+    private Double totalAmount;
     @SerializedName("idItem")
     @Expose
     private Integer idItem;
@@ -40,7 +40,7 @@ public class StockOutPurchaseOrderItem {
     private Integer rackNumber;
     @SerializedName("orderQuantity")
     @Expose
-    private Integer orderQuantity;
+    private Double orderQuantity;
     @SerializedName("idSalesHeader")
     @Expose
     private Integer idSalesHeader;
@@ -78,11 +78,11 @@ public class StockOutPurchaseOrderItem {
         this.purchaseOrderDate = purchaseOrderDate;
     }
 
-    public Integer getTotalAmount() {
+    public Double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(Integer totalAmount) {
+    public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
     }
 
@@ -142,11 +142,11 @@ public class StockOutPurchaseOrderItem {
         this.rackNumber = rackNumber;
     }
 
-    public Integer getOrderQuantity() {
+    public Double getOrderQuantity() {
         return orderQuantity;
     }
 
-    public void setOrderQuantity(Integer orderQuantity) {
+    public void setOrderQuantity(Double orderQuantity) {
         this.orderQuantity = orderQuantity;
     }
 
