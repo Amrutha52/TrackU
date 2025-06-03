@@ -792,6 +792,7 @@ public class SalesRequestActivity extends AppCompatActivity
                 JSONObject sendSalesRequestObj = new JSONObject();
                 sendSalesRequestObj.put("requestDate", possibleDeliveryDateString);
                 sendSalesRequestObj.put("idItem", idItemMaster);
+                sendSalesRequestObj.put("idVendor", idVendor);
                 sendSalesRequestObj.put("orderQty", quantityFromET);
                 sendSalesRequestObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 sendSalesRequestObj.put("description", descriptionETString);
