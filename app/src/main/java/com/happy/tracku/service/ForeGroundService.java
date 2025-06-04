@@ -1,4 +1,4 @@
-package com.happy.tracku.service;
+/*package com.happy.tracku.service;
 
 import static com.happy.tracku.utils.Const.URL_Update_Daily_GPS_Data;
 import static com.happy.tracku.utils.Const.USING_IP;
@@ -241,9 +241,7 @@ public class ForeGroundService extends Service
             CustomTrust customTrust = new CustomTrust(context);
             OkHttpClient client = customTrust.getClient();
             okHttpClient = client;
-            /*okHttpClient = new OkHttpClient.Builder()
-                    .connectTimeout(180, TimeUnit.SECONDS)
-                    .build();*/
+
             dbHelper = new DbHelper(context);
             shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
         }
@@ -252,14 +250,7 @@ public class ForeGroundService extends Service
         protected void onPreExecute() {
             super.onPreExecute();
 
-            /*pd = new ProgressDialog(context.get());
-            pd.setTitle("Updating");
-            pd.setMessage("Please wait few seconds...");
-            pd.setCancelable(false);
-            //pd.setIndeterminate(true);
-            pd.setMax(2);
-            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            pd.show();*/
+
 
         }
 
@@ -370,3 +361,5 @@ public class ForeGroundService extends Service
     }
 
 }
+
+ */

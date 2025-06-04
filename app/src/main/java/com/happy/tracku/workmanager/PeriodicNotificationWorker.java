@@ -1,4 +1,4 @@
-package com.happy.tracku.workmanager;
+/*package com.happy.tracku.workmanager;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -143,46 +143,7 @@ public class PeriodicNotificationWorker extends Worker
 
                         if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
                         {
-                          /*  NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-                            // If above android api level 26
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                NotificationChannel channel = new NotificationChannel(
-                                        "my_channel_id",
-                                        "My Notifications",
-                                        NotificationManager.IMPORTANCE_DEFAULT
-                                );
-                                notificationManager.createNotificationChannel(channel);
-                            }
 
-                            Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
-                            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-                            //Define sound URI
-                            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-                            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "my_channel_id")
-                                    //.setSmallIcon(R.drawable.vector_bell)
-                                    .setContentTitle("TrackU")
-                                    //.setContentText("")
-                                    //.setWhen(System.currentTimeMillis())
-                                    .setContentIntent(pendingIntent)
-                                    .setSound(soundUri)
-                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
-                            {
-                                // TODO: Consider calling
-                                //    ActivityCompat#requestPermissions
-                                // here to request the missing permissions, and then overriding
-                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                //                                          int[] grantResults)
-                                // to handle the case where the user grants the permission. See the documentation
-                                // for ActivityCompat#requestPermissions for more details.
-                                return;
-                            }
-                            notificationManager.notify(0,builder.build());
-
-                           */
 
                             new UploadEmployeeTravelGPSDataForWorkManager(getApplicationContext()).execute();
                         }
@@ -262,9 +223,7 @@ public class PeriodicNotificationWorker extends Worker
             CustomTrust customTrust = new CustomTrust(context);
             OkHttpClient client = customTrust.getClient();
             okHttpClient = client;
-            /*okHttpClient = new OkHttpClient.Builder()
-                    .connectTimeout(180, TimeUnit.SECONDS)
-                    .build();*/
+
             dbHelper = new DbHelper(context);
             shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
         }
@@ -273,14 +232,6 @@ public class PeriodicNotificationWorker extends Worker
         protected void onPreExecute() {
             super.onPreExecute();
 
-            /*pd = new ProgressDialog(context.get());
-            pd.setTitle("Updating");
-            pd.setMessage("Please wait few seconds...");
-            pd.setCancelable(false);
-            //pd.setIndeterminate(true);
-            pd.setMax(2);
-            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            pd.show();*/
 
         }
 
@@ -388,3 +339,4 @@ public class PeriodicNotificationWorker extends Worker
         }
     }
 }
+*/
