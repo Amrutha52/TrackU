@@ -13,6 +13,18 @@ public class Data {
     @SerializedName("itemMaster")
     @Expose
     private List<ItemMaster> itemMaster;
+
+    public List<UnitMaster> getUnitMaster() {
+        return unitMaster;
+    }
+
+    public void setUnitMaster(List<UnitMaster> unitMaster) {
+        this.unitMaster = unitMaster;
+    }
+
+    @SerializedName("unitMaster")
+    @Expose
+    private List<UnitMaster> unitMaster;
     @SerializedName("exceptionData")
     @Expose
     private Object exceptionData;

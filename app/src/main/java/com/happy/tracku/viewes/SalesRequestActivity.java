@@ -51,6 +51,7 @@ import com.happy.tracku.databinding.ActivityStockOutOrderListBinding;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.masterdata.ItemMaster;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
+import com.happy.tracku.gson.masterdata.UnitMaster;
 import com.happy.tracku.gson.masterdata.VendorMaster;
 import com.happy.tracku.gson.salesrequestdatafilling.SalesRequestDataFillingJson;
 import com.happy.tracku.gson.sendsalesrequest.SendSalesRequestJson;
@@ -69,6 +70,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import kotlin.Unit;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -84,8 +86,9 @@ public class SalesRequestActivity extends AppCompatActivity
     Dialog dialog;
     ArrayList<VendorMaster> vendorMasterArrayList;
     ArrayList<ItemMaster> itemMasterArrayList;
-    int idVendor, idItemMaster;
-    String vendorName, itemName;
+    ArrayList<UnitMaster> unitMasterArrayList;
+    int idVendor, idItemMaster, idUnitMaster;
+    String vendorName, itemName, unitName;
     DatePickerDialog pickUpDatePicker;
     String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
     int quantityFromET;
@@ -206,7 +209,7 @@ public class SalesRequestActivity extends AppCompatActivity
                 mailIdString = binding.vendorMailId.getText().toString();
                 mobileNumberString = binding.mobileNumber.getText().toString();
                 quantityFromET = Integer.parseInt(binding.quantityET.getText().toString());
-                unitFromET = binding.unitET.getText().toString();
+             //   unitFromET = binding.unitET.getText().toString();
                 descriptionETString = binding.descriptionET.getText().toString();
 
                 if (idVendor == 0)
@@ -256,7 +259,7 @@ public class SalesRequestActivity extends AppCompatActivity
 
                 String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
-                new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString, fileName, base64, vendorName, itemName).execute();
+                new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString, fileName, base64, vendorName, itemName, idUnitMaster).execute();
 
 
             }
@@ -575,6 +578,68 @@ public class SalesRequestActivity extends AppCompatActivity
         });
 
 
+        binding.unitMasterDropdown.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                dialog=new Dialog(SalesRequestActivity.this);
+                //set  (our custom layout for dialog)
+                dialog.setContentView(R.layout.layout_searchable_spinner);
+
+                //set transparent background
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                //show dialog
+                dialog.show();
+
+                //initialize and assign variable
+                EditText editText=dialog.findViewById(R.id.editText_of_searchableSpinner);
+                ListView listView=dialog.findViewById(R.id.listView_of_searchableSpinner);
+                //array adapter
+                unitMasterArrayList = dbHelper.getUnitMaster();
+                Log.e("Log", "unitMasterArrayList" + unitMasterArrayList);
+                ArrayAdapter<UnitMaster> adapterUnitMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, unitMasterArrayList);
+                listView.setAdapter(adapterUnitMaster);
+
+
+                //Textwatcher for change data after every text type by user
+
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //filter arraylist
+                        adapterUnitMaster.getFilter().filter(charSequence);
+                    }
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                    }
+                });
+
+                // listview onitem click listener
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                        // textViewSpinner.setText( adapterBranchMaster.getItem(i));
+                        binding.unitMasterDropdown.setText(adapterUnitMaster.getItem(position).getUnitName());
+
+                        idUnitMaster = adapterUnitMaster.getItem(position).getIdUnit();
+                        Log.e("Log", "idUnitMaster : " + idUnitMaster);
+
+                        unitName = adapterUnitMaster.getItem(position).getUnitName();
+                        Log.e("Log", "unitName" + unitName);
+
+
+                        Toast.makeText(SalesRequestActivity.this, "Selected:"+ adapterUnitMaster.getItem(position).getUnitName(), Toast.LENGTH_SHORT).show();
+                        //dismiss dialog after choose
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
     }
 
     private static class PullSalesRequestDataFilling extends AsyncTask<String, String, String>
@@ -696,7 +761,7 @@ public class SalesRequestActivity extends AppCompatActivity
         binding.mobileNumber.setText("");
        // binding.productMasterDropdown.setText("");
         binding.quantityET.setText("");
-        binding.unitET.setText("");
+       // binding.unitET.setText("");
         binding.deliveryLocation.setText("");
         binding.possibleDeliveryDateEditText.setText("");
     }
@@ -744,18 +809,18 @@ public class SalesRequestActivity extends AppCompatActivity
         SendSalesRequestJson sendSalesRequestJson;
         int status;
         String statusMessage;
-        int idVendor, idItemMaster, quantityFromET;
+        int idVendor, idItemMaster, quantityFromET, idUnit;
         String descriptionETString;
         String fileName, base64;
         String vendorName, itemName;
         String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
-        public PushSalesRequest(SalesRequestActivity context, int idVendor, int idItemMaster, int quantityFromET, String unitFromET, String possibleDeliveryDateString, String deliveryLocationString, String mailIdString, String mobileNumberString, String descriptionETString, String fileName, String base64, String vendorName, String itemName)
+        public PushSalesRequest(SalesRequestActivity context, int idVendor, int idItemMaster, int quantityFromET, String unitFromET, String possibleDeliveryDateString, String deliveryLocationString, String mailIdString, String mobileNumberString, String descriptionETString, String fileName, String base64, String vendorName, String itemName, int idUnit)
         {
             this.context = new WeakReference<>(context);
             this.idVendor = idVendor;
             this.idItemMaster = idItemMaster;
             this.quantityFromET = quantityFromET;
-            this.unitFromET = unitFromET;
+          //  this.unitFromET = unitFromET;
             this.deliveryLocationString = deliveryLocationString;
             this.possibleDeliveryDateString = possibleDeliveryDateString;
             this.mailIdString = mailIdString;
@@ -765,6 +830,7 @@ public class SalesRequestActivity extends AppCompatActivity
             this.fileName = fileName;
             this.vendorName = vendorName;
             this.itemName = itemName;
+            this.idUnit = idUnit;
 
             CustomTrust customTrust = new CustomTrust(context);
             OkHttpClient client = customTrust.getClient();
@@ -800,6 +866,7 @@ public class SalesRequestActivity extends AppCompatActivity
                 sendSalesRequestObj.put("itemName", itemName);
                 sendSalesRequestObj.put("fileName", fileName);
                 sendSalesRequestObj.put("customerPhoto", base64);
+                sendSalesRequestObj.put("idUnit", idUnit);
 
                 url = USING_IP + URL_SEND_SALES_REQUEST;
                 Log.e("Log", "sendSalesRequestURL" + url);

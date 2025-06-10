@@ -11,6 +11,7 @@ import android.util.Log;
 import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
 import com.happy.tracku.gson.masterdata.ItemMaster;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
+import com.happy.tracku.gson.masterdata.UnitMaster;
 import com.happy.tracku.gson.masterdata.VendorMaster;
 import com.happy.tracku.gson.purchaseorderitemlist.Data;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
@@ -29,7 +30,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -37,6 +38,7 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String SAVE_STOCKOUT_PURCHASE_ORDER_TABLE = "SaveStockOutPurchaseDetails";
     public static final String VENDOR_MASTER = "VendorMaster";
     public static final String ITEM_MASTER =  "ItemMaster";
+    public static final String UNIT_MASTER = "UnitMaster";
 
     private SharedPreferences shp;
     private Context context;
@@ -59,8 +61,10 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+VENDOR_MASTER+" (idVendor INTEGER,vendorName TEXT)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "+ITEM_MASTER+" (idItem INTEGER,itemName TEXT)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+UNIT_MASTER+" (idUnit INTEGER,unitName TEXT)");
 
     }
 
@@ -89,6 +93,11 @@ public class DbHelper extends SQLiteOpenHelper
             db.execSQL("CREATE TABLE IF NOT EXISTS "+VENDOR_MASTER+" (idVendor INTEGER,vendorName TEXT)");
             db.execSQL("CREATE TABLE IF NOT EXISTS "+ITEM_MASTER+" (idItem INTEGER,itemName TEXT)");
 
+        }
+
+        if (oldVersion <= 6)
+        {
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+UNIT_MASTER+" (idUnit INTEGER,unitName TEXT)");
         }
         onCreate(db);
     }
@@ -494,6 +503,23 @@ public class DbHelper extends SQLiteOpenHelper
 
             }
         }
+
+        if (masterDataJson.getData().getUnitMaster() != null)
+        {
+            List<UnitMaster> unitMasterList = masterDataJson.getData().getUnitMaster();
+
+            for (UnitMaster unitMaster : unitMasterList)
+            {
+                ContentValues cv = new ContentValues();
+                cv.put("idUnit", unitMaster.getIdUnit());
+                cv.put("unitName", unitMaster.getUnitName());
+
+
+                db.insert( UNIT_MASTER , null, cv);
+                Log.e("LogDB", "unitMasterCV" + cv);
+
+            }
+        }
     }
 
     public void deleteVendorMaster()
@@ -506,6 +532,12 @@ public class DbHelper extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + ITEM_MASTER);
+    }
+
+    public void deleteUnitMaster()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + UNIT_MASTER);
     }
 
     public ArrayList<VendorMaster> getVendorMaster()
@@ -555,6 +587,31 @@ public class DbHelper extends SQLiteOpenHelper
         }
 
         return itemMasterArrayList;
+
+    }
+
+    public ArrayList<UnitMaster> getUnitMaster()
+    {
+        ArrayList<UnitMaster> unitMasterArrayList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select idUnit,unitName from " + UNIT_MASTER + " order by unitName asc", null);
+        cur.moveToFirst();
+
+        for (int i = 0; i < cur.getCount(); i++) {
+
+            UnitMaster unitMaster = new UnitMaster();
+
+            unitMaster.setIdUnit(cur.getInt(cur.getColumnIndex("idUnit")));
+            unitMaster.setUnitName(cur.getString(cur.getColumnIndex("unitName")));
+
+
+            cur.moveToNext();
+
+            unitMasterArrayList.add(unitMaster);
+        }
+
+        return unitMasterArrayList;
 
     }
 }
