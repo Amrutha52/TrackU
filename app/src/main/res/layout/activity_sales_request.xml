@@ -280,6 +280,33 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
 
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/attach_new_document_loan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Attach Image"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@color/blue_button"
+                        android:onClick="listeners"
+                        android:layout_marginEnd="10dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/take_picture_new_document_loan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Take Photo"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@color/blue_button"
+                        android:onClick="listeners"
+                        android:layout_marginStart="10dp"/>
+                </LinearLayout>
                 <!-- add Camera Button to open the Camera -->
                 <Button
                     android:id="@+id/camera_button"
