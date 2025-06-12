@@ -98,7 +98,7 @@ public class SalesRequestActivity extends AppCompatActivity
     String vendorName, itemName, unitName;
     DatePickerDialog pickUpDatePicker;
     String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
-    int quantityFromET;
+    int quantityFromET = 0;
     String descriptionETString;
 
     /**
@@ -267,7 +267,34 @@ public class SalesRequestActivity extends AppCompatActivity
                 deliveryLocationString = binding.deliveryLocation.getText().toString();
                 mailIdString = binding.vendorMailId.getText().toString();
                 mobileNumberString = binding.mobileNumber.getText().toString();
-                quantityFromET = Integer.parseInt(binding.quantityET.getText().toString());
+                String quantityString = binding.quantityET.getText().toString().trim(); // Get text and trim whitespace
+
+                if (quantityString.isEmpty()) {
+                    // Handle the case where the input is empty
+                    binding.quantityET.setError("This field cannot be empty."); // Show an error message
+                    // Optionally, you might want to stop further processing here,
+                    // or assign a default value like 0.
+                    int parsedNumber = 0; // Default to 0 if empty
+                    Toast.makeText(SalesRequestActivity.this, "Please enter a quantity.", Toast.LENGTH_SHORT).show();
+                    return; // Stop the method execution here if input is mandatory
+                }
+
+                try {
+                    quantityFromET = Integer.parseInt(quantityString);
+                    // If parsing is successful, 'parsedNumber' now holds the integer value.
+                    // You can safely use 'parsedNumber' here.
+                    // Log.d("SalesRequest", "Successfully parsed number: " + parsedNumber);
+
+                } catch (NumberFormatException e) {
+                    // Handle cases where the input is not a valid integer (e.g., "abc", "1.5")
+                    binding.quantityET.setError("Please enter a valid whole number.");
+                    Toast.makeText(SalesRequestActivity.this, "Invalid number format.", Toast.LENGTH_SHORT).show();
+                    // Log.e("SalesRequest", "NumberFormatException: " + e.getMessage());
+                    return; // Stop the method execution if parsing failed
+                }
+
+
+
              //   unitFromET = binding.unitET.getText().toString();
                 descriptionETString = binding.descriptionET.getText().toString();
 
