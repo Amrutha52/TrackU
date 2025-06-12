@@ -191,7 +191,7 @@
                         android:id="@+id/descriptionET"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:maxLength="20"
+                        android:maxLines="30"
                         android:inputType="text"
                         android:gravity="center" />
 
@@ -285,30 +285,33 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:layout_marginTop="20dp"
                     android:gravity="center">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/attach_new_document_loan"
+                        android:id="@+id/attach_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Attach Image"
                         android:layout_gravity="center"
-                        android:backgroundTint="@color/blue_button"
+                        android:backgroundTint="@color/lightish_grey"
+                        android:textColor="@color/black"
                         android:onClick="listeners"
                         android:layout_marginEnd="10dp"/>
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/take_picture_new_document_loan"
+                        android:id="@+id/camera_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Take Photo"
+                        android:text="Camera"
                         android:layout_gravity="center"
-                        android:backgroundTint="@color/blue_button"
+                        android:backgroundTint="@color/lightish_grey"
+                        android:textColor="@color/black"
                         android:onClick="listeners"
                         android:layout_marginStart="10dp"/>
                 </LinearLayout>
                 <!-- add Camera Button to open the Camera -->
-                <Button
+               <!-- <Button
                     android:id="@+id/camera_button"
                     android:layout_width="100dp"
                     android:layout_height="50dp"
@@ -317,7 +320,7 @@
                     android:onClick="listeners"
                     android:backgroundTint="@color/lightish_grey"
                     android:textColor="@color/black"
-                    android:text="Camera" />
+                    android:text="Camera" />-->
 
                 <!-- add ImageView to display the captured image -->
                 <ImageView
