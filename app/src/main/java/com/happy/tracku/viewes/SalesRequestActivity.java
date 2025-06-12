@@ -358,6 +358,8 @@ public class SalesRequestActivity extends AppCompatActivity
                 intent.putExtra("idItemMaster", idItemMaster);
                 intent.putExtra("vendorName", vendorName);
                 intent.putExtra("itemName", itemName);
+                intent.putExtra("idUnit", idUnitMaster);
+                intent.putExtra("unitName", unitName);
                 startActivity(intent);
             }
             break;

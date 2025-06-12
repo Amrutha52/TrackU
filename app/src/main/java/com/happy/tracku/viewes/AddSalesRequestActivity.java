@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -44,6 +45,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
@@ -53,6 +55,7 @@ import com.happy.tracku.databinding.ActivitySalesRequestBinding;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.masterdata.ItemMaster;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
+import com.happy.tracku.gson.masterdata.UnitMaster;
 import com.happy.tracku.gson.masterdata.VendorMaster;
 import com.happy.tracku.gson.salesrequestdatafilling.SalesRequestDataFillingJson;
 import com.happy.tracku.gson.sendsalesrequest.SendSalesRequestJson;
@@ -64,12 +67,14 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import kotlin.Unit;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -79,21 +84,22 @@ import okhttp3.Response;
 public class AddSalesRequestActivity extends AppCompatActivity
 {
     private ActivityAddSalesRequestBinding binding;
-    int idVendor, idItemMaster;
+    int idVendor, idItemMaster, idUnitMaster;
     DatePickerDialog pickUpDatePicker;
     MasterDataJson masterDataJson;
     DbHelper dbHelper;
     Dialog dialog;
     ArrayList<VendorMaster> vendorMasterArrayList;
     ArrayList<ItemMaster> itemMasterArrayList;
+    ArrayList<UnitMaster> unitMasterArrayList;
     SalesRequestDataFillingJson salesRequestDataFillingJson;
     Intent intent;
     MaterialAutoCompleteTextView vendorMasterET;
 
     ArrayAdapter<VendorMaster> adapterVendorMaster;
-
     ArrayAdapter<ItemMaster> adapterItemMaster;
-    String vendorName, itemName;
+    ArrayAdapter<UnitMaster> adapterUnitMaster;
+    String vendorName, itemName, unitName;
 
     /**
      *
@@ -103,9 +109,10 @@ public class AddSalesRequestActivity extends AppCompatActivity
     // Define the pic id
     private static final int pic_id = 123;
     // Define the button and imageview type variable
-    Button camera_open_id;
+    MaterialButton camera_open_id, gallery_open_id;
     ImageView click_image_id;
     Bitmap photo, resizedBitmapBig;
+    private static final int PERMISSION_REQUEST_CODE = 100;
     String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
     int quantityFromET = 0;
     String descriptionETString;
@@ -154,6 +161,14 @@ public class AddSalesRequestActivity extends AppCompatActivity
         itemName = intent.getStringExtra("itemName");
         Log.e("Log", "itemName" + itemName);
 
+        idUnitMaster = intent.getIntExtra("idUnit", 0);
+        Log.e("Log", "idUnitMasterAddSales" + idUnitMaster);
+
+        unitName = intent.getStringExtra("unitName");
+        Log.e("Log", "unitName" + unitName);
+
+        gallery_open_id = findViewById(R.id.attach_image);
+
         dbHelper = new DbHelper(this);
 
         vendorMasterArrayList = dbHelper.getVendorMaster();
@@ -168,7 +183,10 @@ public class AddSalesRequestActivity extends AppCompatActivity
         binding.productMasterDropdown.setAdapter(adapterItemMaster);
         binding.productMasterDropdown.setText(itemName);
 
-
+        unitMasterArrayList = dbHelper.getUnitMaster();
+        adapterUnitMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, unitMasterArrayList);
+        binding.unitMasterDropdown.setAdapter(adapterUnitMaster);
+        binding.unitMasterDropdown.setText(unitName);
 
         binding.possibleDeliveryDateEditText.setText(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
 
@@ -348,14 +366,63 @@ public class AddSalesRequestActivity extends AppCompatActivity
     }
 
     // This method will help to retrieve the image
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.e("Log", "requestCode" + requestCode);
+        //Log.e("Log", "pic_id" + pic_id);
         // Match the request 'pic id with requestCode
-        if (requestCode == pic_id) {
+        if (requestCode == 123) // Camera
+        {
             // BitMap is data structure of image file which store the image in memory
             photo = (Bitmap) data.getExtras().get("data");
             // Set the image in imageview for display
             click_image_id.setImageBitmap(photo);
+        }
+        // Check if the result is from our gallery pick request and was successful
+        else if (requestCode == 124)  // && resultCode == RESULT_OK  // Gallery
+        {
+            // Check if the Intent 'data' is not null and contains a URI for the selected image
+            if (data != null && data.getData() != null)
+            {
+                Uri selectedImageUri = data.getData(); // Get the URI of the selected image
+                try {
+                    // Get the Bitmap from the selected URI using ContentResolver
+                    photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+
+                    // Set the retrieved Bitmap to your ImageView
+                    click_image_id.setImageBitmap(photo);
+
+                    // Display the URI path in the TextView
+                    //imagePathTextView.setText("Image URI: " + selectedImageUri.toString());
+                    Toast.makeText(this, "Image selected from gallery!", Toast.LENGTH_SHORT).show();
+
+                    // At this point, 'bitmap' contains your selected image.
+                    // You can now convert it to a byte array, upload it to a server, etc.
+                    // Example: Convert to byte array (requires more code for actual upload)
+                    // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    // bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // Compress to JPEG with 100% quality
+                    // byte[] imageData = baos.toByteArray();
+                    // Log.d("ImageUpload", "Image data size: " + imageData.length + " bytes");
+                    // Now 'imageData' can be uploaded to a server.
+
+                } catch (IOException e) {
+                    // Handle errors during bitmap loading
+                    e.printStackTrace();
+                    Toast.makeText(this, "Error loading image: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+
+            }
+            else
+            {
+                // User cancelled the selection or no data was returned
+                Toast.makeText(this, "No image selected.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (resultCode == RESULT_CANCELED)
+        {
+            // User explicitly canceled the gallery operation
+            Toast.makeText(this, "Gallery selection cancelled.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -370,8 +437,33 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 deliveryLocationString = binding.deliveryLocation.getText().toString();
                 mailIdString = binding.vendorMailId.getText().toString();
                 mobileNumberString = binding.mobileNumber.getText().toString();
-                quantityFromET = Integer.parseInt(binding.quantityET.getText().toString());
-                unitFromET = binding.unitET.getText().toString();
+                String quantityString = binding.quantityET.getText().toString().trim(); // Get text and trim whitespace
+
+                if (quantityString.isEmpty()) {
+                    // Handle the case where the input is empty
+                    binding.quantityET.setError("This field cannot be empty."); // Show an error message
+                    // Optionally, you might want to stop further processing here,
+                    // or assign a default value like 0.
+                    int parsedNumber = 0; // Default to 0 if empty
+                    Toast.makeText(AddSalesRequestActivity.this, "Please enter a quantity.", Toast.LENGTH_SHORT).show();
+                    return; // Stop the method execution here if input is mandatory
+                }
+
+                try {
+                    quantityFromET = Integer.parseInt(quantityString);
+                    // If parsing is successful, 'parsedNumber' now holds the integer value.
+                    // You can safely use 'parsedNumber' here.
+                    // Log.d("SalesRequest", "Successfully parsed number: " + parsedNumber);
+
+                } catch (NumberFormatException e) {
+                    // Handle cases where the input is not a valid integer (e.g., "abc", "1.5")
+                    binding.quantityET.setError("Please enter a valid whole number.");
+                    Toast.makeText(AddSalesRequestActivity.this, "Invalid number format.", Toast.LENGTH_SHORT).show();
+                    // Log.e("SalesRequest", "NumberFormatException: " + e.getMessage());
+                    return; // Stop the method execution if parsing failed
+                }
+               // quantityFromET = Integer.parseInt(binding.quantityET.getText().toString());
+               // unitFromET = binding.unitET.getText().toString();
                 descriptionETString = binding.descriptionET.getText().toString();
 
                 if (idVendor == 0)
@@ -427,7 +519,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 {
                     Toast.makeText(this, "No image selected or captured.", Toast.LENGTH_SHORT).show();
                 }
-                new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString, fileName, base64, vendorName, itemName).execute();
+                new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString, fileName, base64, vendorName, itemName, idUnitMaster).execute();
 
                 //previewImageView.setImageDrawable(image);
 
@@ -446,7 +538,44 @@ public class AddSalesRequestActivity extends AppCompatActivity
             }
             break;
 
+            case R.id.attach_image:
+            {
+                // Check for Read External Storage permission before opening gallery
+                // checkGalleryPermission();
+                openGallery();
+            }
+            break;
         }
+    }
+
+    /**
+     * Launches an Intent to open the device's image gallery.
+     */
+    private void openGallery() {
+        // Create an Intent with ACTION_PICK action to select an item from data.
+        // MediaStore.Images.Media.EXTERNAL_CONTENT_URI points to the external storage's image collection.
+       /* Intent intent = new Intent();
+        //intent.setType("image/*|application/pdf");
+        intent.setType("image/*");
+        //intent.setType("application/pdf");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra("return-data", true);
+        startActivityForResult(Intent.createChooser(intent, "Complete action using"), 120);
+
+        */
+
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        // Ensure that there's an activity on the device to handle this intent
+        if (galleryIntent.resolveActivity(getPackageManager()) != null) {
+            // Start the activity and expect a result back using REQUEST_IMAGE_PICK code
+            startActivityForResult(galleryIntent, 124);
+        } else {
+            // If no gallery app is found
+            Toast.makeText(this, "No gallery app found on this device.", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 
     private static class PullSalesRequestDataFilling extends AsyncTask<String, String, String>
@@ -598,7 +727,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
         binding.mobileNumber.setText("");
         // binding.productMasterDropdown.setText("");
         binding.quantityET.setText("");
-        binding.unitET.setText("");
+      //  binding.unitET.setText("");
         binding.deliveryLocation.setText("");
         binding.possibleDeliveryDateEditText.setText("");
     }
@@ -616,12 +745,12 @@ public class AddSalesRequestActivity extends AppCompatActivity
         SendSalesRequestJson sendSalesRequestJson;
         int status;
         String statusMessage;
-        int idVendor, idItemMaster, quantityFromET;
+        int idVendor, idItemMaster, quantityFromET, idUnit;
         String descriptionETString;
         String fileName, base64;
         String vendorName, itemName;
         String possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, unitFromET;
-        public PushSalesRequest(AddSalesRequestActivity context, int idVendor, int idItemMaster, int quantityFromET, String unitFromET, String possibleDeliveryDateString, String deliveryLocationString, String mailIdString, String mobileNumberString, String descriptionETString, String fileName, String base64, String vendorName, String itemName)
+        public PushSalesRequest(AddSalesRequestActivity context, int idVendor, int idItemMaster, int quantityFromET, String unitFromET, String possibleDeliveryDateString, String deliveryLocationString, String mailIdString, String mobileNumberString, String descriptionETString, String fileName, String base64, String vendorName, String itemName, int idUnit)
         {
             this.context = new WeakReference<>(context);
             this.idVendor = idVendor;
@@ -637,6 +766,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
             this.fileName = fileName;
             this.vendorName = vendorName;
             this.itemName = itemName;
+            this.idUnit = idUnit;
 
             CustomTrust customTrust = new CustomTrust(context);
             OkHttpClient client = customTrust.getClient();
@@ -671,6 +801,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 sendSalesRequestObj.put("itemName", itemName);
                 sendSalesRequestObj.put("fileName", fileName);
                 sendSalesRequestObj.put("customerPhoto", base64);
+                sendSalesRequestObj.put("idUnit", idUnit);
 
                 url = USING_IP + URL_SEND_SALES_REQUEST;
                 Log.e("Log", "sendSalesRequestURL" + url);
