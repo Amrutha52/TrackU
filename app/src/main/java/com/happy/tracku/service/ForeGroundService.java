@@ -1,4 +1,4 @@
-/*package com.happy.tracku.service;
+package com.happy.tracku.service;
 
 import static com.happy.tracku.utils.Const.URL_Update_Daily_GPS_Data;
 import static com.happy.tracku.utils.Const.USING_IP;
@@ -67,8 +67,8 @@ import okhttp3.Response;
 
 public class ForeGroundService extends Service
 {
-    private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 300000; // 5 minutes
-    private static final int UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS = 300000;
+    private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 600000; // 10 minutes
+    private static final int UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS = 600000;
 
     private static final int PERMISSION_REQUEST_ID = 44;
     Context context;
@@ -362,4 +362,3 @@ public class ForeGroundService extends Service
 
 }
 
- */

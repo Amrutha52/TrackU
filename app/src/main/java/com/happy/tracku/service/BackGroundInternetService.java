@@ -1,4 +1,4 @@
-/*package com.happy.tracku.service;
+package com.happy.tracku.service;
 
 import static com.happy.tracku.utils.Const.URL_Update_Daily_GPS_Data;
 import static com.happy.tracku.utils.Const.USING_IP;
@@ -83,7 +83,7 @@ public class BackGroundInternetService extends Service implements
     // the notification id for the foreground notification
     public static final int GPS_NOTIFICATION = 1;
     // the interval in seconds that gps updates are requested
-    private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 300000;
+    private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 600000;
     // is this service currently running in the foreground?
     private boolean isForeground = false;
     // the google api client
@@ -540,4 +540,3 @@ public class BackGroundInternetService extends Service implements
 
 }
 
- */

@@ -1,4 +1,4 @@
-/*package com.happy.tracku.workmanager;
+package com.happy.tracku.workmanager;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -67,8 +67,8 @@ import okhttp3.Response;
 
 public class PeriodicNotificationWorker extends Worker
 {
-    private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 300000; // 5 minutes
-    private static final int UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS = 300000;
+    private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 600000; // 10 minutes
+    private static final int UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS = 600000;
     private static final int PERMISSION_REQUEST_ID = 44;
 
     String locationAddress;
@@ -339,4 +339,4 @@ public class PeriodicNotificationWorker extends Worker
         }
     }
 }
-*/
+

@@ -58,11 +58,11 @@ import com.happy.tracku.gson.gpsstatusjson.GPSUpdateStatusJson;
 import com.happy.tracku.gson.login.LoginStatusJson;
 import com.happy.tracku.gson.logouttrackjson.LogoutTrackJson;
 import com.happy.tracku.models.DailyTravelModel;
-//import com.happy.tracku.service.ForeGroundService;
+import com.happy.tracku.service.ForeGroundService;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
-///import com.happy.tracku.workmanager.PeriodicNotificationWorker;
+import com.happy.tracku.workmanager.PeriodicNotificationWorker;
 
 import org.json.JSONObject;
 
@@ -161,21 +161,21 @@ public class MainMenuActivity extends AppCompatActivity {
 
         dbHelper = new DbHelper(this);
 
-      /*  mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(300000); // 5 minutes
-        locationRequest.setFastestInterval(300000); // 5 minutes
+        locationRequest.setInterval(600000); // 10 minutes
+        locationRequest.setFastestInterval(600000); // 10 minutes
 
         getLastLocation();
 
-       */
+
 
         /**
          * ForeGround Service
          */
-       /* if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -188,7 +188,7 @@ public class MainMenuActivity extends AppCompatActivity {
             startService(serviceIntent);
         }
 
-       */
+
 
 
 
@@ -201,12 +201,12 @@ public class MainMenuActivity extends AppCompatActivity {
          * WorkManager Implementation
          */
 
-       /* PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(PeriodicNotificationWorker.class,15, TimeUnit.MINUTES)
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(PeriodicNotificationWorker.class,15, TimeUnit.MINUTES)
                 .build();
 
         WorkManager.getInstance(this).enqueue(request);
 
-        */
+
 
 
 
@@ -258,7 +258,7 @@ public class MainMenuActivity extends AppCompatActivity {
    */
 
 
-  /*  @Override
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
@@ -308,10 +308,10 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-   */
 
 
-   /* private void getLastLocation()
+
+    private void getLastLocation()
     {
         Log.e("Log", "getLastLocation");
         // check if permissions are given
@@ -422,8 +422,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(300000);
-        mLocationRequest.setFastestInterval(300000);
+        mLocationRequest.setInterval(600000);
+        mLocationRequest.setFastestInterval(600000);
 
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -495,7 +495,7 @@ public class MainMenuActivity extends AppCompatActivity {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
-    */
+
 
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener = item ->
