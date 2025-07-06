@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.happy.tracku"
+    namespace = "com.happy.ecofied"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.happy.tracku"
+        applicationId = "com.happy.ecofied"
         minSdk = 24
         targetSdk = 35
         versionCode = 11
