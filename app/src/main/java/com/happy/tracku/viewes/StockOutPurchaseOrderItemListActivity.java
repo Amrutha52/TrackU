@@ -57,6 +57,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
     private ActivityStockOutPurchaseOrderItemListBinding binding;
     Intent intent;
     Integer idPurchaseOrder;
+    DbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -83,6 +84,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         getSupportActionBar().setTitle("Purchase Order Item List");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        dbHelper = new DbHelper(this);
+
         intent = getIntent();
 
         idPurchaseOrder = intent.getIntExtra("idPurchaseOrder",0);
@@ -98,7 +101,18 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         {
             case R.id.complete_save_button:
             {
-                new PushStockOutRequest(this, idPurchaseOrder).execute();
+                int count = dbHelper.getPendingStockOutPurchaseOrder();
+                Log.e("Log", "count" + count);
+                if(count > 0)
+                {
+                    Fns.neutralAlert("Alert","Please complete the verification process."+ count + " items remain pending verification.", this);
+                    return;
+                }
+                else
+                {
+                    new PushStockOutRequest(this, idPurchaseOrder).execute();
+                }
+
 
             }
             break;

@@ -51,6 +51,8 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
     Intent intent;
     Integer idPurchaseOrder;
 
+    DbHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -76,6 +78,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
         getSupportActionBar().setTitle("Purchase Order Item List");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        dbHelper = new DbHelper(this);
         intent = getIntent();
 
         idPurchaseOrder = intent.getIntExtra("idPurchaseOrder",0);
@@ -91,7 +94,18 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
         {
             case R.id.complete_save_button:
             {
-                new PushPurchaseOrderRequest(this, idPurchaseOrder).execute();
+                int count = dbHelper.getPendingPurchaseOrder();
+                Log.e("Log", "count" + count);
+                if(count > 0)
+                {
+                    Fns.neutralAlert("Alert","Please complete the verification process."+ count + " items remain pending verification.", this);
+                    return;
+                }
+                else
+                {
+                    new PushPurchaseOrderRequest(this, idPurchaseOrder).execute();
+                }
+
 
             }
             break;
