@@ -8,15 +8,24 @@ import static com.happy.tracku.utils.Const.URL_STOCKOUT_SEND_PURCHASE_REQUEST;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -44,7 +53,13 @@ import com.happy.tracku.utils.Fns;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -58,6 +73,20 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
     Intent intent;
     Integer idPurchaseOrder;
     DbHelper dbHelper;
+
+    /**
+     *
+     *  Camera Section
+     *
+     */
+    // Define the pic id
+    //private static final int pic_id = 123;
+    // Define the button and imageview type variable
+    MaterialButton camera_open_id, gallery_open_id;
+    ImageView click_image_id;
+    Bitmap photo, resizedBitmapBig;
+    // private static final int REQUEST_IMAGE_PICK = 1;
+    private static final int PERMISSION_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -86,6 +115,10 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
         dbHelper = new DbHelper(this);
 
+        camera_open_id = findViewById(R.id.camera_button);
+        click_image_id = findViewById(R.id.click_image);
+        gallery_open_id = findViewById(R.id.attach_image);
+
         intent = getIntent();
 
         idPurchaseOrder = intent.getIntExtra("idPurchaseOrder",0);
@@ -94,6 +127,68 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         new PullStockoutPurchaseOrderItemListDetails(this, idPurchaseOrder).execute();
 
     }
+
+    // This method will help to retrieve the image
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("Log", "requestCode" + requestCode);
+        //Log.e("Log", "pic_id" + pic_id);
+        // Match the request 'pic id with requestCode
+        if (requestCode == 123) // Camera
+        {
+            // BitMap is data structure of image file which store the image in memory
+            photo = (Bitmap) data.getExtras().get("data");
+            // Set the image in imageview for display
+            click_image_id.setImageBitmap(photo);
+        }
+        // Check if the result is from our gallery pick request and was successful
+        else if (requestCode == 124)  // && resultCode == RESULT_OK  // Gallery
+        {
+            // Check if the Intent 'data' is not null and contains a URI for the selected image
+            if (data != null && data.getData() != null)
+            {
+                Uri selectedImageUri = data.getData(); // Get the URI of the selected image
+                try {
+                    // Get the Bitmap from the selected URI using ContentResolver
+                    photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+
+                    // Set the retrieved Bitmap to your ImageView
+                    click_image_id.setImageBitmap(photo);
+
+                    // Display the URI path in the TextView
+                    //imagePathTextView.setText("Image URI: " + selectedImageUri.toString());
+                    Toast.makeText(this, "Image selected from gallery!", Toast.LENGTH_SHORT).show();
+
+                    // At this point, 'bitmap' contains your selected image.
+                    // You can now convert it to a byte array, upload it to a server, etc.
+                    // Example: Convert to byte array (requires more code for actual upload)
+                    // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    // bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // Compress to JPEG with 100% quality
+                    // byte[] imageData = baos.toByteArray();
+                    // Log.d("ImageUpload", "Image data size: " + imageData.length + " bytes");
+                    // Now 'imageData' can be uploaded to a server.
+
+                } catch (IOException e) {
+                    // Handle errors during bitmap loading
+                    e.printStackTrace();
+                    Toast.makeText(this, "Error loading image: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+
+            }
+            else
+            {
+                // User cancelled the selection or no data was returned
+                Toast.makeText(this, "No image selected.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (resultCode == RESULT_CANCELED)
+        {
+            // User explicitly canceled the gallery operation
+            Toast.makeText(this, "Gallery selection cancelled.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     public void listeners(View view)
     {
@@ -110,15 +205,120 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                 }
                 else
                 {
-                    new PushStockOutRequest(this, idPurchaseOrder).execute();
+                    /**
+                     * Today's Date
+                     */
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String currentDateAndTime = sdf.format(calendar.getTime());
+                    Log.e("Log", "currentDateAndTime" + currentDateAndTime);
+
+                    /**
+                     * Bitmap to base64
+                     */
+
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] bytearray = stream.toByteArray();
+
+                    InputStream myInputStream = new ByteArrayInputStream(bytearray);
+                    Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+                    //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+                    //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+
+
+                    //previewImageView.setImageDrawable(image);
+                    resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+                    if(bytearray.length<=1024)
+                    {
+
+                        resizedBitmapBig = bitmap;
+
+                    }
+
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+                    String fileName = idPurchaseOrder+"_"+currentDateAndTime+".jpg";
+
+                    String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                    new PushStockOutRequest(this, idPurchaseOrder, fileName, base64).execute();
                 }
 
 
             }
             break;
+            case R.id.camera_button:
+            {
+
+                Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                // Start the activity with camera_intent, and request pic id
+                startActivityForResult(camera_intent, 123);
+            }
+            break;
+
+            case R.id.attach_image:
+            {
+                // Check for Read External Storage permission before opening gallery
+                // checkGalleryPermission();
+                openGallery();
+            }
+            break;
         }
     }
 
+
+    /**
+     * Callback for the result from requesting permissions.
+     * This method is invoked when the user responds to the permission request dialog.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults); // Always call super
+
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted by the user
+                Toast.makeText(this, "Storage permission granted.", Toast.LENGTH_SHORT).show();
+                openGallery(); // Re-attempt to open gallery now that permission is granted
+            } else {
+                // Permission denied by the user
+                Toast.makeText(this, "Storage permission denied. Cannot pick image from gallery.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    /**
+     * Launches an Intent to open the device's image gallery.
+     */
+    private void openGallery()
+    {
+        // Create an Intent with ACTION_PICK action to select an item from data.
+        // MediaStore.Images.Media.EXTERNAL_CONTENT_URI points to the external storage's image collection.
+       /* Intent intent = new Intent();
+        //intent.setType("image/*|application/pdf");
+        intent.setType("image/*");
+        //intent.setType("application/pdf");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra("return-data", true);
+        startActivityForResult(Intent.createChooser(intent, "Complete action using"), 120);
+
+        */
+
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        // Ensure that there's an activity on the device to handle this intent
+        if (galleryIntent.resolveActivity(getPackageManager()) != null) {
+            // Start the activity and expect a result back using REQUEST_IMAGE_PICK code
+            startActivityForResult(galleryIntent, 124);
+        } else {
+            // If no gallery app is found
+            Toast.makeText(this, "No gallery app found on this device.", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
     private static class PullStockoutPurchaseOrderItemListDetails extends AsyncTask<String, String, String>
     {
         ProgressDialog pd;
@@ -265,14 +465,16 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         SharedPreferences shp;
         DbHelper dbHelper;
         StockOutSendPurchaseRequestJson stockOutSendPurchaseRequestJson;
-        String message;
+        String message, fileName, base64;
 
         int idPurchaseOrder;
 
-        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder)
+        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64)
         {
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
+            this.fileName = fileName;
+            this.base64 = base64;
 
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
@@ -307,6 +509,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
 
                 JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder);
+                pushDataObj.put("fileName", fileName);
+                pushDataObj.put("customerPhoto", base64);
 
                 url = Const.USING_IP + URL_STOCKOUT_SEND_PURCHASE_REQUEST;
 
