@@ -641,6 +641,7 @@ public class SalesRequestActivity extends AppCompatActivity
 
                         vendorName = adapterVendorMaster.getItem(position).getVendorName();
                         Log.e("Log", "vendorName" + vendorName);
+                        binding.vendorNameET.setText(vendorName);
 
                         new PullSalesRequestDataFilling(SalesRequestActivity.this, idVendor).execute();
 
@@ -747,6 +748,7 @@ public class SalesRequestActivity extends AppCompatActivity
 
                         itemName = adapterItemMaster.getItem(position).getItemName();
                         Log.e("Log", "itemName" + itemName);
+                        binding.productNameET.setText(itemName);
 
                         Toast.makeText(SalesRequestActivity.this, "Selected:"+ adapterItemMaster.getItem(position).getItemName(), Toast.LENGTH_SHORT).show();
                         //dismiss dialog after choose
