@@ -115,6 +115,8 @@ public class SalesRequestActivity extends AppCompatActivity
    // private static final int REQUEST_IMAGE_PICK = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
 
+    String fileName, base64;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -205,9 +207,12 @@ public class SalesRequestActivity extends AppCompatActivity
         if (requestCode == 123) // Camera
         {
             // BitMap is data structure of image file which store the image in memory
-            photo = (Bitmap) data.getExtras().get("data");
-            // Set the image in imageview for display
-            click_image_id.setImageBitmap(photo);
+            if (photo != null)
+            {
+                photo = (Bitmap) data.getExtras().get("data");
+                // Set the image in imageview for display
+                click_image_id.setImageBitmap(photo);
+            }
         }
         // Check if the result is from our gallery pick request and was successful
         else if (requestCode == 124)  // && resultCode == RESULT_OK  // Gallery
@@ -318,32 +323,36 @@ public class SalesRequestActivity extends AppCompatActivity
                  * Bitmap to base64
                  */
 
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] bytearray = stream.toByteArray();
-
-                InputStream myInputStream = new ByteArrayInputStream(bytearray);
-                Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
-                //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
-                //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
-
-
-                //previewImageView.setImageDrawable(image);
-                resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
-                if(bytearray.length<=1024)
+                if (photo != null)
                 {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] bytearray = stream.toByteArray();
 
-                    resizedBitmapBig = bitmap;
+                    InputStream myInputStream = new ByteArrayInputStream(bytearray);
+                    Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+                    //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+                    //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+
+
+                    //previewImageView.setImageDrawable(image);
+                    resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+                    if(bytearray.length<=1024)
+                    {
+
+                        resizedBitmapBig = bitmap;
+
+                    }
+
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+                    fileName = mobileNumberString+"_"+currentDateAndTime+".jpg";
+
+                    base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                 }
-
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                byte[] byteArray = byteArrayOutputStream .toByteArray();
-
-                String fileName = mobileNumberString+"_"+currentDateAndTime+".jpg";
-
-                String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                 new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString, fileName, base64, vendorName, itemName, idUnitMaster).execute();
 
@@ -571,6 +580,7 @@ public class SalesRequestActivity extends AppCompatActivity
 
         dbHelper.deleteVendorMaster();
         dbHelper.deleteItemMaster();
+        dbHelper.deleteUnitMaster();
         dbHelper.insertMasterData(masterDataJson);
 
         /**
