@@ -614,4 +614,44 @@ public class DbHelper extends SQLiteOpenHelper
         return unitMasterArrayList;
 
     }
+
+    public int getPendingPurchaseOrder()
+    {
+        int count = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_PURCHASE_ORDER_TABLE + " where AcceptedQty='"+0.0+"'", null);
+
+        if (cur.getCount() > 0)
+        {
+            cur.moveToFirst();
+
+            count = cur.getInt(0);
+            Log.e("LogDB","countDB" + count);
+        }
+
+        cur.close();
+        return count;
+    }
+
+    public int getPendingStockOutPurchaseOrder()
+    {
+        int count = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " where StockOutQuantity='"+0.0+"'", null);
+
+        if (cur.getCount() > 0)
+        {
+            cur.moveToFirst();
+
+            count = cur.getInt(0);
+            Log.e("LogDB","countDBSO" + count);
+        }
+
+        cur.close();
+        return count;
+    }
 }

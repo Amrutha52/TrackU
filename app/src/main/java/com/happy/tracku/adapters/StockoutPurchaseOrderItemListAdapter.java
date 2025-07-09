@@ -1,10 +1,14 @@
 package com.happy.tracku.adapters;
 
+import static android.view.View.VISIBLE;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,10 +60,12 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
         holder.rateTV.setText(purchaseOrderItem.getTotalAmount().toString());
         holder.floorNoTV.setText(purchaseOrderItem.getFloor().toString());
 
-        holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getStockOutQuantity()));
+        holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getOrderQuantity()));
 
         holder.acceptedQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
         holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
+        holder.acceptedQtyOkButton.setTag(R.string.key_three, holder.verifiedQtyTV);
+        holder.acceptedQtyOkButton.setTag(R.string.key_four, holder.verifiedQtyLL);
         holder.acceptedQtyOkButton.setOnClickListener(this);
 
     }
@@ -80,9 +86,14 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
             {
                 StockOutPurchaseOrderItem purchaseOrderItem = (StockOutPurchaseOrderItem) view.getTag(R.string.key_one);
                 TextInputEditText acceptedQtyTextInput = (TextInputEditText)view.getTag(R.string.key_two);
+                TextView verifiedQuantityTV = (TextView) view.getTag(R.string.key_three);
+                LinearLayout verifiedQtyLL = (LinearLayout) view.getTag(R.string.key_four);
 
                 double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
                 Log.e("Log","acceptedQtyAdapter" + acceptedQty);
+
+                verifiedQtyLL.setVisibility(VISIBLE);
+                verifiedQuantityTV.setText(String.valueOf(acceptedQty));
 
                 purchaseOrderItem.setStockOutQuantity(acceptedQty);
 

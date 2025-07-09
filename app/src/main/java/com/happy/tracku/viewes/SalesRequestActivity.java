@@ -438,7 +438,8 @@ public class SalesRequestActivity extends AppCompatActivity
     /**
      * Launches an Intent to open the device's image gallery.
      */
-    private void openGallery() {
+    private void openGallery()
+    {
         // Create an Intent with ACTION_PICK action to select an item from data.
         // MediaStore.Images.Media.EXTERNAL_CONTENT_URI points to the external storage's image collection.
        /* Intent intent = new Intent();

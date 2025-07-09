@@ -65,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="right"
+                    android:background="#f9cfd1"
                     android:text="Abc" />
 
             </LinearLayout>
@@ -202,7 +203,30 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/verifiedQtyLL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:visibility="invisible"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="Verified Quantity" />
+
+                <TextView
+                    android:id="@+id/verifiQtyTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="1200" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
