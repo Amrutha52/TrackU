@@ -2,6 +2,7 @@ package com.happy.ecofied.viewholders;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,9 +13,10 @@ import com.happy.ecofied.R;
 
 public class PurchaseOrderItemListViewHolder extends RecyclerView.ViewHolder
 {
-    public TextView itemTV, orderQtyTV, rackNoTV, rateTV, floorNoTV;
+    public TextView itemTV, orderQtyTV, rackNoTV, rateTV, floorNoTV, verifiedQtyTV;
     public TextInputEditText acceptedQtyET;
     public Button acceptedQtyOkButton;
+    public LinearLayout verifiedQtyLL;
     public PurchaseOrderItemListViewHolder(@NonNull View itemView)
     {
         super(itemView);
@@ -25,6 +27,9 @@ public class PurchaseOrderItemListViewHolder extends RecyclerView.ViewHolder
         floorNoTV = itemView.findViewById(R.id.floorNoTV);
         acceptedQtyET = itemView.findViewById(R.id.acceptedQtyET);
         acceptedQtyOkButton = itemView.findViewById(R.id.acceptedQtyOkButton);
+        verifiedQtyTV = itemView.findViewById(R.id.verifiQtyTV);
+        verifiedQtyLL = itemView.findViewById(R.id.verifiedQtyLL);
 
     }
 }
+

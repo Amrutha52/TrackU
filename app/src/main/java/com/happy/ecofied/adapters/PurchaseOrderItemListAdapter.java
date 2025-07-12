@@ -1,10 +1,19 @@
 package com.happy.ecofied.adapters;
 
+
+import static android.view.View.VISIBLE;
+
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +26,7 @@ import com.happy.ecofied.utils.Fns;
 import com.happy.ecofied.viewes.PurchaseOrderItemListActivity;
 import com.happy.ecofied.viewholders.PurchaseOrderItemListViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -55,10 +65,12 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
         holder.rateTV.setText(purchaseOrderItem.getTotalAmount().toString());
         holder.floorNoTV.setText(purchaseOrderItem.getFloor().toString());
 
-        holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getAcceptedQuantity()));
+        holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getOrderQuantity()));
 
         holder.acceptedQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
         holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
+        holder.acceptedQtyOkButton.setTag(R.string.key_three, holder.verifiedQtyTV);
+        holder.acceptedQtyOkButton.setTag(R.string.key_four, holder.verifiedQtyLL);
         holder.acceptedQtyOkButton.setOnClickListener(this);
 
     }
@@ -73,17 +85,22 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
     @Override
     public void onClick(View view)
     {
-     switch (view.getId())
-     {
-         case R.id.acceptedQtyOkButton:
-         {
-             PurchaseOrderItem purchaseOrderItem = (PurchaseOrderItem) view.getTag(R.string.key_one);
-             TextInputEditText acceptedQtyTextInput = (TextInputEditText)view.getTag(R.string.key_two);
+        switch (view.getId())
+        {
+            case R.id.acceptedQtyOkButton:
+            {
+                PurchaseOrderItem purchaseOrderItem = (PurchaseOrderItem) view.getTag(R.string.key_one);
+                TextInputEditText acceptedQtyTextInput = (TextInputEditText)view.getTag(R.string.key_two);
+                TextView verifiedQuantityTV = (TextView) view.getTag(R.string.key_three);
+                LinearLayout verifiedQtyLL = (LinearLayout) view.getTag(R.string.key_four);
 
-             double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
-             Log.e("Log","acceptedQtyAdapter" + acceptedQty);
+                double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
+                Log.e("Log","acceptedQtyAdapter" + acceptedQty);
 
-             purchaseOrderItem.setAcceptedQuantity(acceptedQty);
+                verifiedQtyLL.setVisibility(VISIBLE);
+                verifiedQuantityTV.setText(String.valueOf(acceptedQty));
+
+                purchaseOrderItem.setAcceptedQuantity(acceptedQty);
 
            /*  if (purchaseOrderItem.getOrderQuantity() != acceptedQty)
              {
@@ -93,15 +110,15 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
              {
 
             */
-                 dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
+                dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
 
-                 Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
-           //  }
+                Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
+                //  }
 
 
 
-         }
-         break;
-     }
+            }
+            break;
+        }
     }
 }

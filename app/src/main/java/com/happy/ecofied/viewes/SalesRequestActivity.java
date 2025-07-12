@@ -105,8 +105,10 @@ public class SalesRequestActivity extends AppCompatActivity
     MaterialButton camera_open_id, gallery_open_id;
     ImageView click_image_id;
     Bitmap photo, resizedBitmapBig;
-   // private static final int REQUEST_IMAGE_PICK = 1;
+    // private static final int REQUEST_IMAGE_PICK = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
+
+    String fileName, base64;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -198,9 +200,12 @@ public class SalesRequestActivity extends AppCompatActivity
         if (requestCode == 123) // Camera
         {
             // BitMap is data structure of image file which store the image in memory
-            photo = (Bitmap) data.getExtras().get("data");
-            // Set the image in imageview for display
-            click_image_id.setImageBitmap(photo);
+            if (photo != null)
+            {
+                photo = (Bitmap) data.getExtras().get("data");
+                // Set the image in imageview for display
+                click_image_id.setImageBitmap(photo);
+            }
         }
         // Check if the result is from our gallery pick request and was successful
         else if (requestCode == 124)  // && resultCode == RESULT_OK  // Gallery
@@ -288,7 +293,7 @@ public class SalesRequestActivity extends AppCompatActivity
 
 
 
-             //   unitFromET = binding.unitET.getText().toString();
+                //   unitFromET = binding.unitET.getText().toString();
                 descriptionETString = binding.descriptionET.getText().toString();
 
                 if (idVendor == 0)
@@ -311,32 +316,36 @@ public class SalesRequestActivity extends AppCompatActivity
                  * Bitmap to base64
                  */
 
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] bytearray = stream.toByteArray();
-
-                InputStream myInputStream = new ByteArrayInputStream(bytearray);
-                Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
-                //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
-                //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
-
-
-                //previewImageView.setImageDrawable(image);
-                resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
-                if(bytearray.length<=1024)
+                if (photo != null)
                 {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] bytearray = stream.toByteArray();
 
-                    resizedBitmapBig = bitmap;
+                    InputStream myInputStream = new ByteArrayInputStream(bytearray);
+                    Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+                    //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+                    //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+
+
+                    //previewImageView.setImageDrawable(image);
+                    resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+                    if(bytearray.length<=1024)
+                    {
+
+                        resizedBitmapBig = bitmap;
+
+                    }
+
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+                    fileName = mobileNumberString+"_"+currentDateAndTime+".jpg";
+
+                    base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                 }
-
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                byte[] byteArray = byteArrayOutputStream .toByteArray();
-
-                String fileName = mobileNumberString+"_"+currentDateAndTime+".jpg";
-
-                String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                 new PushSalesRequest(this, idVendor, idItemMaster, quantityFromET, unitFromET, possibleDeliveryDateString, deliveryLocationString, mailIdString, mobileNumberString, descriptionETString, fileName, base64, vendorName, itemName, idUnitMaster).execute();
 
@@ -369,7 +378,7 @@ public class SalesRequestActivity extends AppCompatActivity
             case R.id.attach_image:
             {
                 // Check for Read External Storage permission before opening gallery
-               // checkGalleryPermission();
+                // checkGalleryPermission();
                 openGallery();
             }
             break;
@@ -422,7 +431,8 @@ public class SalesRequestActivity extends AppCompatActivity
     /**
      * Launches an Intent to open the device's image gallery.
      */
-    private void openGallery() {
+    private void openGallery()
+    {
         // Create an Intent with ACTION_PICK action to select an item from data.
         // MediaStore.Images.Media.EXTERNAL_CONTENT_URI points to the external storage's image collection.
        /* Intent intent = new Intent();
@@ -564,6 +574,7 @@ public class SalesRequestActivity extends AppCompatActivity
 
         dbHelper.deleteVendorMaster();
         dbHelper.deleteItemMaster();
+        dbHelper.deleteUnitMaster();
         dbHelper.insertMasterData(masterDataJson);
 
         /**
@@ -623,6 +634,7 @@ public class SalesRequestActivity extends AppCompatActivity
 
                         vendorName = adapterVendorMaster.getItem(position).getVendorName();
                         Log.e("Log", "vendorName" + vendorName);
+                        binding.vendorNameET.setText(vendorName);
 
                         new PullSalesRequestDataFilling(SalesRequestActivity.this, idVendor).execute();
 
@@ -729,6 +741,7 @@ public class SalesRequestActivity extends AppCompatActivity
 
                         itemName = adapterItemMaster.getItem(position).getItemName();
                         Log.e("Log", "itemName" + itemName);
+                        binding.productNameET.setText(itemName);
 
                         Toast.makeText(SalesRequestActivity.this, "Selected:"+ adapterItemMaster.getItem(position).getItemName(), Toast.LENGTH_SHORT).show();
                         //dismiss dialog after choose
@@ -920,9 +933,9 @@ public class SalesRequestActivity extends AppCompatActivity
         binding.vendorMailId.setText("");
         binding.deliveryLocation.setText("");
         binding.mobileNumber.setText("");
-       // binding.productMasterDropdown.setText("");
+        // binding.productMasterDropdown.setText("");
         binding.quantityET.setText("");
-       // binding.unitET.setText("");
+        // binding.unitET.setText("");
         binding.deliveryLocation.setText("");
         binding.possibleDeliveryDateEditText.setText("");
     }
@@ -981,7 +994,7 @@ public class SalesRequestActivity extends AppCompatActivity
             this.idVendor = idVendor;
             this.idItemMaster = idItemMaster;
             this.quantityFromET = quantityFromET;
-          //  this.unitFromET = unitFromET;
+            //  this.unitFromET = unitFromET;
             this.deliveryLocationString = deliveryLocationString;
             this.possibleDeliveryDateString = possibleDeliveryDateString;
             this.mailIdString = mailIdString;
@@ -1087,7 +1100,7 @@ public class SalesRequestActivity extends AppCompatActivity
             if (s.equals("success"))
             {
                 statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
-               // Fns.neutralAlert("Alert", statusMessage, context.get());
+                // Fns.neutralAlert("Alert", statusMessage, context.get());
 
                 AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
 
