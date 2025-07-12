@@ -1,4 +1,4 @@
-package com.happy.tracku.service;
+/*package com.happy.tracku.service;
 
 import static com.happy.tracku.utils.Const.URL_Update_Daily_GPS_Data;
 import static com.happy.tracku.utils.Const.USING_IP;
@@ -361,4 +361,6 @@ public class ForeGroundService extends Service
     }
 
 }
+
+ */
 
