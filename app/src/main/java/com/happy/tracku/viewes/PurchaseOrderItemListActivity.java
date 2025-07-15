@@ -532,14 +532,20 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                 sendPurchaseRequestStatusJson= gson.fromJson(resultString,SendPurchaseRequestStatusJson.class);
                 Log.e("Log", "sendPurchaseRequestStatusJson" + sendPurchaseRequestStatusJson);
 
-                int status = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatus();
-                Log.e("Log", "status" + status);
-                message = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatusMsg();
-                Log.e("Log", "message" + message);
-
-                if(status != 3)
+                if (sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().isEmpty() || sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().size() == 0 || sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus() == null)
                 {
-                    return "failure";
+                    return "nullException";
+                }
+                else
+                {
+                    int status = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatus();
+                    Log.e("Log", "status" + status);
+                    message = sendPurchaseRequestStatusJson.getData().getSendPurchaseRequestStatus().get(0).getStatusMsg();
+                    Log.e("Log", "message" + message);
+                    if(status != 3)
+                    {
+                        return "failure";
+                    }
                 }
 
 
@@ -619,6 +625,10 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                     }
                 });
 
+            }
+            else if (s.equals("nullException"))
+            {
+                Fns.neutralAlert("Alert", "Null Exception From Server", context.get());
             }
             else
             {

@@ -475,8 +475,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         DbHelper dbHelper;
         StockOutSendPurchaseRequestJson stockOutSendPurchaseRequestJson;
         String message, fileName, base64;
-
         int idPurchaseOrder;
+        int status;
 
         public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64)
         {
@@ -554,15 +554,23 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                 stockOutSendPurchaseRequestJson = gson.fromJson(resultString,StockOutSendPurchaseRequestJson.class);
                 Log.e("Log", "stockOutSendPurchaseRequestJson" + stockOutSendPurchaseRequestJson);
 
-                int status = stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus().get(0).getStatus();
-                Log.e("Log", "status" + status);
-                message = stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus().get(0).getStatusMsg();
-                Log.e("Log", "message" + message);
-
-                if(status != 3)
+                if (stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus().isEmpty() || stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus().size() == 0 || stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus() == null)
                 {
-                    return "failure";
+                    return "nullException";
                 }
+                else
+                {
+                    status = stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus().get(0).getStatus();
+                    Log.e("Log", "status" + status);
+                    message = stockOutSendPurchaseRequestJson.getData().getStockOutSendPurchaseRequestStatus().get(0).getStatusMsg();
+                    Log.e("Log", "message" + message);
+
+                    if(status != 3)
+                    {
+                        return "failure";
+                    }
+                }
+
 
 
             }catch (Exception e)
@@ -641,8 +649,10 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                     }
                 });
 
-            }
-            else
+            } else if (s.equals("nullException"))
+            {
+                Fns.neutralAlert("Alert", "Null Exception from server", context.get());
+            } else
             {
                 Log.e("Log", "failed to fetch");
             }
