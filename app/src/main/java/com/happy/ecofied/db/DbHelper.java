@@ -459,7 +459,7 @@ public class DbHelper extends SQLiteOpenHelper
             finalJson.put("idStatus", idStatus);
             Log.e("Log", "sendstockoutjson" + finalJson);
             Log.e("Log", "dataarray"+dataArray);
-            finalJson.put("StockInTable",dataArray);
+            finalJson.put("StockOutTable",dataArray);
             Log.e("Log", "finalJsonDB"+finalJson);
 
         } catch (JSONException e) {
