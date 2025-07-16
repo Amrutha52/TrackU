@@ -9,15 +9,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        app:srcCompat="@drawable/vector_check_mark"
+        app:srcCompat="@drawable/baseline_cross"
         android:layout_marginTop="16dp"/>
 
     <TextView
         android:id="@+id/success_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Failure"
         android:textColor="@color/black"
-        android:text="Success"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"/>
 

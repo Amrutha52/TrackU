@@ -323,7 +323,7 @@ public class DbHelper extends SQLiteOpenHelper
 
     }
 
-    public JSONObject getSendPurchaseRequest(String createdBy, int idStatus, int idPurchaseOrder)
+    public JSONObject getSendPurchaseRequest(String createdBy, int idStatus, int idPurchaseOrder, String fileName, String base64)
     {
         JSONObject finalJson = new JSONObject();
         JSONArray dataArray = new JSONArray();
@@ -359,6 +359,9 @@ public class DbHelper extends SQLiteOpenHelper
 
             finalJson.put("createdBy", createdBy);
             finalJson.put("idStatus", idStatus);
+           // finalJson.put("fileName", fileName);
+           // finalJson.put("customerPhoto", base64);
+
             Log.e("Log", "sendpurchasejson" + finalJson);
             Log.e("Log", "dataarray"+dataArray);
             finalJson.put("StockInTable",dataArray);

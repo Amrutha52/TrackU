@@ -200,12 +200,12 @@ public class SalesRequestActivity extends AppCompatActivity
         if (requestCode == 123) // Camera
         {
             // BitMap is data structure of image file which store the image in memory
-            if (photo != null)
-            {
+           // if (photo != null)
+           // {
                 photo = (Bitmap) data.getExtras().get("data");
                 // Set the image in imageview for display
                 click_image_id.setImageBitmap(photo);
-            }
+           // }
         }
         // Check if the result is from our gallery pick request and was successful
         else if (requestCode == 124)  // && resultCode == RESULT_OK  // Gallery
@@ -344,6 +344,7 @@ public class SalesRequestActivity extends AppCompatActivity
                     fileName = mobileNumberString+"_"+currentDateAndTime+".jpg";
 
                     base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                    Log.e("Log","base64SalesRequest"+base64);
 
                 }
 

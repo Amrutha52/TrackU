@@ -3,7 +3,9 @@ package com.happy.ecofied.viewes;
 import static com.happy.ecofied.utils.Const.URL_PURCHASE_ORDER_ITEM_LIST;
 import static com.happy.ecofied.utils.Const.URL_SEND_PURCHASE_REQUEST;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,8 +16,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,6 +30,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -80,7 +85,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
     // private static final int REQUEST_IMAGE_PICK = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
 
-    String fileName, base64;
+    String fileName = "", base64 = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -129,14 +134,14 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
         // Match the request 'pic id with requestCode
         if (requestCode == 123) // Camera
         {
-            if(photo != null)
-            {
+           // if(photo != null)
+          //  {
 
                 // BitMap is data structure of image file which store the image in memory
                 photo = (Bitmap) data.getExtras().get("data");
                 // Set the image in imageview for display
                 click_image_id.setImageBitmap(photo);
-            }
+          //  }
         }
         // Check if the result is from our gallery pick request and was successful
         else if (requestCode == 124)  // && resultCode == RESULT_OK  // Gallery
@@ -495,9 +500,9 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendPurchaseRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder);
-                pushDataObj.put("fileName", fileName);
-                pushDataObj.put("customerPhoto", base64);
+                JSONObject pushDataObj = dbHelper.getSendPurchaseRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName,base64);
+               // pushDataObj.put("fileName", fileName);
+               // pushDataObj.put("customerPhoto", base64);
 
                 url = Const.USING_IP + URL_SEND_PURCHASE_REQUEST;
 
@@ -563,13 +568,13 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
             {
 
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(context.get());
+              /*  AlertDialog.Builder builder = new AlertDialog.Builder(context.get());
                 View dialogView = LayoutInflater.from(context.get()).inflate(R.layout.dialog_success,null);
 
                 builder.setView(dialogView);
 
                 AlertDialog alertDialog = builder.create();
-                alertDialog.getWindow().setBackgroundDrawableResource(R.color.green_text);
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.white);
                 alertDialog.show();
 
                 TextView successMsg = dialogView.findViewById(R.id.success_msg);
@@ -588,25 +593,143 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                         context.get().finish();
                     }
                 });
+
+               */
+                android.app.AlertDialog.Builder adb = new android.app.AlertDialog.Builder(context.get());
+
+                TextView titletxtview = new TextView(context.get());
+                titletxtview.setText("Alert");
+                titletxtview.setBackgroundColor(ContextCompat.getColor(context.get(), R.color.colorPrimary));
+                titletxtview.setPadding(10, 10, 10, 10);
+                titletxtview.setGravity(Gravity.CENTER);
+                titletxtview.setTextColor(Color.WHITE);
+                titletxtview.setTextSize(20);
+
+                adb.setCustomTitle(titletxtview);
+
+                TextView messagetxtview = new TextView(context.get());
+                messagetxtview.setText(message);
+                messagetxtview.setBackgroundColor(Color.WHITE);
+                messagetxtview.setPadding(10, 24, 10, 10);
+                messagetxtview.setGravity(Gravity.CENTER);
+                messagetxtview.setTextColor(Color.BLACK);
+                messagetxtview.setTextSize(18);
+                messagetxtview.setVerticalScrollBarEnabled(true);
+                messagetxtview.setMaxHeight(750);
+                messagetxtview.setMovementMethod(new ScrollingMovementMethod());
+
+                adb.setView(messagetxtview);
+
+                adb.setNegativeButton("OK", new DialogInterface.OnClickListener()
+                {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        // dialog.cancel();
+
+                        dialog.dismiss();
+
+                        context.get().startActivity(new Intent(context.get(), MainMenuActivity.class));
+                        context.get().finish();
+
+                    }
+                });
+
+                adb.setPositiveButton("Share", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                        String shareBody = message;
+                        Log.e("LogFns", "fns message" + shareBody);
+                        intent.setType("text/plain");
+                        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Share");
+                        intent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                        context.get().startActivity(Intent.createChooser(intent, "Share using"));
+
+                    }
+                });
+                android.app.AlertDialog ad = adb.create();
+                ad.show();
 
             }
             else if (s.equals("failure"))
             {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(context.get());
-                View dialogView = LayoutInflater.from(context.get()).inflate(R.layout.dialog_success,null);
+                android.app.AlertDialog.Builder adb = new android.app.AlertDialog.Builder(context.get());
+
+                TextView titletxtview = new TextView(context.get());
+                titletxtview.setText("Alert");
+                titletxtview.setBackgroundColor(ContextCompat.getColor(context.get(), R.color.colorPrimary));
+                titletxtview.setPadding(10, 10, 10, 10);
+                titletxtview.setGravity(Gravity.CENTER);
+                titletxtview.setTextColor(Color.WHITE);
+                titletxtview.setTextSize(20);
+
+                adb.setCustomTitle(titletxtview);
+
+                TextView messagetxtview = new TextView(context.get());
+                messagetxtview.setText(message);
+                messagetxtview.setBackgroundColor(Color.WHITE);
+                messagetxtview.setPadding(10, 24, 10, 10);
+                messagetxtview.setGravity(Gravity.CENTER);
+                messagetxtview.setTextColor(Color.BLACK);
+                messagetxtview.setTextSize(18);
+                messagetxtview.setVerticalScrollBarEnabled(true);
+                messagetxtview.setMaxHeight(750);
+                messagetxtview.setMovementMethod(new ScrollingMovementMethod());
+
+                adb.setView(messagetxtview);
+
+                adb.setNegativeButton("OK", new DialogInterface.OnClickListener()
+                {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                       // dialog.cancel();
+
+                        dialog.dismiss();
+
+                        context.get().startActivity(new Intent(context.get(), MainMenuActivity.class));
+                        context.get().finish();
+
+                    }
+                });
+
+                adb.setPositiveButton("Share", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                        String shareBody = message;
+                        Log.e("LogFns", "fns message" + shareBody);
+                        intent.setType("text/plain");
+                        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Share");
+                        intent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                        context.get().startActivity(Intent.createChooser(intent, "Share using"));
+
+                    }
+                });
+                android.app.AlertDialog ad = adb.create();
+                ad.show();
+               /* AlertDialog.Builder builder = new AlertDialog.Builder(context.get());
+                View dialogView = LayoutInflater.from(context.get()).inflate(R.layout.dialog_failure,null);
 
                 builder.setView(dialogView);
 
                 AlertDialog alertDialog = builder.create();
-                alertDialog.getWindow().setBackgroundDrawableResource(R.color.red_button);
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.white);
                 alertDialog.show();
 
-                TextView successMsg = dialogView.findViewById(R.id.success_msg);
+                @SuppressLint({"MissingInflatedId", "LocalSuppress"}) TextView successMsg = dialogView.findViewById(R.id.success_msg);
                 successMsg.setTextColor(Color.BLACK);
                 successMsg.setText(message);
 
-                MaterialButton okButton = dialogView.findViewById(R.id.ok_button);
+                @SuppressLint({"MissingInflatedId", "LocalSuppress"}) MaterialButton okButton = dialogView.findViewById(R.id.ok_button);
                 okButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -619,10 +742,12 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                     }
                 });
 
+                */
+
             }
             else
             {
-                Log.e("Log", "failed to fetch");
+                Fns.neutralAlert("Alert", "Failed to Fetch", context.get());
             }
 
         }
