@@ -430,7 +430,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
     {
         switch (view.getId())
         {
-            case R.id.submit_button:
+            case R.id.add_button:
             {
 
                 possibleDeliveryDateString = binding.possibleDeliveryDateEditText.getText().toString();
