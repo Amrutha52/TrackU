@@ -1039,9 +1039,10 @@ public class SalesRequestActivity extends AppCompatActivity
                 sendSalesRequestObj.put("description", descriptionETString);
                 sendSalesRequestObj.put("vendorName", vendorName);
                 sendSalesRequestObj.put("itemName", itemName);
-                sendSalesRequestObj.put("fileName", fileName);
-                sendSalesRequestObj.put("photoUpload", base64);
                 sendSalesRequestObj.put("idUnit", idUnit);
+                sendSalesRequestObj.put("fileName", fileName);
+                sendSalesRequestObj.put("customerPhoto", base64);
+
 
                 url = USING_IP + URL_SEND_SALES_REQUEST;
                 Log.e("Log", "sendSalesRequestURL" + url);

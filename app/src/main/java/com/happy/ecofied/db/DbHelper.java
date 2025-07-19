@@ -359,8 +359,8 @@ public class DbHelper extends SQLiteOpenHelper
 
             finalJson.put("createdBy", createdBy);
             finalJson.put("idStatus", idStatus);
-           // finalJson.put("fileName", fileName);
-           // finalJson.put("customerPhoto", base64);
+            finalJson.put("fileName", fileName);
+            finalJson.put("photoUpload", base64);
 
             Log.e("Log", "sendpurchasejson" + finalJson);
             Log.e("Log", "dataarray"+dataArray);
@@ -421,7 +421,7 @@ public class DbHelper extends SQLiteOpenHelper
 
     }
 
-    public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idPurchaseOrder)
+    public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idPurchaseOrder, String fileName, String base64)
     {
         JSONObject finalJson = new JSONObject();
         JSONArray dataArray = new JSONArray();
@@ -459,6 +459,8 @@ public class DbHelper extends SQLiteOpenHelper
             finalJson.put("idStatus", idStatus);
             Log.e("Log", "sendstockoutjson" + finalJson);
             Log.e("Log", "dataarray"+dataArray);
+            finalJson.put("fileName", fileName);
+            finalJson.put("photoUpload", base64);
             finalJson.put("StockOutTable",dataArray);
             Log.e("Log", "finalJsonDB"+finalJson);
 

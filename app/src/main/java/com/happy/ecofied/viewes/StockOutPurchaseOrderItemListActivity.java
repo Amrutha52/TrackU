@@ -83,7 +83,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
     Bitmap photo, resizedBitmapBig;
     // private static final int REQUEST_IMAGE_PICK = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
-    String fileName, base64;
+    String fileName="", base64="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -134,14 +134,12 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         // Match the request 'pic id with requestCode
         if (requestCode == 123) // Camera
         {
-            if(photo != null)
-            {
 
                 // BitMap is data structure of image file which store the image in memory
                 photo = (Bitmap) data.getExtras().get("data");
                 // Set the image in imageview for display
                 click_image_id.setImageBitmap(photo);
-            }
+
         }
         // Check if the result is from our gallery pick request and was successful
         else if (requestCode == 124)  // && resultCode == RESULT_OK  // Gallery
@@ -513,9 +511,9 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder);
-                pushDataObj.put("fileName", fileName);
-                pushDataObj.put("customerPhoto", base64);
+                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64);
+              //  pushDataObj.put("fileName", fileName);
+              //  pushDataObj.put("customerPhoto", base64);
 
                 url = Const.USING_IP + URL_STOCKOUT_SEND_PURCHASE_REQUEST;
 
