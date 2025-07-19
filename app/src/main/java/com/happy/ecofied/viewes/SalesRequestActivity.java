@@ -966,7 +966,7 @@ public class SalesRequestActivity extends AppCompatActivity
         }
         else
         {
-            binding.vendorMailId.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber());
+            binding.mobileNumber.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber());
         }
 
     }
@@ -1040,7 +1040,7 @@ public class SalesRequestActivity extends AppCompatActivity
                 sendSalesRequestObj.put("vendorName", vendorName);
                 sendSalesRequestObj.put("itemName", itemName);
                 sendSalesRequestObj.put("fileName", fileName);
-                sendSalesRequestObj.put("customerPhoto", base64);
+                sendSalesRequestObj.put("photoUpload", base64);
                 sendSalesRequestObj.put("idUnit", idUnit);
 
                 url = USING_IP + URL_SEND_SALES_REQUEST;
