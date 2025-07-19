@@ -108,7 +108,7 @@ public class SalesRequestActivity extends AppCompatActivity
     // private static final int REQUEST_IMAGE_PICK = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
 
-    String fileName, base64;
+    String fileName="", base64="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
