@@ -800,7 +800,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 sendSalesRequestObj.put("vendorName", vendorName);
                 sendSalesRequestObj.put("itemName", itemName);
                 sendSalesRequestObj.put("fileName", fileName);
-                sendSalesRequestObj.put("customerPhoto", base64);
+                sendSalesRequestObj.put("photoUpload", base64);
                 sendSalesRequestObj.put("idUnit", idUnit);
 
                 url = USING_IP + URL_SEND_SALES_REQUEST;
@@ -861,9 +861,9 @@ public class AddSalesRequestActivity extends AppCompatActivity
             if (s.equals("success"))
             {
                 statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
-                 Fns.neutralAlert("Alert", statusMessage, context.get());
+                // Fns.neutralAlert("Alert", statusMessage, context.get());
 
-              /*  AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
+                AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
 
                 TextView titletxtview = new TextView(context.get());
                 titletxtview.setText("Alert");
@@ -923,9 +923,6 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 });
                 AlertDialog ad = adb.create();
                 ad.show();
-
-               */
-
 
             }
             else if (s.equals("failure"))
