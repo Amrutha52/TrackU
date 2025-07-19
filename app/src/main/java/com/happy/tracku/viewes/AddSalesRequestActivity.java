@@ -117,7 +117,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
     int quantityFromET = 0;
     String descriptionETString;
 
-    String fileName, base64;
+    String fileName="", base64="";
 
 
     @Override
@@ -144,6 +144,10 @@ public class AddSalesRequestActivity extends AppCompatActivity
 
         getSupportActionBar().setTitle("AddSalesRequest");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        camera_open_id = findViewById(R.id.camera_button);
+        click_image_id = findViewById(R.id.click_image);
+        gallery_open_id = findViewById(R.id.attach_image);
 
         vendorMasterET = findViewById(R.id.vendor_master_dropdown);
 
