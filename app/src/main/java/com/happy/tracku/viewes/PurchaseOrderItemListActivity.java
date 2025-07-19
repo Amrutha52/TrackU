@@ -499,7 +499,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendPurchaseRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder);
+                JSONObject pushDataObj = dbHelper.getSendPurchaseRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64);
                 pushDataObj.put("fileName", fileName);
                 pushDataObj.put("customerPhoto", base64);
 

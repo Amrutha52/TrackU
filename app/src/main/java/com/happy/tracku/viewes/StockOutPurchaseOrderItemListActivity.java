@@ -521,9 +521,9 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder);
-                pushDataObj.put("fileName", fileName);
-                pushDataObj.put("customerPhoto", base64);
+                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64);
+               // pushDataObj.put("fileName", fileName);
+               // pushDataObj.put("customerPhoto", base64);
 
                 url = Const.USING_IP + URL_STOCKOUT_SEND_PURCHASE_REQUEST;
 
