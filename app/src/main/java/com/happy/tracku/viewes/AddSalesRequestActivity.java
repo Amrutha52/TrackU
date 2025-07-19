@@ -861,9 +861,9 @@ public class AddSalesRequestActivity extends AppCompatActivity
             if (s.equals("success"))
             {
                 statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
-                // Fns.neutralAlert("Alert", statusMessage, context.get());
+                 Fns.neutralAlert("Alert", statusMessage, context.get());
 
-                AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
+              /*  AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
 
                 TextView titletxtview = new TextView(context.get());
                 titletxtview.setText("Alert");
@@ -923,6 +923,8 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 });
                 AlertDialog ad = adb.create();
                 ad.show();
+
+               */
 
 
             }
