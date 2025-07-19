@@ -972,7 +972,7 @@ public class SalesRequestActivity extends AppCompatActivity
         }
         else
         {
-            binding.vendorMailId.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber());
+            binding.mobileNumber.setText(salesRequestDataFillingJson.getData().getSalesRequestDataFillingDetails().get(0).getMobileNumber());
         }
 
     }
