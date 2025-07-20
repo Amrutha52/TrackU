@@ -30,7 +30,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -56,9 +56,9 @@ public class DbHelper extends SQLiteOpenHelper
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+EMPLOYEE_MASTER+" (idEmployee INTEGER,employeeCode TEXT, employeeName TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, AcceptedQty Double, CreatedBy Text)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, AcceptedQty Double, CreatedBy Text, IsVerified INTEGER)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+VENDOR_MASTER+" (idVendor INTEGER,vendorName TEXT)");
 
@@ -98,6 +98,11 @@ public class DbHelper extends SQLiteOpenHelper
         if (oldVersion <= 6)
         {
             db.execSQL("CREATE TABLE IF NOT EXISTS "+UNIT_MASTER+" (idUnit INTEGER,unitName TEXT)");
+        }
+        if (oldVersion <= 7)
+        {
+            db.execSQL("ALTER TABLE " + SAVE_PURCHASE_ORDER_TABLE + " ADD IsVerified INTEGER") ;
+            db.execSQL("ALTER TABLE " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " ADD IsVerified INTEGER") ;
         }
         onCreate(db);
     }
@@ -318,7 +323,7 @@ public class DbHelper extends SQLiteOpenHelper
         Log.e("Log", "acceptedQtyDB" + acceptedQty);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set AcceptedQty="+acceptedQty+" where idItem="+idItem);
+        db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set AcceptedQty="+acceptedQty+" and IsVerified = "+1+" where idItem="+idItem);
 
 
     }
@@ -415,7 +420,7 @@ public class DbHelper extends SQLiteOpenHelper
         Log.e("Log", "stockoutQtyDB" + stockOutQuantity);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set StockOutQuantity="+stockOutQuantity+" where idItem="+idItem);
+        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set StockOutQuantity="+stockOutQuantity+" and IsVerified "+1+" where idItem="+idItem);
 
 
     }
@@ -625,7 +630,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_PURCHASE_ORDER_TABLE + " where AcceptedQty='"+0.0+"'", null);
+        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_PURCHASE_ORDER_TABLE + " where IsVerified='"+1+"'", null);
 
         if (cur.getCount() > 0)
         {
@@ -645,7 +650,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " where StockOutQuantity='"+0.0+"'", null);
+        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " where IsVerified='"+1+"'", null);
 
         if (cur.getCount() > 0)
         {

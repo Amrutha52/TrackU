@@ -100,6 +100,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
     ArrayAdapter<ItemMaster> adapterItemMaster;
     ArrayAdapter<UnitMaster> adapterUnitMaster;
     String vendorName, itemName, unitName;
+    String deliveryDateStringFromSales, deliveryLocationStringFromSales, vendorMailIDStringFromSales, mobileNumberStringFromSales;
 
     /**
      *
@@ -156,20 +157,21 @@ public class AddSalesRequestActivity extends AppCompatActivity
         idVendor = intent.getIntExtra("idVendor",0);
         Log.e("Log", "idVendorAddSales" + idVendor);
 
-        idItemMaster = intent.getIntExtra("idItemMaster",0);
-        Log.e("Log", "idItemMasterAddSales" + idItemMaster);
 
         vendorName = intent.getStringExtra("vendorName");
-        Log.e("Log", "vendorName" + vendorName);
+        Log.e("Log", "vendorNameSales" + vendorName);
 
-        itemName = intent.getStringExtra("itemName");
-        Log.e("Log", "itemName" + itemName);
+        deliveryDateStringFromSales = intent.getStringExtra("date");
+        Log.e("Log", "deliveryDateStringFromSales" + deliveryDateStringFromSales);
 
-        idUnitMaster = intent.getIntExtra("idUnit", 0);
-        Log.e("Log", "idUnitMasterAddSales" + idUnitMaster);
+        deliveryLocationStringFromSales = intent.getStringExtra("deliveryLocation");
+        Log.e("Log", "deliveryLocationStringFromSales" + deliveryLocationStringFromSales);
 
-        unitName = intent.getStringExtra("unitName");
-        Log.e("Log", "unitName" + unitName);
+        vendorMailIDStringFromSales = intent.getStringExtra("vendorMailID");
+        Log.e("Log", "vendorMailIDStringFromSales" + vendorMailIDStringFromSales);
+
+        mobileNumberStringFromSales = intent.getStringExtra("vendorMobileNumber");
+        Log.e("Log", "mobileNumberStringFromSales" + mobileNumberStringFromSales);
 
         gallery_open_id = findViewById(R.id.attach_image);
 
@@ -177,22 +179,29 @@ public class AddSalesRequestActivity extends AppCompatActivity
 
         vendorMasterArrayList = dbHelper.getVendorMaster();
         Log.e("Log", "vendorMasterArrayList" + vendorMasterArrayList);
-        adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, vendorMasterArrayList);
+        adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, vendorMasterArrayList);
         binding.vendorMasterDropdown.setAdapter(adapterVendorMaster);
         binding.vendorMasterDropdown.setText(vendorName);
 
-        itemMasterArrayList = dbHelper.getItemMaster();
+      /*  itemMasterArrayList = dbHelper.getItemMaster();
         Log.e("Log", "itemMasterArrayList" + itemMasterArrayList);
         adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, itemMasterArrayList);
         binding.productMasterDropdown.setAdapter(adapterItemMaster);
-        binding.productMasterDropdown.setText(itemName);
+        // binding.productMasterDropdown.setText(itemName);
 
         unitMasterArrayList = dbHelper.getUnitMaster();
         adapterUnitMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, unitMasterArrayList);
         binding.unitMasterDropdown.setAdapter(adapterUnitMaster);
-        binding.unitMasterDropdown.setText(unitName);
+      //  binding.unitMasterDropdown.setText(unitName);
 
-        binding.possibleDeliveryDateEditText.setText(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
+       */
+
+
+
+        binding.possibleDeliveryDateEditText.setText(deliveryDateStringFromSales);
+        binding.deliveryLocation.setText(deliveryLocationStringFromSales);
+        binding.vendorMailId.setText(vendorMailIDStringFromSales);
+        binding.mobileNumber.setText(mobileNumberStringFromSales);
 
         binding.possibleDeliveryDateEditText.setOnClickListener(new View.OnClickListener()
         {
@@ -258,7 +267,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 //array adapter
                 vendorMasterArrayList = dbHelper.getVendorMaster();
                 Log.e("Log", "vendorMasterArrayList" + vendorMasterArrayList);
-                ArrayAdapter<VendorMaster> adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, vendorMasterArrayList);
+                ArrayAdapter<VendorMaster> adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, vendorMasterArrayList);
                 listView.setAdapter(adapterVendorMaster);
 
 
@@ -326,7 +335,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 //array adapter
                 itemMasterArrayList = dbHelper.getItemMaster();
                 Log.e("Log", "itemMasterArrayList" + itemMasterArrayList);
-                ArrayAdapter<ItemMaster> adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, itemMasterArrayList);
+                ArrayAdapter<ItemMaster> adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, itemMasterArrayList);
                 listView.setAdapter(adapterItemMaster);
 
                 //Textwatcher for change data after every text type by user
@@ -366,6 +375,71 @@ public class AddSalesRequestActivity extends AppCompatActivity
             }
         });
 
+        /**
+         * Unit Master
+         */
+        binding.unitMasterDropdown.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                dialog=new Dialog(AddSalesRequestActivity.this);
+                //set  (our custom layout for dialog)
+                dialog.setContentView(R.layout.layout_searchable_spinner);
+
+                //set transparent background
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                //show dialog
+                dialog.show();
+
+                //initialize and assign variable
+                EditText editText=dialog.findViewById(R.id.editText_of_searchableSpinner);
+                ListView listView=dialog.findViewById(R.id.listView_of_searchableSpinner);
+                //array adapter
+                unitMasterArrayList = dbHelper.getUnitMaster();
+                Log.e("Log", "unitMasterArrayList" + unitMasterArrayList);
+                ArrayAdapter<UnitMaster> adapterUnitMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, unitMasterArrayList);
+                listView.setAdapter(adapterUnitMaster);
+
+
+                //Textwatcher for change data after every text type by user
+
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //filter arraylist
+                        adapterUnitMaster.getFilter().filter(charSequence);
+                    }
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                    }
+                });
+
+                // listview onitem click listener
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                        // textViewSpinner.setText( adapterBranchMaster.getItem(i));
+                        binding.unitMasterDropdown.setText(adapterUnitMaster.getItem(position).getUnitName());
+
+                        idUnitMaster = adapterUnitMaster.getItem(position).getIdUnit();
+                        Log.e("Log", "idUnitMaster : " + idUnitMaster);
+
+                        unitName = adapterUnitMaster.getItem(position).getUnitName();
+                        Log.e("Log", "unitName" + unitName);
+
+
+                        Toast.makeText(AddSalesRequestActivity.this, "Selected:"+ adapterUnitMaster.getItem(position).getUnitName(), Toast.LENGTH_SHORT).show();
+                        //dismiss dialog after choose
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
 
     }
 
@@ -434,7 +508,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
     {
         switch (view.getId())
         {
-            case R.id.add_button:
+            case R.id.add_another_item_button:
             {
 
                 possibleDeliveryDateString = binding.possibleDeliveryDateEditText.getText().toString();
@@ -531,7 +605,15 @@ public class AddSalesRequestActivity extends AppCompatActivity
             }
             break;
 
+            case R.id.complete_button:
+            {
 
+
+                Intent intent = new Intent(this, SalesRequestActivity.class);
+                this.startActivity(intent);
+
+            }
+            break;
 
             case R.id.camera_button:
             {
@@ -726,14 +808,15 @@ public class AddSalesRequestActivity extends AppCompatActivity
 
     private void clearFillingDetails()
     {
-        binding.vendorMailId.setText("");
-        binding.deliveryLocation.setText("");
-        binding.mobileNumber.setText("");
-        // binding.productMasterDropdown.setText("");
+       // binding.vendorMailId.setText("");
+      //  binding.deliveryLocation.setText("");
+      //  binding.mobileNumber.setText("");
+         binding.productMasterDropdown.setText("");
         binding.quantityET.setText("");
-      //  binding.unitET.setText("");
-        binding.deliveryLocation.setText("");
-        binding.possibleDeliveryDateEditText.setText("");
+        binding.unitMasterDropdown.setText("");
+     //   binding.deliveryLocation.setText("");
+     //   binding.possibleDeliveryDateEditText.setText("");
+        click_image_id.setImageBitmap(null);
     }
 
     private static class PushSalesRequest extends AsyncTask<String, String, String>
@@ -903,8 +986,6 @@ public class AddSalesRequestActivity extends AppCompatActivity
                         {
                             context.get().clearFillingDetails();
 
-                            Intent intent = new Intent(context.get(), SalesRequestActivity.class);
-                            context.get().startActivity(intent);
 
                         }
 

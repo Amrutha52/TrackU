@@ -364,11 +364,11 @@ public class SalesRequestActivity extends AppCompatActivity
             {
                 Intent intent = new Intent(this, AddSalesRequestActivity.class);
                 intent.putExtra("idVendor", idVendor);
-                intent.putExtra("idItemMaster", idItemMaster);
                 intent.putExtra("vendorName", vendorName);
-                intent.putExtra("itemName", itemName);
-                intent.putExtra("idUnit", idUnitMaster);
-                intent.putExtra("unitName", unitName);
+                intent.putExtra("date", possibleDeliveryDateString);
+                intent.putExtra("deliveryLocation", deliveryLocationString);
+                intent.putExtra("vendorMailID", mailIdString);
+                intent.putExtra("vendorMobileNumber", mobileNumberString);
                 startActivity(intent);
             }
             break;
@@ -605,10 +605,11 @@ public class SalesRequestActivity extends AppCompatActivity
                 //initialize and assign variable
                 EditText editText=dialog.findViewById(R.id.editText_of_searchableSpinner);
                 ListView listView=dialog.findViewById(R.id.listView_of_searchableSpinner);
+
                 //array adapter
                 vendorMasterArrayList = dbHelper.getVendorMaster();
                 Log.e("Log", "vendorMasterArrayList" + vendorMasterArrayList);
-                ArrayAdapter<VendorMaster> adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, vendorMasterArrayList);
+                ArrayAdapter<VendorMaster> adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, vendorMasterArrayList);
                 listView.setAdapter(adapterVendorMaster);
 
 
@@ -717,7 +718,7 @@ public class SalesRequestActivity extends AppCompatActivity
                 //array adapter
                 itemMasterArrayList = dbHelper.getItemMaster();
                 Log.e("Log", "itemMasterArrayList" + itemMasterArrayList);
-                ArrayAdapter<ItemMaster> adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, itemMasterArrayList);
+                ArrayAdapter<ItemMaster> adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, itemMasterArrayList);
                 listView.setAdapter(adapterItemMaster);
 
                 //Textwatcher for change data after every text type by user
@@ -945,6 +946,7 @@ public class SalesRequestActivity extends AppCompatActivity
        // binding.unitET.setText("");
         binding.deliveryLocation.setText("");
         binding.possibleDeliveryDateEditText.setText("");
+        click_image_id.setImageBitmap(null);
     }
 
     private void setFillingData(SalesRequestDataFillingJson salesRequestDataFillingJson)
@@ -1107,9 +1109,9 @@ public class SalesRequestActivity extends AppCompatActivity
             if (s.equals("success"))
             {
                 statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
-                Fns.neutralAlert("Alert", statusMessage, context.get());
+               // Fns.neutralAlert("Alert", statusMessage, context.get());
 
-              /*  AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
+                AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
 
                 TextView titletxtview = new TextView(context.get());
                 titletxtview.setText("Alert");
@@ -1144,8 +1146,16 @@ public class SalesRequestActivity extends AppCompatActivity
                         {
                             context.get().clearFillingDetails();
 
-                            Intent intent = new Intent(context.get(), MainMenuActivity.class);
-                            context.get().startActivity(intent);
+                            TextView addTextView = context.get().findViewById(R.id.addTextView);
+                            MaterialButton addButton = context.get().findViewById(R.id.add_button);
+                            MaterialButton submitButton = context.get().findViewById(R.id.submit_button);
+
+                            submitButton.setVisibility(View.GONE);
+                            addTextView.setVisibility(View.VISIBLE);
+                            addButton.setVisibility(View.VISIBLE);
+
+                          //  Intent intent = new Intent(context.get(), MainMenuActivity.class);
+                          //  context.get().startActivity(intent);
 
                         }
 
@@ -1169,8 +1179,6 @@ public class SalesRequestActivity extends AppCompatActivity
                 });
                 AlertDialog ad = adb.create();
                 ad.show();
-
-               */
 
 
             }
