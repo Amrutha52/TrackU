@@ -265,10 +265,12 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 EditText editText=dialog.findViewById(R.id.editText_of_searchableSpinner);
                 ListView listView=dialog.findViewById(R.id.listView_of_searchableSpinner);
                 //array adapter
-                vendorMasterArrayList = dbHelper.getVendorMaster();
+             /*   vendorMasterArrayList = dbHelper.getVendorMaster();
                 Log.e("Log", "vendorMasterArrayList" + vendorMasterArrayList);
                 ArrayAdapter<VendorMaster> adapterVendorMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, vendorMasterArrayList);
                 listView.setAdapter(adapterVendorMaster);
+
+              */
 
 
                 //Textwatcher for change data after every text type by user

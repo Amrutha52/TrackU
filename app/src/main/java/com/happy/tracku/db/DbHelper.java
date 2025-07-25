@@ -317,14 +317,31 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("DELETE FROM " + SAVE_PURCHASE_ORDER_TABLE);
     }
 
-    public void updateAcceptedQuantity(Integer idItem, double acceptedQty)
+    public void updateAcceptedQuantity(int idItem, double acceptedQty)
     {
         Log.e("Log", "updateAcceptedQuantity");
         Log.e("Log", "acceptedQtyDB" + acceptedQty);
+        Log.e("Log", "idItemDB" + idItem);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set AcceptedQty="+acceptedQty+" and IsVerified = "+1+" where idItem="+idItem);
+        db.execSQL("update " + SAVE_PURCHASE_ORDER_TABLE + " set AcceptedQty="+acceptedQty+", IsVerified = 1 where idItem='" + idItem + "'");
 
+       // db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set AcceptedQty="+acceptedQty+" where idItem="+idItem);
+
+        // db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set AcceptedQty=acceptedQty where idItem='" + idItem + "'");
+
+       // db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set IsVerified = 1 where idItem='" + idItem + "'");
+
+    }
+
+    public void updateAcceptedQuantityVerified(int idItem)
+    {
+        Log.e("Log", "updateAcceptedQuantityVerified");
+        Log.e("Log", "idItem"+idItem);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("update " + SAVE_PURCHASE_ORDER_TABLE + " set IsVerified = 1 where idItem='" + idItem + "'");
 
     }
 
@@ -420,11 +437,21 @@ public class DbHelper extends SQLiteOpenHelper
         Log.e("Log", "stockoutQtyDB" + stockOutQuantity);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set StockOutQuantity="+stockOutQuantity+" and IsVerified "+1+" where idItem="+idItem);
+        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set StockOutQuantity="+stockOutQuantity+" where idItem='" + idItem + "'");
 
 
     }
 
+    public void updateStockOutQuantityVerified(int idItem)
+    {
+        Log.e("Log", "updateStockoutQuantity");
+        Log.e("Log", "idItemstockoutQtyDB" + idItem);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set IsVerified = 1 where idItem='" + idItem + "'");
+
+
+    }
     public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idPurchaseOrder, String fileName, String base64)
     {
         JSONObject finalJson = new JSONObject();
@@ -630,7 +657,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_PURCHASE_ORDER_TABLE + " where IsVerified='"+1+"'", null);
+        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_PURCHASE_ORDER_TABLE + " where IsVerified IS NULL", null);
 
         if (cur.getCount() > 0)
         {
@@ -650,7 +677,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " where IsVerified='"+1+"'", null);
+        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " where IsVerified IS NULL", null);
 
         if (cur.getCount() > 0)
         {
