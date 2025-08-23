@@ -3,18 +3,26 @@ package com.happy.tracku.viewes;
 import static com.happy.tracku.utils.Const.URL_CUSTOMER_VISIT_INSERT;
 import static com.happy.tracku.utils.Const.USING_IP;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -381,18 +389,72 @@ public class CustomerVisitActivity extends AppCompatActivity
             {
                statusMessage = customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatusMsg();
 
-                Fns.neutralAlert("Alert", customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatusMsg(), mContext.get());
+              //  Fns.neutralAlert("Alert", customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatusMsg(), mContext.get());
 
-                if (customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatus() == 1)
+                AlertDialog.Builder adb = new AlertDialog.Builder(mContext.get());
+
+                TextView titletxtview = new TextView(mContext.get());
+                titletxtview.setText("Alert");
+                titletxtview.setBackgroundColor(ContextCompat.getColor(mContext.get(), R.color.colorPrimary));
+                titletxtview.setPadding(10, 10, 10, 10);
+                titletxtview.setGravity(Gravity.CENTER);
+                titletxtview.setTextColor(Color.WHITE);
+                titletxtview.setTextSize(20);
+
+                adb.setCustomTitle(titletxtview);
+
+                TextView messagetxtview = new TextView(mContext.get());
+                messagetxtview.setText(statusMessage);
+                messagetxtview.setBackgroundColor(Color.WHITE);
+                messagetxtview.setPadding(10, 24, 10, 10);
+                messagetxtview.setGravity(Gravity.CENTER);
+                messagetxtview.setTextColor(Color.BLACK);
+                messagetxtview.setTextSize(18);
+                messagetxtview.setVerticalScrollBarEnabled(true);
+                messagetxtview.setMaxHeight(750);
+                messagetxtview.setMovementMethod(new ScrollingMovementMethod());
+
+                adb.setView(messagetxtview);
+
+                adb.setNegativeButton("OK", new DialogInterface.OnClickListener()
                 {
-                    mContext.get().clearDetails();
-                    mContext.get().finish();
-                }
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        if (customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatus() == 1)
+                        {
+                            mContext.get().clearDetails();
+                            mContext.get().finish();
+                        }
+
+                    }
+                });
+
+                adb.setPositiveButton("Share", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                        String shareBody = statusMessage;
+                        Log.e("LogFns", "fns message" + shareBody);
+                        intent.setType("text/plain");
+                        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Share");
+                        intent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                        mContext.get().startActivity(Intent.createChooser(intent, "Share using"));
+
+                    }
+                });
+                AlertDialog ad = adb.create();
+                ad.show();
+
 
             }
             else if (s.equals("failure"))
             {
                 Fns.neutralAlert("Alert", customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatusMsg(), mContext.get());
+                mContext.get().clearDetails();
                 // Toast.makeText(textWatcher, "Updation Failed", Toast.LENGTH_SHORT).show();
             }
             else if (s.equals("nullException"))
