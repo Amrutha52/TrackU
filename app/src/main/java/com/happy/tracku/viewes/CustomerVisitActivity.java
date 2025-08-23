@@ -141,10 +141,10 @@ public class CustomerVisitActivity extends AppCompatActivity
             shp = mContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
             dbHelper = new DbHelper(mContext);
 
-            pd.setTitle("Please wait");
-            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            pd.setMessage("wait...");
-            pd.setCancelable(false);
+           // pd.setTitle("Please wait");
+          //  pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+           // pd.setMessage("wait...");
+           // pd.setCancelable(false);
 
         }
 
@@ -154,7 +154,7 @@ public class CustomerVisitActivity extends AppCompatActivity
             super.onPreExecute();
             try
             {
-                pd.show();
+              //  pd.show();
 
             }
             catch (Exception e)
@@ -171,6 +171,7 @@ public class CustomerVisitActivity extends AppCompatActivity
             {
 
                 JSONObject pullCustomerVisitDetailsObj = new JSONObject();
+                pullCustomerVisitDetailsObj.put("action", 10);
                 pullCustomerVisitDetailsObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 pullCustomerVisitDetailsObj.put("companyName", companyName);
                 pullCustomerVisitDetailsObj.put("companyEmail", "");
@@ -231,8 +232,9 @@ public class CustomerVisitActivity extends AppCompatActivity
             }
             else if (s.equals("failure"))
             {
+               // mContext.get().clearDetails();
                // Fns.neutralAlert("Alert", addEmployeeJson.getData().getInsertEmployeeDetailsStatus().get(0).getStatusMsg(), mContext);
-                // Toast.makeText(textWatcher, "Updation Failed", Toast.LENGTH_SHORT).show();
+                 Toast.makeText(mContext.get(), "Failed", Toast.LENGTH_SHORT).show();
             }
             else if (s.equals("nullException"))
             {
@@ -312,6 +314,7 @@ public class CustomerVisitActivity extends AppCompatActivity
             {
 
                 JSONObject pullCustomerVisitDetailsObj = new JSONObject();
+                pullCustomerVisitDetailsObj.put("action", 11);
                 pullCustomerVisitDetailsObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 pullCustomerVisitDetailsObj.put("companyName", companyNameString);
                 pullCustomerVisitDetailsObj.put("companyEmail", companyEmailString);
@@ -352,6 +355,10 @@ public class CustomerVisitActivity extends AppCompatActivity
                 else
                 {
                     status = customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatus();
+                    if (status != 1)
+                    {
+                        return "failure";
+                    }
                 }
 
             }
@@ -385,7 +392,7 @@ public class CustomerVisitActivity extends AppCompatActivity
             }
             else if (s.equals("failure"))
             {
-                // Fns.neutralAlert("Alert", addEmployeeJson.getData().getInsertEmployeeDetailsStatus().get(0).getStatusMsg(), mContext);
+                Fns.neutralAlert("Alert", customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatusMsg(), mContext.get());
                 // Toast.makeText(textWatcher, "Updation Failed", Toast.LENGTH_SHORT).show();
             }
             else if (s.equals("nullException"))
