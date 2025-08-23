@@ -1,6 +1,5 @@
 package com.happy.tracku.viewes;
 
-import static com.happy.tracku.utils.Const.URL_CREATE_EMPLOYEE;
 import static com.happy.tracku.utils.Const.URL_CUSTOMER_VISIT_INSERT;
 import static com.happy.tracku.utils.Const.USING_IP;
 
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -24,13 +22,13 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.db.DbHelper;
-import com.happy.tracku.gson.addemployeejsondetails.AddEmployeeJson;
 import com.happy.tracku.gson.insertcustomervisitdetails.CustomerVisitDetailsJson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
-import com.happy.tracku.utils.Fns;
 
 import org.json.JSONObject;
+
+import java.lang.ref.WeakReference;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -81,7 +79,7 @@ public class CustomerVisitActivity extends AppCompatActivity
                 String companyName = s.toString();
                 Log.e("Log", "companyNameAfterTextChanged" + companyName);
                 if (companyName.length() >= 2) { // Set a minimum length to avoid unnecessary calls
-                    new fetchCompanyDetails(this,companyName).execute();
+                    new fetchCompanyDetails(CustomerVisitActivity.this,companyName).execute();
                 }
             }
         });
@@ -101,7 +99,7 @@ public class CustomerVisitActivity extends AppCompatActivity
         String url;
         Request request;
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        AddEmployeeActivity mContext;
+        WeakReference<CustomerVisitActivity> mContext;
         ProgressDialog pd;
         SharedPreferences shp;
         String failureMsg, resultString;
@@ -111,9 +109,9 @@ public class CustomerVisitActivity extends AppCompatActivity
 
         TextWatcher textWatcher;
 
-        public fetchCompanyDetails(TextWatcher textWatcher, String companyName)
+        public fetchCompanyDetails(CustomerVisitActivity mContext, String companyName)
         {
-            this.textWatcher = textWatcher;
+            this.mContext = new WeakReference<>(mContext);;
             this.companyName = companyName;
 
             CustomTrust customTrust = new CustomTrust(mContext);
@@ -223,7 +221,7 @@ public class CustomerVisitActivity extends AppCompatActivity
             }
             else if (s.equals("nullException"))
             {
-                Toast.makeText(mContext, "Null Exception From Server", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
             }
         }
     }
