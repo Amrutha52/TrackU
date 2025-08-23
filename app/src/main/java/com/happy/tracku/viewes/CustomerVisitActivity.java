@@ -25,6 +25,7 @@ import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.insertcustomervisitdetails.CustomerVisitDetailsJson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
+import com.happy.tracku.utils.Fns;
 
 import org.json.JSONObject;
 
@@ -40,6 +41,7 @@ public class CustomerVisitActivity extends AppCompatActivity
 {
     TextInputEditText companyNameET, companyEmailET, contactPersonNameET, contactPersonNumberET, contactPersonEmailET;
     CustomerVisitDetailsJson customerVisitDetailsJson;
+    String companyNameString, companyEmailString, contactPersonNameString, contactPersonNumberString, contactPersonEmailString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +49,9 @@ public class CustomerVisitActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer_visit);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Customer Visit");
 
         View rootView = findViewById(android.R.id.content); // Get root view
 
@@ -76,10 +81,10 @@ public class CustomerVisitActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-                String companyName = s.toString();
-                Log.e("Log", "companyNameAfterTextChanged" + companyName);
-                if (companyName.length() >= 2) { // Set a minimum length to avoid unnecessary calls
-                    new fetchCompanyDetails(CustomerVisitActivity.this,companyName).execute();
+                companyNameString = s.toString();
+                Log.e("Log", "companyNameAfterTextChanged" + companyNameString);
+                if (companyNameString.length() >= 2) { // Set a minimum length to avoid unnecessary calls
+                    new fetchCompanyDetails(CustomerVisitActivity.this,companyNameString).execute();
                 }
             }
         });
@@ -89,7 +94,17 @@ public class CustomerVisitActivity extends AppCompatActivity
     {
         switch (view.getId())
         {
+            case R.id.customer_visit_details_save_button:
+            {
+                companyNameString = companyNameET.getText().toString();
+                companyEmailString = companyEmailET.getText().toString();
+                contactPersonNameString = contactPersonNameET.getText().toString();
+                contactPersonNumberString = contactPersonNumberET.getText().toString();
+                contactPersonEmailString = contactPersonEmailET.getText().toString();
 
+                new SaveCustomerVisitDetails(this, companyNameString, companyEmailString, contactPersonNameString, contactPersonNumberString, contactPersonEmailString).execute();
+            }
+            break;
         }
     }
 
@@ -235,4 +250,158 @@ public class CustomerVisitActivity extends AppCompatActivity
         contactPersonNumberET.setText(customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getContactPerson());
         contactPersonEmailET.setText(customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getContactPersonEmail());
     }
+
+    private static class SaveCustomerVisitDetails extends AsyncTask<String, String, String>
+    {
+        OkHttpClient okHttpClient;
+        String url;
+        Request request;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        WeakReference<CustomerVisitActivity> mContext;
+        ProgressDialog pd;
+        SharedPreferences shp;
+        String failureMsg, resultString;
+        CustomerVisitDetailsJson customerVisitDetailsJson;
+        DbHelper dbHelper;
+        String companyNameString, companyEmailString, contactPersonNameString, contactPersonNumberString,contactPersonEmailString;
+        int status;
+        String statusMessage;
+        public SaveCustomerVisitDetails(CustomerVisitActivity mContext, String companyNameString, String companyEmailString, String contactPersonNameString, String contactPersonNumberString, String contactPersonEmailString)
+        {
+            this.mContext = new WeakReference<>(mContext);
+            this.companyNameString = companyNameString;
+            this.companyEmailString = companyEmailString;
+            this.contactPersonNameString = contactPersonNameString;
+            this.contactPersonEmailString = contactPersonEmailString;
+            this.contactPersonNumberString = contactPersonNumberString;
+
+            CustomTrust customTrust = new CustomTrust(mContext);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+
+            pd = new ProgressDialog(mContext);
+            shp = mContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+            dbHelper = new DbHelper(mContext);
+
+            pd.setTitle("Please wait");
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("wait...");
+            pd.setCancelable(false);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            try
+            {
+                pd.show();
+
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+            }
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+
+                JSONObject pullCustomerVisitDetailsObj = new JSONObject();
+                pullCustomerVisitDetailsObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+                pullCustomerVisitDetailsObj.put("companyName", companyNameString);
+                pullCustomerVisitDetailsObj.put("companyEmail", companyEmailString);
+                pullCustomerVisitDetailsObj.put("contactPerson", contactPersonNameString);
+                pullCustomerVisitDetailsObj.put("contactNumber", contactPersonNumberString);
+                pullCustomerVisitDetailsObj.put("contactPersonEmail", contactPersonEmailString);
+
+                url = USING_IP + URL_CUSTOMER_VISIT_INSERT;
+                Log.e("Log", "customerVisitURL" + url);
+                Log.e("Log", "pullCustomerVisitDetailsObj" + pullCustomerVisitDetailsObj);
+
+                RequestBody body = RequestBody.create(pullCustomerVisitDetailsObj.toString(), JSON);
+
+                request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                Response response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "response" + response);
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+                }
+
+                resultString = response.body().string();
+                Log.e("Log", "resultString" + resultString);
+
+                Gson gson = new Gson();
+                customerVisitDetailsJson = gson.fromJson(resultString, CustomerVisitDetailsJson.class);
+
+                if (customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().isEmpty() || customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().size() == 0 || customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus() == null)
+                {
+                    return "nullException";
+                }
+                else
+                {
+                    status = customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatus();
+                }
+
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+                return "failure";
+            }
+
+            return "success";
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+            pd.dismiss();
+
+            if (s.equals("success"))
+            {
+               statusMessage = customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatusMsg();
+
+                Fns.neutralAlert("Alert", customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatusMsg(), mContext.get());
+
+                if (customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatus() == 1)
+                {
+                    mContext.get().clearDetails();
+                    mContext.get().finish();
+                }
+
+            }
+            else if (s.equals("failure"))
+            {
+                // Fns.neutralAlert("Alert", addEmployeeJson.getData().getInsertEmployeeDetailsStatus().get(0).getStatusMsg(), mContext);
+                // Toast.makeText(textWatcher, "Updation Failed", Toast.LENGTH_SHORT).show();
+            }
+            else if (s.equals("nullException"))
+            {
+                Toast.makeText(mContext.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void clearDetails()
+    {
+        companyNameET.setText("");
+        companyEmailET.setText("");
+        contactPersonNameET.setText("");
+        contactPersonNumberET.setText("");
+        contactPersonEmailET.setText("");
+    }
+
 }

@@ -17,6 +17,12 @@ public class CustomerVisitDetailsstatus {
     @SerializedName("contactPersonEmail")
     @Expose
     private String contactPersonEmail;
+    @SerializedName("status")
+    @Expose
+    private Integer status;
+    @SerializedName("statusMessage")
+    @Expose
+    private String statusMsg;
 
     public String getCompanyEmail() {
         return companyEmail;
@@ -50,5 +56,20 @@ public class CustomerVisitDetailsstatus {
         this.contactPersonEmail = contactPersonEmail;
     }
 
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getStatusMsg() {
+        return statusMsg;
+    }
+
+    public void setStatusMsg(String statusMsg) {
+        this.statusMsg = statusMsg;
+    }
 }
 
