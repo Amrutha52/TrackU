@@ -358,11 +358,11 @@ public class SalesRequestActivity extends AppCompatActivity
             {
                 Intent intent = new Intent(this, AddSalesRequestActivity.class);
                 intent.putExtra("idVendor", idVendor);
-                intent.putExtra("idItemMaster", idItemMaster);
                 intent.putExtra("vendorName", vendorName);
-                intent.putExtra("itemName", itemName);
-                intent.putExtra("idUnit", idUnitMaster);
-                intent.putExtra("unitName", unitName);
+                intent.putExtra("date", possibleDeliveryDateString);
+                intent.putExtra("deliveryLocation", deliveryLocationString);
+                intent.putExtra("vendorMailID", mailIdString);
+                intent.putExtra("vendorMobileNumber", mobileNumberString);
                 startActivity(intent);
             }
             break;
@@ -939,6 +939,8 @@ public class SalesRequestActivity extends AppCompatActivity
         // binding.unitET.setText("");
         binding.deliveryLocation.setText("");
         binding.possibleDeliveryDateEditText.setText("");
+        click_image_id.setImageBitmap(null);
+
     }
 
     private void setFillingData(SalesRequestDataFillingJson salesRequestDataFillingJson)
@@ -1102,9 +1104,9 @@ public class SalesRequestActivity extends AppCompatActivity
             if (s.equals("success"))
             {
                 statusMessage = sendSalesRequestJson.getData().getSendSalesRequestStatus().get(0).getStatusMsg();
-                 Fns.neutralAlert("Alert", statusMessage, context.get());
+                // Fns.neutralAlert("Alert", statusMessage, context.get());
 
-              /*  AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
+                AlertDialog.Builder adb = new AlertDialog.Builder(context.get());
 
                 TextView titletxtview = new TextView(context.get());
                 titletxtview.setText("Alert");
@@ -1165,7 +1167,7 @@ public class SalesRequestActivity extends AppCompatActivity
                 AlertDialog ad = adb.create();
                 ad.show();
 
-               */
+
 
 
             }

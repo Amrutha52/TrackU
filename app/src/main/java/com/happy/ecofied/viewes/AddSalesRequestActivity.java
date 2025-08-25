@@ -1,10 +1,20 @@
-package com.happy.tracku.viewes;
+package com.happy.ecofied.viewes;
 
-import static com.happy.tracku.utils.Const.URL_MASTER_DATA;
-import static com.happy.tracku.utils.Const.URL_SALES_DATA_FILLING;
-import static com.happy.tracku.utils.Const.URL_SEND_SALES_REQUEST;
-import static com.happy.tracku.utils.Const.USING_IP;
-import static com.happy.tracku.utils.Fns.getVendorPositionFromId;
+import static com.happy.ecofied.utils.Const.URL_SALES_DATA_FILLING;
+import static com.happy.ecofied.utils.Const.URL_SEND_SALES_REQUEST;
+import static com.happy.ecofied.utils.Const.USING_IP;
+import com.happy.ecofied.R;
+import com.happy.ecofied.databinding.ActivityAddSalesRequestBinding;
+import com.happy.ecofied.db.DbHelper;
+import com.happy.ecofied.gson.masterdata.ItemMaster;
+import com.happy.ecofied.gson.masterdata.MasterDataJson;
+import com.happy.ecofied.gson.masterdata.UnitMaster;
+import com.happy.ecofied.gson.masterdata.VendorMaster;
+import com.happy.ecofied.gson.salesrequestdatafilling.SalesRequestDataFillingJson;
+import com.happy.ecofied.gson.sendsalesrequest.SendSalesRequestJson;
+import com.happy.ecofied.ssl.CustomTrust;
+import com.happy.ecofied.utils.Const;
+import com.happy.ecofied.utils.Fns;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -49,19 +59,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
-import com.happy.tracku.R;
-import com.happy.tracku.databinding.ActivityAddSalesRequestBinding;
-import com.happy.tracku.databinding.ActivitySalesRequestBinding;
-import com.happy.tracku.db.DbHelper;
-import com.happy.tracku.gson.masterdata.ItemMaster;
-import com.happy.tracku.gson.masterdata.MasterDataJson;
-import com.happy.tracku.gson.masterdata.UnitMaster;
-import com.happy.tracku.gson.masterdata.VendorMaster;
-import com.happy.tracku.gson.salesrequestdatafilling.SalesRequestDataFillingJson;
-import com.happy.tracku.gson.sendsalesrequest.SendSalesRequestJson;
-import com.happy.tracku.ssl.CustomTrust;
-import com.happy.tracku.utils.Const;
-import com.happy.tracku.utils.Fns;
+
 
 import org.json.JSONObject;
 

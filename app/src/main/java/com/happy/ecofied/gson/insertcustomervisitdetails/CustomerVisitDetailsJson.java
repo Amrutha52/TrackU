@@ -1,4 +1,4 @@
-package com.happy.tracku.gson.insertcustomervisitdetails;
+package com.happy.ecofied.gson.insertcustomervisitdetails;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

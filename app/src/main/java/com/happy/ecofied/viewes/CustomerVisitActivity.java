@@ -1,7 +1,8 @@
-package com.happy.tracku.viewes;
+package com.happy.ecofied.viewes;
 
-import static com.happy.tracku.utils.Const.URL_CUSTOMER_VISIT_INSERT;
-import static com.happy.tracku.utils.Const.USING_IP;
+import static com.happy.ecofied.utils.Const.URL_CUSTOMER_VISIT_INSERT;
+import static com.happy.ecofied.utils.Const.USING_IP;
+
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -19,6 +20,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.happy.ecofied.utils.Const;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,12 +30,12 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
-import com.happy.tracku.R;
-import com.happy.tracku.db.DbHelper;
-import com.happy.tracku.gson.insertcustomervisitdetails.CustomerVisitDetailsJson;
-import com.happy.tracku.ssl.CustomTrust;
-import com.happy.tracku.utils.Const;
-import com.happy.tracku.utils.Fns;
+import com.happy.ecofied.R;
+import com.happy.ecofied.db.DbHelper;
+import com.happy.ecofied.gson.insertcustomervisitdetails.CustomerVisitDetailsJson;
+import com.happy.ecofied.ssl.CustomTrust;
+import com.happy.ecofied.utils.Fns;
+
 
 import org.json.JSONObject;
 
