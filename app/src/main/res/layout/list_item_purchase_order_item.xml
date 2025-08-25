@@ -181,13 +181,13 @@
                     android:text="OK"
                     android:layout_gravity="bottom"/>
 
-                <!-- <ImageButton
-                     android:id="@+id/acceptedQtyOkButton"
-                     android:layout_width="20dp"
-                     android:layout_height="20dp"
-                     android:layout_weight="1"
-                     android:src="@drawable/accept"
-                     android:onClick="listeners" /> -->
+               <!-- <ImageButton
+                    android:id="@+id/acceptedQtyOkButton"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/accept"
+                    android:onClick="listeners" /> -->
 
                 <!--<EditText
                     android:id="@+id/collection_amount"
@@ -216,6 +216,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="left"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="@color/quantum_googred"
                     android:text="Verified Quantity" />
 
                 <TextView
@@ -224,6 +227,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="right"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/quantum_googred"
                     android:text="1200" />
 
             </LinearLayout>

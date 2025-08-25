@@ -14,59 +14,59 @@
         android:orientation="vertical">
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/purchaseorderitemlistrecyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/purchaseorderitemlistrecyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp"
-            android:visibility="visible"
-            android:gravity="center">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:visibility="visible"
+        android:gravity="center">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/attach_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Attach Image"
-                android:layout_gravity="center"
-                android:backgroundTint="@color/lightish_grey"
-                android:textColor="@color/black"
-                android:onClick="listeners"
-                android:layout_marginEnd="10dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/camera_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Camera"
-                android:layout_gravity="center"
-                android:backgroundTint="@color/lightish_grey"
-                android:textColor="@color/black"
-                android:onClick="listeners"
-                android:layout_marginStart="10dp"/>
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/click_image"
-            android:visibility="visible"
-            android:layout_width="350dp"
-            android:layout_height="450dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="100dp"
-            android:layout_marginBottom="10dp" />
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/complete_save_button"
-            android:layout_width="match_parent"
+            android:id="@+id/attach_image"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/yellow"
-            android:onClick="listeners"/>
+            android:text="Attach Image"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/lightish_grey"
+            android:textColor="@color/black"
+            android:onClick="listeners"
+            android:layout_marginEnd="10dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/camera_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/lightish_grey"
+            android:textColor="@color/black"
+            android:onClick="listeners"
+            android:layout_marginStart="10dp"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/click_image"
+        android:layout_width="350dp"
+        android:layout_height="450dp"
+        android:layout_marginStart="30dp"
+        android:visibility="visible"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="10dp" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/complete_save_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/yellow"
+        android:onClick="listeners"/>
     </LinearLayout>
 </ScrollView>
