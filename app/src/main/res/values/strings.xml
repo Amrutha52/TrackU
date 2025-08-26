@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">tracku</string>
+    <string name="app_name">Ecofied</string>
     <string name="google_map_api_key">AIzaSyDGtUaQkp49fUS1hAiJUW8x2LBR_KxJafs</string>
     <!--<String name = "google_directions_key">sample</String>-->
     <string name="get_started_text">Show your\n responsibility\n towards society</string>
