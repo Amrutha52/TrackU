@@ -10,8 +10,8 @@ android {
         applicationId = "com.happy.ecofied"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.01"
+        versionCode = 13
+        versionName = "1.13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
