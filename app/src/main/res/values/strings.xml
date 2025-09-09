@@ -1,11 +1,12 @@
 <resources>
-    <string name="app_name">tracku</string>
+    <string name="app_name">Ecofied</string>
     <string name="google_map_api_key">AIzaSyDGtUaQkp49fUS1hAiJUW8x2LBR_KxJafs</string>
     <!--<String name = "google_directions_key">sample</String>-->
     <string name="get_started_text">Show your\n responsibility\n towards society</string>
     <string name="forgot_password_msg">Don\'t worry! it happens. Please enter the email address associated with your account.</string>
     <string name="on_submit_msg">Check out your mailbox, you will receive an email containing link where you can reset your password</string>
     <string name="default_web_client_id">783597013161-lngcl7m8mkk6imji4r8pgqhh1hj15ckj.apps.googleusercontent.com</string>
+    <string name="salesrequestaddquestion">If you want to add another item against this vendor? Click ADD</string>
 
     <string-array name="isAdmin">
         <item>0</item>

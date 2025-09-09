@@ -635,6 +635,13 @@ public class MainMenuActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SalesRequestActivity.class));
             }
             break;
+
+            case R.id.customerVisitLayout:
+            {
+                startActivity(new Intent(this, CustomerVisitActivity.class));
+            }
+            break;
+
         }
     }
 

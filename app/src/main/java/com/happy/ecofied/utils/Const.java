@@ -24,7 +24,7 @@ public class Const
    // public static final String URL_PUBLIC_LIVE = "https://tracku.ecopackuae.com/api/TrackVeDetails/";
    public static final String URL_PUBLIC_LIVE = "https://trackuecofied.ecopackuae.com:88/api/TrackVeDetails/";
 
-   //  public static String USING_IP = URL_PUBLIC_TEST;
+    // public static String USING_IP = URL_PUBLIC_TEST;
    public static String USING_IP = URL_PUBLIC_LIVE;
 
     public static final String URL_LOGIN = "TrackVeValidateLogin";
@@ -46,5 +46,6 @@ public class Const
     public static final String URL_SALES_DATA_FILLING = "SalesRequestDataFilling";
     public static final String URL_SEND_SALES_REQUEST = "SendSalesRequest";
     public static final String URL_LOGOUT_TRACK = "LogoutTrack";
+    public static final String URL_CUSTOMER_VISIT_INSERT = "InsertCustomerVisitDetails";
 
 }

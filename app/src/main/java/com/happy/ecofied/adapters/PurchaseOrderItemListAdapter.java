@@ -111,6 +111,9 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
 
             */
                 dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
+                dbHelper.updateAcceptedQuantityVerified(purchaseOrderItem.getIdItem());
+
+
 
                 Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
                 //  }
