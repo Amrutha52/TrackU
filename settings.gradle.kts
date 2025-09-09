@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "tracku"
+rootProject.name = "ecofied"
 include(":app")
  
