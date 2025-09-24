@@ -1,0 +1,39 @@
+package com.happy.tracku.gson.productdetailsfromidvendor;
+
+import androidx.annotation.NonNull;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+public class ProductDetailsResponse {
+
+    @SerializedName("idItem")
+    @Expose
+    private Integer idItem;
+    @SerializedName("itemName")
+    @Expose
+    private String itemName;
+
+    public Integer getIdItem() {
+        return idItem;
+    }
+
+    public void setIdItem(Integer idItem) {
+        this.idItem = idItem;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    @NonNull
+    @Override
+    public String toString()
+    {
+        return itemName;
+    }
+}

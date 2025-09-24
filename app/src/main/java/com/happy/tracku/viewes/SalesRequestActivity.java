@@ -1,5 +1,6 @@
 package com.happy.tracku.viewes;
 
+import static com.happy.tracku.utils.Const.URL_GETPRODUCT_NAME_FROM_IDVENDOR;
 import static com.happy.tracku.utils.Const.URL_MASTER_DATA;
 import static com.happy.tracku.utils.Const.URL_SALES_DATA_FILLING;
 import static com.happy.tracku.utils.Const.URL_SEND_SALES_REQUEST;
@@ -59,6 +60,8 @@ import com.happy.tracku.gson.masterdata.ItemMaster;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
 import com.happy.tracku.gson.masterdata.UnitMaster;
 import com.happy.tracku.gson.masterdata.VendorMaster;
+import com.happy.tracku.gson.productdetailsfromidvendor.ProductDetailsResponse;
+import com.happy.tracku.gson.productdetailsfromidvendor.ProductDetailsResponseJson;
 import com.happy.tracku.gson.salesrequestdatafilling.SalesRequestDataFillingJson;
 import com.happy.tracku.gson.sendsalesrequest.SendSalesRequestJson;
 import com.happy.tracku.ssl.CustomTrust;
@@ -76,6 +79,7 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import kotlin.Unit;
 import okhttp3.MediaType;
@@ -92,7 +96,7 @@ public class SalesRequestActivity extends AppCompatActivity
     DbHelper dbHelper;
     Dialog dialog;
     ArrayList<VendorMaster> vendorMasterArrayList;
-    ArrayList<ItemMaster> itemMasterArrayList;
+    List<ProductDetailsResponse> itemMasterArrayList;
     ArrayList<UnitMaster> unitMasterArrayList;
     int idVendor, idItemMaster, idUnitMaster;
     String vendorName, itemName, unitName;
@@ -116,6 +120,8 @@ public class SalesRequestActivity extends AppCompatActivity
     private static final int PERMISSION_REQUEST_CODE = 100;
 
     String fileName="", base64="";
+
+    ProductDetailsResponseJson productDetailsResponseJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -644,6 +650,8 @@ public class SalesRequestActivity extends AppCompatActivity
                         Log.e("Log", "vendorName" + vendorName);
                         binding.vendorNameET.setText(vendorName);
 
+                        new PullProductDetailsFromIdVendor(SalesRequestActivity.this, idVendor).execute();
+
                         new PullSalesRequestDataFilling(SalesRequestActivity.this, idVendor).execute();
 
                         Toast.makeText(SalesRequestActivity.this, "Selected:"+ adapterVendorMaster.getItem(position).getVendorName(), Toast.LENGTH_SHORT).show();
@@ -693,71 +701,6 @@ public class SalesRequestActivity extends AppCompatActivity
         });
 
       */
-
-        /**
-         * Searchable Product Spinner
-         */
-
-        binding.productMasterDropdown.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                dialog=new Dialog(SalesRequestActivity.this);
-                //set  (our custom layout for dialog)
-                dialog.setContentView(R.layout.layout_searchable_spinner);
-
-                //set transparent background
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-                //show dialog
-                dialog.show();
-
-                //initialize and assign variable
-                EditText editText=dialog.findViewById(R.id.editText_of_searchableSpinner);
-                ListView listView=dialog.findViewById(R.id.listView_of_searchableSpinner);
-                //array adapter
-                itemMasterArrayList = dbHelper.getItemMaster();
-                Log.e("Log", "itemMasterArrayList" + itemMasterArrayList);
-                ArrayAdapter<ItemMaster> adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, itemMasterArrayList);
-                listView.setAdapter(adapterItemMaster);
-
-                //Textwatcher for change data after every text type by user
-
-                editText.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //filter arraylist
-                        adapterItemMaster.getFilter().filter(charSequence);
-                    }
-                    @Override
-                    public void afterTextChanged(Editable editable) {
-                    }
-                });
-
-                // listview onitem click listener
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                        // textViewSpinner.setText( adapterBranchMaster.getItem(i));
-                        binding.productMasterDropdown.setText(adapterItemMaster.getItem(position).getItemName());
-                        idItemMaster = adapterItemMaster.getItem(position).getIdItem();
-                        Log.e("Log", "idItemMaster : " + idItemMaster);
-
-                        itemName = adapterItemMaster.getItem(position).getItemName();
-                        Log.e("Log", "itemName" + itemName);
-                        binding.productNameET.setText(itemName);
-
-                        Toast.makeText(SalesRequestActivity.this, "Selected:"+ adapterItemMaster.getItem(position).getItemName(), Toast.LENGTH_SHORT).show();
-                        //dismiss dialog after choose
-                        dialog.dismiss();
-                    }
-                });
-            }
-        });
 
 
         binding.unitMasterDropdown.setOnClickListener(new View.OnClickListener()
@@ -1196,5 +1139,185 @@ public class SalesRequestActivity extends AppCompatActivity
 
             pd.dismiss();
         }
+    }
+
+    private static class PullProductDetailsFromIdVendor extends AsyncTask<String, String, String>
+    {
+        WeakReference<SalesRequestActivity> context;
+        ProgressDialog pd;
+        OkHttpClient okHttpClient;
+        String url, resultString;
+        Request request;
+        Response response;
+        SharedPreferences shp;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        ProductDetailsResponseJson productDetailsResponseJson;
+        int idVendor;
+        public PullProductDetailsFromIdVendor(SalesRequestActivity context, int idVendor)
+        {
+            this.context = new WeakReference<>(context);
+            this.idVendor = idVendor;
+
+            CustomTrust customTrust = new CustomTrust(context);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+
+            shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pd = new ProgressDialog(context.get());
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("Loading");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+
+                JSONObject dataFillingObj = new JSONObject();
+                dataFillingObj.put("idVendor", idVendor);
+                dataFillingObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+
+                url = USING_IP + URL_GETPRODUCT_NAME_FROM_IDVENDOR;
+                Log.e("Log", "PullProductDetailsFromIdVendorURL" + url);
+
+                RequestBody body = RequestBody.create(dataFillingObj.toString(), JSON);
+                Log.e("Log", "PullProductDetailsFromIdVendorObj" + dataFillingObj);
+
+                request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "response" + response);
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+                }
+
+                resultString = response.body().string();
+                Log.e("Log", "SalesDataFillingResultString" + resultString);
+
+                Gson gson = new Gson();
+                productDetailsResponseJson = gson.fromJson(resultString, ProductDetailsResponseJson.class);
+                Log.e("Log", "productDetailsResponseJson" + productDetailsResponseJson);
+
+                if (productDetailsResponseJson.getData().getProductDetailsResponse() == null || productDetailsResponseJson.getData().getProductDetailsResponse().size() == 0 || productDetailsResponseJson.getData().getProductDetailsResponse().isEmpty())
+                {
+                    return "nullException";
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+                return "failure";
+            }
+            return "success";
+
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+            if (s.equals("success"))
+            {
+                context.get().clearFillingDetails();
+                context.get().setFillingProductDropDown(productDetailsResponseJson);
+                Toast.makeText(context.get(), "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
+            }
+            else if (s.equals("failure"))
+            {
+                Toast.makeText(context.get(), "Pull Failed", Toast.LENGTH_SHORT).show();
+            } else if (s.equals("nullException"))
+            {
+                Toast.makeText(context.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
+            }
+
+            pd.dismiss();
+        }
+
+    }
+
+    private void setFillingProductDropDown(ProductDetailsResponseJson productDetailsResponseJson)
+    {
+        this.productDetailsResponseJson = productDetailsResponseJson;
+
+        /**
+         * Searchable Product Spinner
+         */
+
+        binding.productMasterDropdown.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                dialog=new Dialog(SalesRequestActivity.this);
+                //set  (our custom layout for dialog)
+                dialog.setContentView(R.layout.layout_searchable_spinner);
+
+                //set transparent background
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                //show dialog
+                dialog.show();
+
+                //initialize and assign variable
+                EditText editText=dialog.findViewById(R.id.editText_of_searchableSpinner);
+                ListView listView=dialog.findViewById(R.id.listView_of_searchableSpinner);
+                //array adapter
+                itemMasterArrayList = productDetailsResponseJson.getData().getProductDetailsResponse();
+                Log.e("Log", "itemMasterArrayList" + itemMasterArrayList);
+                ArrayAdapter<ProductDetailsResponse> adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, itemMasterArrayList);
+                listView.setAdapter(adapterItemMaster);
+
+                //Textwatcher for change data after every text type by user
+
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //filter arraylist
+                        adapterItemMaster.getFilter().filter(charSequence);
+                    }
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                    }
+                });
+
+                // listview onitem click listener
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                        // textViewSpinner.setText( adapterBranchMaster.getItem(i));
+                        binding.productMasterDropdown.setText(adapterItemMaster.getItem(position).getItemName());
+                        idItemMaster = adapterItemMaster.getItem(position).getIdItem();
+                        Log.e("Log", "idItemMaster : " + idItemMaster);
+
+                        itemName = adapterItemMaster.getItem(position).getItemName();
+                        Log.e("Log", "itemName" + itemName);
+                        binding.productNameET.setText(itemName);
+
+                        Toast.makeText(SalesRequestActivity.this, "Selected:"+ adapterItemMaster.getItem(position).getItemName(), Toast.LENGTH_SHORT).show();
+                        //dismiss dialog after choose
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
     }
 }
