@@ -24,8 +24,8 @@ public class Const
     public static final String URL_PUBLIC_LIVE = "https://tracku.ecopackuae.com/api/TrackVeDetails/";
   // public static final String URL_PUBLIC_LIVE = "https://trackuecofied.ecopackuae.com:88/api/TrackVeDetails/";
 
-     public static String USING_IP = URL_PUBLIC_TEST;
-  // public static String USING_IP = URL_PUBLIC_LIVE;
+    // public static String USING_IP = URL_PUBLIC_TEST;
+   public static String USING_IP = URL_PUBLIC_LIVE;
 
     public static final String URL_LOGIN = "TrackVeValidateLogin";
     public static final String URL_Update_Daily_GPS_Data = "UpdateDailyGPSData";
