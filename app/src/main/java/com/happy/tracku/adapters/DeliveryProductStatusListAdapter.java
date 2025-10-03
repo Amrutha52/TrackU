@@ -1,6 +1,7 @@
 package com.happy.tracku.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.happy.tracku.R;
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPending;
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPendingListJson;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
+import com.happy.tracku.viewes.DeliveryProductDetailsActivity;
 import com.happy.tracku.viewes.DeliveryStatusActivity;
 import com.happy.tracku.viewholders.DeliveryProductStatusViewHolder;
 import com.happy.tracku.viewholders.PurchaseOrderItemListViewHolder;
@@ -69,6 +71,9 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
                 int idSalesHeader = (int) view.getTag(R.string.key_one);
                 Log.e("Log","idSalesHeader" + idSalesHeader);
 
+                Intent intent = new Intent(context, DeliveryProductDetailsActivity.class);
+                intent.putExtra("idSalesHeader", idSalesHeader);
+                context.startActivity(intent);
             }
             break;
         }
