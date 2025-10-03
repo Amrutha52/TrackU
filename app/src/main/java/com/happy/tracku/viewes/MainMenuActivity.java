@@ -648,6 +648,12 @@ public class MainMenuActivity extends AppCompatActivity {
                 startActivity(new Intent(this, StorePurchaseActivity.class));
             }
             break;
+
+            case R.id.deliveryPendingLL:
+            {
+                startActivity(new Intent(this, DeliveryStatusActivity.class));
+            }
+            break;
         }
     }
 
