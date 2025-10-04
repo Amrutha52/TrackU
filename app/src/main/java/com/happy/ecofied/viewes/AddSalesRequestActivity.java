@@ -888,7 +888,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 sendSalesRequestObj.put("itemName", itemName);
                 sendSalesRequestObj.put("idUnit", idUnit);
                 sendSalesRequestObj.put("fileName", fileName);
-                sendSalesRequestObj.put("customerPhoto", base64);
+                sendSalesRequestObj.put("photoUpload", base64);
 
 
                 url = USING_IP + URL_SEND_SALES_REQUEST;
