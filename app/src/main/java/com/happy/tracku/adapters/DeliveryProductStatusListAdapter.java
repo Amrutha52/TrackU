@@ -25,6 +25,7 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
 {
     Context context;
     List<DeliveryPending> deliveryPendingList;
+
     public DeliveryProductStatusListAdapter(DeliveryStatusActivity context, List<DeliveryPending> deliveryPendingList)
     {
         this.context = context;
