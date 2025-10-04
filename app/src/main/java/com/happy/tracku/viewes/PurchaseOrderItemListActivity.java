@@ -569,8 +569,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
 
             pd.dismiss();
 
-            if (s.equals("success"))
-            {
+            if (s.equals("success")) {
 
                 android.app.AlertDialog.Builder adb = new android.app.AlertDialog.Builder(context.get());
 
@@ -597,12 +596,10 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
 
                 adb.setView(messagetxtview);
 
-                adb.setNegativeButton("OK", new DialogInterface.OnClickListener()
-                {
+                adb.setNegativeButton("OK", new DialogInterface.OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
+                    public void onClick(DialogInterface dialog, int which) {
                         // dialog.cancel();
 
                         dialog.dismiss();
@@ -660,9 +657,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
 
                 */
 
-            }
-            else if (s.equals("failure"))
-            {
+            } else if (s.equals("failure")) {
 
                 android.app.AlertDialog.Builder adb = new android.app.AlertDialog.Builder(context.get());
 
@@ -689,12 +684,10 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
 
                 adb.setView(messagetxtview);
 
-                adb.setNegativeButton("OK", new DialogInterface.OnClickListener()
-                {
+                adb.setNegativeButton("OK", new DialogInterface.OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
+                    public void onClick(DialogInterface dialog, int which) {
                         // dialog.cancel();
 
                         dialog.dismiss();
@@ -751,13 +744,9 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
 
                */
 
-            }
-            else if (s.equals("nullException"))
-            {
+            } else if (s.equals("nullException")) {
                 Fns.neutralAlert("Alert", "Null Exception From Server", context.get());
-            }
-            else
-            {
+            } else {
                 Log.e("Log", "failed to fetch");
             }
 

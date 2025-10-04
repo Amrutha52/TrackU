@@ -22,7 +22,7 @@ public class DeliveryPending {
     private String itemName;
     @SerializedName("quantity")
     @Expose
-    private Integer quantity;
+    private Double quantity;
     @SerializedName("idSalesDeliveryDetails")
     @Expose
     private Integer idSalesDeliveryDetails;
@@ -67,11 +67,11 @@ public class DeliveryPending {
         this.itemName = itemName;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 

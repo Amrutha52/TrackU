@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Update Status"
+            android:textColor="@color/black"
             android:layout_gravity="center"
             android:backgroundTint="@color/quantum_yellow"
             android:onClick="listeners"
