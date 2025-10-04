@@ -47,5 +47,7 @@ public class Const
     public static final String URL_SEND_SALES_REQUEST = "SendSalesRequest";
     public static final String URL_LOGOUT_TRACK = "LogoutTrack";
     public static final String URL_CUSTOMER_VISIT_INSERT = "InsertCustomerVisitDetails";
+    public static final String URL_GETPRODUCT_NAME_FROM_IDVENDOR = "GetProductNameFromIdVendor";
+
 
 }
