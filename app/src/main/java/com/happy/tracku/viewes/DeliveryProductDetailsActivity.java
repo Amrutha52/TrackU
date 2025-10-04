@@ -180,6 +180,12 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
                 Gson gson = new Gson();
                 deliveryPendingListJson = gson.fromJson(result, DeliveryPendingListJson.class);
 
+                if (deliveryPendingListJson.getData().getDeliveryPending().isEmpty() || deliveryPendingListJson.getData().getDeliveryPending().size() == 0 || deliveryPendingListJson.getData().getDeliveryPending() == null)
+                {
+                    return "nullException";
+                }
+
+
             }
             catch (Exception e)
             {
@@ -213,6 +219,10 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
                 deliveryProductDetailsRecyclerview.setAdapter(deliveryProductDetailsAdapter);
 
 
+            }
+            else if (s.equals("nullException"))
+            {
+                Fns.neutralAlert("Alert", "Null from server side", context.get());
             }
             else
             {

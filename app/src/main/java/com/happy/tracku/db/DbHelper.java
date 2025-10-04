@@ -716,7 +716,9 @@ public class DbHelper extends SQLiteOpenHelper
             cv.put("idSalesDetails", deliveryPending.getIdSalesDeliveryDetails());
 
             db.insert(DELIVERY_PENDING_DETAILS_TABLE, null, cv);
+            Log.e("Log", "insertDeliveryPendingDetails" + cv);
         }
+
         db.close();
     }
 
@@ -735,7 +737,7 @@ public class DbHelper extends SQLiteOpenHelper
 
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor cur = db.rawQuery("select * from "+ DELIVERY_PENDING_DETAILS_TABLE +" where idSalesHeader="+idSalesHeader,null);
+            Cursor cur = db.rawQuery("select idSalesDetails, quantity from "+ DELIVERY_PENDING_DETAILS_TABLE +" where idSalesHeader="+idSalesHeader,null);
 
             if(cur.getCount() > 0)
             {

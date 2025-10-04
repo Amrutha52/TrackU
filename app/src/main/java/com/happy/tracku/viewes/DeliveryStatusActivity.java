@@ -153,6 +153,12 @@ public class DeliveryStatusActivity extends AppCompatActivity
                 Gson gson = new Gson();
                 deliveryPendingListJson = gson.fromJson(result, DeliveryPendingListJson.class);
 
+                if (deliveryPendingListJson.getData().getDeliveryPending().isEmpty() || deliveryPendingListJson.getData().getDeliveryPending().size() == 0 || deliveryPendingListJson.getData().getDeliveryPending() == null)
+                {
+                    return "nullException";
+                }
+
+
             }
             catch (Exception e)
             {
@@ -184,6 +190,10 @@ public class DeliveryStatusActivity extends AppCompatActivity
 
 
 
+            }
+            else if (s.equals("nullException"))
+            {
+                Fns.neutralAlert("Alert", "Null from server side", context.get());
             }
             else
             {

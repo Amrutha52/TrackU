@@ -23,7 +23,7 @@ public class DeliveryPending {
     @SerializedName("quantity")
     @Expose
     private Double quantity;
-    @SerializedName("idSalesDeliveryDetails")
+    @SerializedName("idSalesDetails")
     @Expose
     private Integer idSalesDeliveryDetails;
 
