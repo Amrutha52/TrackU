@@ -32,6 +32,12 @@
         android:theme="@style/Theme.Tracku"
         tools:targetApi="31">
         <activity
+            android:name=".viewes.DeliveryStatusActivity"
+            android:exported="false" />
+        <activity
+            android:name=".viewes.DeliveryProductDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".viewes.StorePurchaseActivity"
             android:exported="false"
             android:parentActivityName=".viewes.MainMenuActivity"

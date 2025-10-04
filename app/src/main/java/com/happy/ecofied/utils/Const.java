@@ -50,6 +50,7 @@ public class Const
     public static final String URL_GETPRODUCT_NAME_FROM_IDVENDOR = "GetProductNameFromIdVendor";
 
     public static final String URL_UPDATE_STORE_PURCHASE = "UpdateStorePurchase";
-
+    public static final String URL_GET_DELIVERY_PENDING = "GetDeliveryPending";
+    public static final String URL_UPDATE_DELIVERY_STATUS = "UpdateDeliveryStatus";
 
 }
