@@ -642,6 +642,12 @@ public class MainMenuActivity extends AppCompatActivity {
             }
             break;
 
+            case R.id.storePurchaseListLL:
+            {
+                startActivity(new Intent(this, StorePurchaseActivity.class));
+            }
+            break;
+
         }
     }
 

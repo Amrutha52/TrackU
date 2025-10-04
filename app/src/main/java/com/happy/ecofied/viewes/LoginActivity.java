@@ -1,6 +1,7 @@
 package com.happy.ecofied.viewes;
 
 import static com.happy.ecofied.utils.Const.URL_LOGIN;
+import static com.happy.ecofied.utils.Const.URL_MASTER_DATA;
 import static com.happy.ecofied.utils.Const.USING_IP;
 
 import androidx.appcompat.app.AlertDialog;
@@ -24,7 +25,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.happy.ecofied.R;
 import com.happy.ecofied.databinding.ActivityLoginBinding;
+import com.happy.ecofied.db.DbHelper;
 import com.happy.ecofied.gson.login.LoginStatusJson;
+import com.happy.ecofied.gson.masterdata.MasterDataJson;
 import com.happy.ecofied.ssl.CustomTrust;
 import com.happy.ecofied.utils.Const;
 import com.happy.ecofied.utils.Fns;
@@ -32,6 +35,7 @@ import com.happy.ecofied.utils.Fns;
 import org.json.JSONObject;
 
 import java.io.InterruptedIOException;
+import java.lang.ref.WeakReference;
 import java.net.SocketTimeoutException;
 
 import okhttp3.MediaType;
@@ -44,8 +48,10 @@ public class LoginActivity extends AppCompatActivity
 {
     private ActivityLoginBinding activityLoginBinding;
     String usernameString, versionNameString;
-
     SharedPreferences shp;
+    DbHelper dbHelper;
+    MasterDataJson masterDataJson;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,6 +77,7 @@ public class LoginActivity extends AppCompatActivity
         Log.e("Log", "versionNo" + Fns.getAppVersionName(this));
         activityLoginBinding.versionNo.setText("Ver"+Fns.getAppVersionName(this));
 
+        dbHelper = new DbHelper(this);
         shp = getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
 
         String androidIdString = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -89,6 +96,9 @@ public class LoginActivity extends AppCompatActivity
 //        {
 //            startActivity(new Intent(this, MainMenuActivity.class));
 //        }
+
+        new PullMasterData(this).execute();
+
 
     }
 
@@ -469,6 +479,126 @@ public class LoginActivity extends AppCompatActivity
             }
 
         }
+    }
+
+    private static class PullMasterData extends AsyncTask<String, String, String>
+    {
+
+        WeakReference<LoginActivity> context;
+        ProgressDialog pd;
+        OkHttpClient okHttpClient;
+        String url, resultString;
+        Request request;
+        Response response;
+        SharedPreferences shp;
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        MasterDataJson masterDataJson;
+        DbHelper dbHelper;
+
+        public PullMasterData(LoginActivity context)
+        {
+            this.context = new WeakReference<>(context);
+
+            CustomTrust customTrust = new CustomTrust(context);
+            OkHttpClient client = customTrust.getClient();
+            okHttpClient = client;
+
+            shp = context.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+            dbHelper = new DbHelper(context);
+
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pd = new ProgressDialog(context.get());
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("Loading");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            try
+            {
+
+                JSONObject masterDataDetailsObj = new JSONObject();
+                masterDataDetailsObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+
+                url = USING_IP + URL_MASTER_DATA;
+                Log.e("Log", "masterurl" + url);
+
+                RequestBody body = RequestBody.create(masterDataDetailsObj.toString(), JSON);
+                Log.e("Log", "masterDataDetailsObj" + masterDataDetailsObj);
+
+                request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
+                Log.e("Log", "request" + request);
+
+                response = okHttpClient.newCall(request).execute();
+                Log.e("Log", "response" + response);
+
+                if (!response.isSuccessful())
+                {
+                    return "failure";
+                }
+
+                resultString = response.body().string();
+                Log.e("Log", "MasterResultString" + resultString);
+
+                Gson gson = new Gson();
+                masterDataJson = gson.fromJson(resultString, MasterDataJson.class);
+                Log.e("Log", "masterDataJson" + masterDataJson);
+
+                if (masterDataJson.getData().getVendorMaster() == null || masterDataJson.getData().getVendorMaster().size() == 0 || masterDataJson.getData().getVendorMaster().isEmpty() || masterDataJson.getData().getItemMaster().isEmpty() || masterDataJson.getData().getItemMaster() == null || masterDataJson.getData().getItemMaster().size() == 0)
+                {
+                    return "nullException";
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("Log", "Exception", e);
+                return "failure";
+            }
+            return "success";
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+            if (s.equals("success"))
+            {
+                context.get().setMasterData(masterDataJson);
+
+            }
+            else if (s.equals("failure"))
+            {
+                Toast.makeText(context.get(), "Pull Failed", Toast.LENGTH_SHORT).show();
+            } else if (s.equals("nullException"))
+            {
+                Toast.makeText(context.get(), "Null Exception From Server", Toast.LENGTH_SHORT).show();
+            }
+
+            pd.dismiss();
+        }
+    }
+
+    private void setMasterData(MasterDataJson masterDataJson)
+    {
+        this.masterDataJson = masterDataJson;
+
+        dbHelper.deleteVendorMaster();
+        dbHelper.deleteItemMaster();
+        dbHelper.deleteUnitMaster();
+        dbHelper.insertMasterData(masterDataJson);
+
     }
 }
 
