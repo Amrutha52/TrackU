@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.happy.ecofied.gson.deliverypendinglist.DeliveryPending;
 import com.happy.ecofied.gson.employeemasterdetails.EmployeeMasterDetail;
 import com.happy.ecofied.gson.masterdata.ItemMaster;
 import com.happy.ecofied.gson.masterdata.MasterDataJson;
@@ -30,7 +31,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 7;
+    public static final int DATABASE_VERSION = 8;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -39,6 +40,7 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String VENDOR_MASTER = "VendorMaster";
     public static final String ITEM_MASTER =  "ItemMaster";
     public static final String UNIT_MASTER = "UnitMaster";
+    public static final String DELIVERY_PENDING_DETAILS_TABLE = "DeliveryPending";
 
     private SharedPreferences shp;
     private Context context;
@@ -65,6 +67,9 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("CREATE TABLE IF NOT EXISTS "+ITEM_MASTER+" (idItem INTEGER,itemName TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+UNIT_MASTER+" (idUnit INTEGER,unitName TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+DELIVERY_PENDING_DETAILS_TABLE+" (idSalesHeader INTEGER,vendorName TEXT, salesDate TEXT, grandTotal DOUBLE,itemName TEXT, quantity DOUBLE, idSalesDetails INTEGER)");
+
 
     }
 
@@ -105,6 +110,12 @@ public class DbHelper extends SQLiteOpenHelper
             db.execSQL("ALTER TABLE " + SAVE_PURCHASE_ORDER_TABLE + " ADD IsVerified INTEGER") ;
             db.execSQL("ALTER TABLE " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " ADD IsVerified INTEGER") ;
         }
+        if (oldVersion <= 8)
+        {
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+DELIVERY_PENDING_DETAILS_TABLE+" (idSalesHeader INTEGER,vendorName TEXT, salesDate TEXT, grandTotal DOUBLE,itemName TEXT, quantity DOUBLE, idSalesDetails INTEGER)");
+
+        }
+
         onCreate(db);
     }
 
@@ -696,5 +707,78 @@ public class DbHelper extends SQLiteOpenHelper
 
         cur.close();
         return count;
+    }
+
+    public void insertDeliveryPendingDetails(List<DeliveryPending> deliveryPendingList)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        for (DeliveryPending deliveryPending : deliveryPendingList)
+        {
+            ContentValues cv = new ContentValues();
+            cv.put("idSalesHeader", deliveryPending.getIdSalesHeader());
+            cv.put("vendorName", deliveryPending.getVendorName());
+            cv.put("salesDate", deliveryPending.getSalesDate());
+            cv.put("grandTotal", deliveryPending.getGrandTotal());
+            cv.put("itemName", deliveryPending.getItemName());
+            cv.put("quantity", deliveryPending.getQuantity());
+            cv.put("idSalesDetails", deliveryPending.getIdSalesDeliveryDetails());
+
+            db.insert(DELIVERY_PENDING_DETAILS_TABLE, null, cv);
+            Log.e("Log", "insertDeliveryPendingDetails" + cv);
+        }
+
+        db.close();
+    }
+
+    public void deleteDeliveryPendingDetails()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + DELIVERY_PENDING_DETAILS_TABLE);
+    }
+
+    public JSONObject getDeliveryPendingDetails(int idSalesHeader, String createdBy)
+    {
+        JSONObject finalJson = new JSONObject();
+        JSONArray dataArray = new JSONArray();
+
+        try {
+
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor cur = db.rawQuery("select idSalesDetails, quantity from "+ DELIVERY_PENDING_DETAILS_TABLE +" where idSalesHeader="+idSalesHeader,null);
+
+            if(cur.getCount() > 0)
+            {
+
+                cur.moveToFirst();
+
+                for (int i = 0; i < cur.getCount(); i++) {
+
+                    JSONObject singleDataObj = new JSONObject();
+                    singleDataObj.put("idDetail",cur.getInt(cur.getColumnIndex("idSalesDetails")));
+                    singleDataObj.put("deliveredQty",cur.getDouble(cur.getColumnIndex("quantity")));
+
+                    dataArray.put(singleDataObj);
+
+
+                    cur.moveToNext();
+
+                }
+
+            }
+            cur.close();
+
+            finalJson.put("createdBy", createdBy);
+            finalJson.put("id", idSalesHeader);
+            finalJson.put("action", 1);
+            finalJson.put("deliveryDetails",dataArray);
+            Log.e("Log", "finalJsonDBDel"+finalJson);
+            Log.e("Log", "dataarrayDel"+dataArray);
+
+        } catch (JSONException e) {
+            Log.e("Log", "exception" + e);
+        }
+
+        return finalJson;
     }
 }
