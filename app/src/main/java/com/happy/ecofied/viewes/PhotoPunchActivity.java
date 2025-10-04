@@ -3,18 +3,27 @@ package com.happy.ecofied.viewes;
 import static com.happy.ecofied.utils.Const.URL_MANUAL_PUNCH;
 import static com.happy.ecofied.utils.Const.USING_IP;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.Log;
@@ -25,11 +34,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 import com.happy.ecofied.R;
 import com.happy.ecofied.db.DbHelper;
@@ -45,6 +63,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -61,6 +81,10 @@ public class PhotoPunchActivity extends AppCompatActivity
     Button camera_open_id;
     ImageView click_image_id;
     Bitmap photo, resizedBitmapBig;
+    Double latitude=0.0, longitude=0.0;
+    String locationAddress;
+    FusedLocationProviderClient mFusedLocationClient;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -93,8 +117,146 @@ public class PhotoPunchActivity extends AppCompatActivity
 //            startActivityForResult(camera_intent, pic_id);
 //        });
 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // method to get the location
+        getLastLocation();
+
     }
 
+    private void getLastLocation() {
+        // check if permissions are given
+        if (checkPermissions()) {
+
+            // check if location is enabled
+            if (isLocationEnabled()) {
+
+                // getting last
+                // location from
+                // FusedLocationClient
+                // object
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        Location location = task.getResult();
+                        if (location == null) {
+                            requestNewLocationData();
+                        } else {
+                            Log.e("Log", "latitudeInsideFusedlocation" + location.getLatitude());
+                            Log.e("Log", "longitudeInsideFusedlocation" + location.getLongitude());
+                            latitude = location==null?0.0:location.getLatitude();
+                            Log.e("Log", "location Latitude" + latitude);
+
+                            longitude = location==null?0.0:location.getLongitude();
+                            Log.e("Log", "location longitude" + longitude);
+
+                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                            try
+                            {
+                                // throw new RuntimeException("Exception For Testing");
+
+                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                                Log.e("Log", latitude + "" + longitude);
+
+                                if (addresses != null && addresses.size() != 0)
+                                {
+                                    locationAddress = addresses.get(0).getAddressLine(0);
+                                    Log.e("address", locationAddress);
+                                }
+
+                            }
+                            catch (Exception e)
+                            {
+                                locationAddress = "Not Able To Get Address";
+                                Log.e("ExceptionAddress", locationAddress);
+                                Log.e("Log", "Exception", e);
+                            }
+
+                        }
+                    }
+                });
+            } else {
+                Toast.makeText(this, "Please turn on" + " your location...", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        } else {
+            // if permissions aren't available,
+            // request for permissions
+            requestPermissions();
+        }
+    }
+
+    private boolean checkPermissions() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        // If we want background location
+        // on Android 10.0 and higher,
+        // use:
+        // ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    // method to request for permissions
+    private void requestPermissions() {
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION}, 44);
+    }
+
+    private void requestNewLocationData() {
+
+        // Initializing LocationRequest
+        // object with appropriate methods
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(5);
+        mLocationRequest.setFastestInterval(0);
+        mLocationRequest.setNumUpdates(1);
+
+        // setting LocationRequest
+        // on FusedLocationClient
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+    }
+
+    private LocationCallback mLocationCallback = new LocationCallback() {
+
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            Location mLastLocation = locationResult.getLastLocation();
+            Log.e("Log", "latitude" + mLastLocation.getLatitude());
+            Log.e("Log", "latitude" + mLastLocation.getLatitude());
+            // latitudeTextView.setText("Latitude: " + mLastLocation.getLatitude() + "");
+            //longitTextView.setText("Longitude: " + mLastLocation.getLongitude() + "");
+        }
+    };
+
+    // method to check
+    // if location is enabled
+    private boolean isLocationEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
     // This method will help to retrieve the image
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -159,7 +321,7 @@ public class PhotoPunchActivity extends AppCompatActivity
 
                 String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
-                new PushPhotoPunchingDetails(this, currentDateAndTime, base64).execute();
+                new PushPhotoPunchingDetails(this, currentDateAndTime, base64, longitude, latitude, locationAddress).execute();
 
             }
             break;
@@ -179,13 +341,18 @@ public class PhotoPunchActivity extends AppCompatActivity
         Photopunchingjson photopunchingjson;
         DbHelper dbHelper;
         int status;
+        double longitude, latitude;
+        String locationAddress;
 
         String punchingDateTime, punchingImage;
-        public PushPhotoPunchingDetails(PhotoPunchActivity mContext, String currentDateAndTime, String base64)
+        public PushPhotoPunchingDetails(PhotoPunchActivity mContext, String currentDateAndTime, String base64, double longitude, double latitude, String locationAddress)
         {
             this.mContext = mContext;
             this.punchingDateTime = currentDateAndTime;
             this.punchingImage = base64;
+            this.longitude = longitude;
+            this.latitude = latitude;
+            this.locationAddress = locationAddress;
 
             CustomTrust customTrust = new CustomTrust(mContext);
             OkHttpClient client = customTrust.getClient();
@@ -234,6 +401,10 @@ public class PhotoPunchActivity extends AppCompatActivity
                 photoPunchObj.put("employeeCode", shp.getString(Const.Shp_Employee_Code, ""));
                 photoPunchObj.put("date", punchingDateTime);
                 photoPunchObj.put("employeeImage", punchingImage);
+                photoPunchObj.put("Longitude", longitude);
+                photoPunchObj.put("Latitude", latitude);
+                photoPunchObj.put("Address", locationAddress);
+
                 //photoPunchObj.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
 
                 url = USING_IP + URL_MANUAL_PUNCH;
