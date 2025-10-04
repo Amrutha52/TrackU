@@ -36,7 +36,7 @@
         <activity
             android:name=".viewes.DeliveryProductDetailsActivity"
             android:exported="false"
-            android:parentActivityName=".viewes.MainMenuActivity"
+            android:parentActivityName=".viewes.DeliveryStatusActivity"
             android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.DeliveryStatusActivity"
