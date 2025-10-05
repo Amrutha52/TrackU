@@ -1037,7 +1037,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 }
 
                 resultString = response.body().string();
-                Log.e("Log", "SalesDataFillingResultString" + resultString);
+                Log.e("Log", "PullProductDetailsFromIdVendorResultString" + resultString);
 
                 Gson gson = new Gson();
                 productDetailsResponseJson = gson.fromJson(resultString, ProductDetailsResponseJson.class);
@@ -1108,7 +1108,7 @@ public class AddSalesRequestActivity extends AppCompatActivity
                 ListView listView=dialog.findViewById(R.id.listView_of_searchableSpinner);
                 //array adapter
                 itemMasterArrayList = productDetailsResponseJson.getData().getProductDetailsResponse();
-                Log.e("Log", "itemMasterArrayList" + itemMasterArrayList);
+                Log.e("Log", "PullProductDetailsFromIdVendoritemMasterArrayList" + itemMasterArrayList);
                 ArrayAdapter<ProductDetailsResponse> adapterItemMaster = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_textview, itemMasterArrayList);
                 listView.setAdapter(adapterItemMaster);
 

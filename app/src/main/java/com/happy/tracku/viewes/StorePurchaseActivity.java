@@ -229,6 +229,7 @@ public class StorePurchaseActivity extends AppCompatActivity
                 storePurchaseObj.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 storePurchaseObj.put("action", 1);
                 storePurchaseObj.put("physicalQty", physicalQuantityString);
+                storePurchaseObj.put("idItem", idProduct);
                 storePurchaseObj.put("orderQty", orderQuantityString);
 
 

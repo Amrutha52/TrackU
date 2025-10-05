@@ -48,6 +48,7 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
 
         holder.vendorNameTV.setText(deliveryPending.getVendorName());
         holder.dateTV.setText(deliveryPending.getSalesDate());
+        holder.invoiceNumberTV.setText(deliveryPending.getInvoiceNumber());
         holder.amountTV.setText(deliveryPending.getGrandTotal().toString());
 
         holder.detailsTV.setTag(R.string.key_one,deliveryPending.getIdSalesHeader());

@@ -11,7 +11,7 @@ import com.happy.tracku.R;
 
 public class DeliveryProductDetailsViewHolder extends RecyclerView.ViewHolder
 {
-    public TextView vendorNameTV, dateTV, amountTV, itemNameTV;
+    public TextView vendorNameTV, dateTV, amountTV, itemNameTV, invoiceNumberTV;
     public TextInputEditText quantityET;
     public DeliveryProductDetailsViewHolder(@NonNull View itemView)
     {
@@ -21,5 +21,6 @@ public class DeliveryProductDetailsViewHolder extends RecyclerView.ViewHolder
         amountTV = itemView.findViewById(R.id.amountTV);
         itemNameTV = itemView.findViewById(R.id.itemNameTV);
         quantityET = itemView.findViewById(R.id.quantityET);
+        invoiceNumberTV = itemView.findViewById(R.id.invoiceNumberTV);
     }
 }
