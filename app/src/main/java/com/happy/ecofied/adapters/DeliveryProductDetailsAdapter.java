@@ -43,6 +43,7 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
 
         holder.vendorNameTV.setText(deliveryPending.getVendorName());
         holder.dateTV.setText(deliveryPending.getSalesDate());
+        holder.invoiceNumberTV.setText(deliveryPending.getInvoiceNumber());
         holder.amountTV.setText(deliveryPending.getGrandTotal().toString());
         holder.itemNameTV.setText(deliveryPending.getItemName());
         holder.quantityET.setText(deliveryPending.getQuantity().toString());

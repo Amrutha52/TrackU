@@ -10,7 +10,7 @@ import com.happy.ecofied.R;
 
 public class DeliveryProductStatusViewHolder extends RecyclerView.ViewHolder
 {
-    public TextView vendorNameTV, dateTV, amountTV, detailsTV;
+    public TextView vendorNameTV, dateTV, amountTV, detailsTV, invoiceNumberTV;
     public DeliveryProductStatusViewHolder(@NonNull View itemView)
     {
         super(itemView);
@@ -18,5 +18,6 @@ public class DeliveryProductStatusViewHolder extends RecyclerView.ViewHolder
         dateTV = itemView.findViewById(R.id.dateTV);
         amountTV = itemView.findViewById(R.id.amountTV);
         detailsTV = itemView.findViewById(R.id.detailsTV);
+        invoiceNumberTV = itemView.findViewById(R.id.invoiceNumberTV);
     }
 }

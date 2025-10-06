@@ -227,7 +227,7 @@ public class StorePurchaseActivity extends AppCompatActivity
                 storePurchaseObj.put("action", 1);
                 storePurchaseObj.put("physicalQty", physicalQuantityString);
                 storePurchaseObj.put("orderQty", orderQuantityString);
-
+                storePurchaseObj.put("idItem", idProduct);
 
                 url = USING_IP + URL_UPDATE_STORE_PURCHASE;
                 Log.e("Log", "storePurchaseURL" + url);

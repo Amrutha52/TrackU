@@ -27,6 +27,10 @@ public class DeliveryPending {
     @Expose
     private Integer idSalesDeliveryDetails;
 
+    @SerializedName("invoiceNumber")
+    @Expose
+    private String invoiceNumber;
+
     public Integer getIdSalesHeader() {
         return idSalesHeader;
     }
@@ -83,5 +87,12 @@ public class DeliveryPending {
         this.idSalesDeliveryDetails = idSalesDeliveryDetails;
     }
 
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
 }
 
