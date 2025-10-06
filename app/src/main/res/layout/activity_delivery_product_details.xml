@@ -13,6 +13,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:id="@+id/search_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchbox_invoice_number"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:queryHint="Search VendorName/InvoiceNumber"
+                android:layout_gravity="center"
+                android:layout_weight="1" />
+
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/deliveryProductDetailsRecyclerview"

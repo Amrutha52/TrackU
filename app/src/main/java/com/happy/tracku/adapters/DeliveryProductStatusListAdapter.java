@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,17 +20,21 @@ import com.happy.tracku.viewes.DeliveryStatusActivity;
 import com.happy.tracku.viewholders.DeliveryProductStatusViewHolder;
 import com.happy.tracku.viewholders.PurchaseOrderItemListViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<DeliveryProductStatusViewHolder> implements View.OnClickListener
 {
     Context context;
     List<DeliveryPending> deliveryPendingList;
+    List<DeliveryPending> deliveryPendingFilterList;
 
     public DeliveryProductStatusListAdapter(DeliveryStatusActivity context, List<DeliveryPending> deliveryPendingList)
     {
         this.context = context;
         this.deliveryPendingList = deliveryPendingList;
+        this.deliveryPendingFilterList = deliveryPendingList;
         Log.e("Log", "deliveryPendingList" + deliveryPendingList);
     }
 
@@ -44,7 +49,7 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
     @Override
     public void onBindViewHolder(@NonNull DeliveryProductStatusViewHolder holder, int position)
     {
-        DeliveryPending deliveryPending = deliveryPendingList.get(position);
+        DeliveryPending deliveryPending = deliveryPendingFilterList.get(position);
 
         holder.vendorNameTV.setText(deliveryPending.getVendorName());
         holder.dateTV.setText(deliveryPending.getSalesDate());
@@ -60,7 +65,7 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
     @Override
     public int getItemCount()
     {
-        return deliveryPendingList.size();
+        return deliveryPendingFilterList.size();
     }
 
     @Override
@@ -79,5 +84,61 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
             }
             break;
         }
+    }
+
+    public Filter getFilter()
+    {
+
+        return new Filter()
+        {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence)
+            {
+
+                String charString = charSequence.toString();
+
+                if (charString.isEmpty()) {
+                    Log.e("Log", "InsidecharString.isEmpty()");
+                    deliveryPendingFilterList = deliveryPendingList;
+                }else
+                {
+
+                    List<DeliveryPending> filteredList = new ArrayList<>();
+                    Log.e("Log", "deliveryPendingList" + deliveryPendingList);
+
+
+                    for(DeliveryPending row: deliveryPendingList)
+                    {
+
+                        if(row.getVendorName().toLowerCase().contains(charString.toLowerCase())||
+                                row.getInvoiceNumber().contains(charString.toLowerCase()))
+
+                        {
+
+                            filteredList.add(row);
+                            Log.e("Log", "filteredList" + filteredList);
+                        }
+
+                    }
+
+                    deliveryPendingFilterList = filteredList;
+
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = deliveryPendingFilterList;
+                Log.e("Log", "filterResults" + filterResults.toString());
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+
+                deliveryPendingFilterList = (ArrayList<DeliveryPending>)filterResults.values;
+                notifyDataSetChanged();
+
+            }
+        };
+
     }
 }

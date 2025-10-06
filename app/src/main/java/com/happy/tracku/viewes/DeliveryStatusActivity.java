@@ -4,6 +4,8 @@ import static com.happy.tracku.utils.Const.URL_GET_DELIVERY_PENDING;
 import static com.happy.tracku.utils.Const.URL_PURCHASE_ORDER_ITEM_LIST;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -86,6 +89,7 @@ public class DeliveryStatusActivity extends AppCompatActivity
         DeliveryPendingListJson deliveryPendingListJson;
         int idPurchaseOrder;
         DbHelper dbHelper;
+        SearchView searchByInvoiceNumber;
         public GetDeliveryPendingList(DeliveryStatusActivity context)
         {
             this.context = new WeakReference<>(context);
@@ -188,7 +192,31 @@ public class DeliveryStatusActivity extends AppCompatActivity
                 DeliveryProductStatusListAdapter deliveryProductStatusListAdapter = new DeliveryProductStatusListAdapter(context.get(), deliveryPendingListJson.getData().getDeliveryPending());
                 deliveryProductStatusListRecyclerview.setAdapter(deliveryProductStatusListAdapter);
 
+                searchByInvoiceNumber = context.get().findViewById(R.id.searchbox_invoice_number);
+                SearchManager searchManager = (SearchManager) context.get().getSystemService(Context.SEARCH_SERVICE);
+                searchByInvoiceNumber.setSearchableInfo(searchManager
+                        .getSearchableInfo(context.get().getComponentName()));
+                searchByInvoiceNumber.setMaxWidth(Integer.MAX_VALUE);
 
+                searchByInvoiceNumber.setOnQueryTextListener(new SearchView.OnQueryTextListener()
+                {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+
+                        deliveryProductStatusListAdapter.getFilter().filter(query);
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+
+                        deliveryProductStatusListAdapter.getFilter().filter(newText);
+
+                        return false;
+                    }
+
+                });
 
             }
             else if (s.equals("nullException"))
