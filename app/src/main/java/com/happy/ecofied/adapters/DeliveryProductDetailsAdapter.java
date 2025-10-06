@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,16 +15,19 @@ import com.happy.ecofied.gson.deliverypendinglist.DeliveryPending;
 import com.happy.ecofied.viewes.DeliveryProductDetailsActivity;
 import com.happy.ecofied.viewholders.DeliveryProductDetailsViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<DeliveryProductDetailsViewHolder>
 {
     Context context;
     List<DeliveryPending> deliveryPendingList;
+    List<DeliveryPending> deliveryPendingFilterList;
     public DeliveryProductDetailsAdapter(DeliveryProductDetailsActivity context, List<DeliveryPending> deliveryPendingList)
     {
         this.context = context;
         this.deliveryPendingList = deliveryPendingList;
+        this.deliveryPendingFilterList = deliveryPendingList;
         Log.e("Log", "deliveryPendingList" + deliveryPendingList);
     }
 
@@ -39,7 +43,7 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
     public void onBindViewHolder(@NonNull DeliveryProductDetailsViewHolder holder, int position)
     {
 
-        DeliveryPending deliveryPending = deliveryPendingList.get(position);
+        DeliveryPending deliveryPending = deliveryPendingFilterList.get(position);
 
         holder.vendorNameTV.setText(deliveryPending.getVendorName());
         holder.dateTV.setText(deliveryPending.getSalesDate());
@@ -53,8 +57,63 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
 
     @Override
     public int getItemCount() {
-        return deliveryPendingList.size();
+        return deliveryPendingFilterList.size();
     }
 
+    public Filter getFilter()
+    {
+
+        return new Filter()
+        {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence)
+            {
+
+                String charString = charSequence.toString();
+
+                if (charString.isEmpty()) {
+                    Log.e("Log", "InsidecharString.isEmpty()");
+                    deliveryPendingFilterList = deliveryPendingList;
+                }else
+                {
+
+                    List<DeliveryPending> filteredList = new ArrayList<>();
+                    Log.e("Log", "deliveryPendingList" + deliveryPendingList);
+
+
+                    for(DeliveryPending row: deliveryPendingList)
+                    {
+
+                        if(row.getVendorName().toLowerCase().contains(charString.toLowerCase())||
+                                row.getInvoiceNumber().contains(charString.toLowerCase()))
+
+                        {
+
+                            filteredList.add(row);
+                            Log.e("Log", "filteredList" + filteredList);
+                        }
+
+                    }
+
+                    deliveryPendingFilterList = filteredList;
+
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = deliveryPendingFilterList;
+                Log.e("Log", "filterResults" + filterResults.toString());
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+
+                deliveryPendingFilterList = (ArrayList<DeliveryPending>)filterResults.values;
+                notifyDataSetChanged();
+
+            }
+        };
+
+    }
 
 }
