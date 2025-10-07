@@ -1,4 +1,4 @@
-/*package com.happy.ecofied.service;
+package com.happy.ecofied.service;
 
 import static com.happy.ecofied.utils.Const.URL_Update_Daily_GPS_Data;
 import static com.happy.ecofied.utils.Const.USING_IP;
@@ -178,7 +178,8 @@ public class ForeGroundService extends Service
 
                                 if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
                                 {
-                                    new UploadEmployeeTravelGPSData(context).execute();
+                                    //Commented for heavy traffic
+                                 //   new UploadEmployeeTravelGPSData(context).execute();
                                 }
 
 
@@ -359,5 +360,5 @@ public class ForeGroundService extends Service
 
 }
 
- */
+
 

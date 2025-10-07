@@ -58,6 +58,7 @@ import com.happy.ecofied.gson.login.LoginStatusJson;
 import com.happy.ecofied.gson.logouttrackjson.LogoutTrackJson;
 import com.happy.ecofied.models.DailyTravelModel;
 //import com.happy.ecofied.service.ForeGroundService;
+import com.happy.ecofied.service.ForeGroundService;
 import com.happy.ecofied.ssl.CustomTrust;
 import com.happy.ecofied.utils.Const;
 import com.happy.ecofied.utils.Fns;
@@ -176,7 +177,7 @@ public class MainMenuActivity extends AppCompatActivity {
         /**
          * ForeGround Service
          */
-      /*  if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -189,7 +190,7 @@ public class MainMenuActivity extends AppCompatActivity {
             startService(serviceIntent);
         }
 
-       */
+
 
 
 
@@ -235,6 +236,13 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onResume();
         // Reset any session timeouts if necessary
     }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+    }
+
   /*  private void getLocation() {
         if (ActivityCompat.checkSelfPermission(MainMenuActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(MainMenuActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -651,7 +659,7 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-   /* @Override
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         Log.e("Log", "onRequestPermissionsResult");
@@ -662,7 +670,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     }
 
-    */
+
 
 
 
