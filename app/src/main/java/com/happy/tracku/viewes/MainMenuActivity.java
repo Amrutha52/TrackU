@@ -59,6 +59,7 @@ import com.happy.tracku.gson.login.LoginStatusJson;
 import com.happy.tracku.gson.logouttrackjson.LogoutTrackJson;
 import com.happy.tracku.models.DailyTravelModel;
 //import com.happy.tracku.service.ForeGroundService;
+import com.happy.tracku.service.ForeGroundService;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
@@ -177,7 +178,7 @@ public class MainMenuActivity extends AppCompatActivity {
         /**
          * ForeGround Service
          */
-    /*    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -189,10 +190,6 @@ public class MainMenuActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, ForeGroundService.class);
             startService(serviceIntent);
         }
-
-     */
-
-
 
 
 
@@ -232,10 +229,20 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
         // Reset any session timeouts if necessary
     }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+    }
+
+
   /*  private void getLocation() {
         if (ActivityCompat.checkSelfPermission(MainMenuActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(MainMenuActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -657,7 +664,7 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-   /* @Override
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         Log.e("Log", "onRequestPermissionsResult");
@@ -668,7 +675,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     }
 
-    */
+
 
 
 
