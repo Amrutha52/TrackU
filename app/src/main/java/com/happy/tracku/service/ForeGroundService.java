@@ -1,4 +1,4 @@
-/*package com.happy.tracku.service;
+package com.happy.tracku.service;
 
 import static com.happy.tracku.utils.Const.URL_Update_Daily_GPS_Data;
 import static com.happy.tracku.utils.Const.USING_IP;
@@ -128,72 +128,75 @@ public class ForeGroundService extends Service
         FusedLocationProviderClient mFusedLocationClient = LocationServices
                 .getFusedLocationProviderClient(getApplicationContext());
 
-        mFusedLocationClient.requestLocationUpdates(mLocationRequestHighAccuracy,
-                new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult)
-                    {
-                        Location location = locationResult.getLastLocation();
-                        if (location != null)
-                        {
-                            double latitude = location.getLatitude();
-                            double longitude = location.getLongitude();
-                            Log.e("Log", "latitudeForeGround" + latitude);
-                            Log.e("Log", "longitudeForeGround" + longitude);
-                            // Process latitude and longitude as needed
+        // Location callback commented due to heavy traffic
 
-                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                            try {
-                                // throw new RuntimeException("Exception For Testing");
+//        mFusedLocationClient.requestLocationUpdates(mLocationRequestHighAccuracy,
+//                new LocationCallback() {
+//                    @Override
+//                    public void onLocationResult(LocationResult locationResult)
+//                    {
+//                        Location location = locationResult.getLastLocation();
+//                        if (location != null)
+//                        {
+//                            double latitude = location.getLatitude();
+//                            double longitude = location.getLongitude();
+//                            Log.e("Log", "latitudeForeGround" + latitude);
+//                            Log.e("Log", "longitudeForeGround" + longitude);
+//                            // Process latitude and longitude as needed
+//
+//                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+//                            try {
+//                                // throw new RuntimeException("Exception For Testing");
+//
+//                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+//                                Log.e("Log", latitude + "" + longitude);
+//
+//                                if (addresses != null && addresses.size() != 0) {
+//                                    locationAddress = addresses.get(0).getAddressLine(0);
+//                                    Log.e("address", locationAddress);
+//                                }
+//
+//                            } catch (Exception e) {
+//                                locationAddress = "Not Able To Get Address";
+//                                Log.e("ExceptionAddress", locationAddress);
+//                                Log.e("Log", "Exception", e);
+//                            }
+//
+//                            Calendar cal = Calendar.getInstance();
+//                            Date dateNow = cal.getTime();
+//                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                            String dateTimeString = sdf.format(dateNow);
+//
+//                            DailyTravelModel dailyTravelModel = new DailyTravelModel();
+//                            dailyTravelModel.setIdLocation(String.valueOf(dateNow.getTime()));
+//                            dailyTravelModel.setLatitude(latitude);
+//                            dailyTravelModel.setLongitude(longitude);
+//                            dailyTravelModel.setAddress(locationAddress);
+//                            dailyTravelModel.setDateTime(dateTimeString);
+//                            dailyTravelModel.setIdEmployee(shp.getInt(Const.Shp_Id_Employee, 0));
+//                            dailyTravelModel.setIsForUpload(0);
+//                            dailyTravelModel.setIsSynced(0);
+//
+//                            dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
+//
+//                            try{
+//
+//                                if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
+//                                {
+//                                    new UploadEmployeeTravelGPSData(context).execute();
+//                                }
+//
+//
+//                            }catch (Exception e)
+//                            {
+//                                Log.e("Log","Exception",e);
+//
+//                            }
+//                        }
+//                    }
+//                },
+//                Looper.myLooper());
 
-                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                                Log.e("Log", latitude + "" + longitude);
-
-                                if (addresses != null && addresses.size() != 0) {
-                                    locationAddress = addresses.get(0).getAddressLine(0);
-                                    Log.e("address", locationAddress);
-                                }
-
-                            } catch (Exception e) {
-                                locationAddress = "Not Able To Get Address";
-                                Log.e("ExceptionAddress", locationAddress);
-                                Log.e("Log", "Exception", e);
-                            }
-
-                            Calendar cal = Calendar.getInstance();
-                            Date dateNow = cal.getTime();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            String dateTimeString = sdf.format(dateNow);
-
-                            DailyTravelModel dailyTravelModel = new DailyTravelModel();
-                            dailyTravelModel.setIdLocation(String.valueOf(dateNow.getTime()));
-                            dailyTravelModel.setLatitude(latitude);
-                            dailyTravelModel.setLongitude(longitude);
-                            dailyTravelModel.setAddress(locationAddress);
-                            dailyTravelModel.setDateTime(dateTimeString);
-                            dailyTravelModel.setIdEmployee(shp.getInt(Const.Shp_Id_Employee, 0));
-                            dailyTravelModel.setIsForUpload(0);
-                            dailyTravelModel.setIsSynced(0);
-
-                            dbHelper.insertContinousGPSLocationOfAnEmployee(dailyTravelModel);
-
-                            try{
-
-                                if(dbHelper.getDailyTravelDataForCompensationAsArray().size() > 1)
-                                {
-                                    new UploadEmployeeTravelGPSData(context).execute();
-                                }
-
-
-                            }catch (Exception e)
-                            {
-                                Log.e("Log","Exception",e);
-
-                            }
-                        }
-                    }
-                },
-                Looper.myLooper());
     }
 
 
@@ -362,5 +365,5 @@ public class ForeGroundService extends Service
 
 }
 
- */
+
 
