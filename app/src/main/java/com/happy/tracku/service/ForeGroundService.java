@@ -70,7 +70,7 @@ public class ForeGroundService extends Service
     private static final int UPDATE_INTERVAL_IN_MILLI_SECONDS = 600000; // 10 minutes
     private static final int UPDATE_FASTEST_INTERVAL_IN_MILLI_SECONDS = 600000;
 
-    private static final int PERMISSION_REQUEST_ID = 44;
+    private static final int PERMISSION_REQUEST_ID = 501;
     Context context;
     String locationAddress;
     @Override
@@ -85,6 +85,7 @@ public class ForeGroundService extends Service
     }
 
     private Notification getNotification() {
+        Log.e("Log", "getNotification" + PERMISSION_REQUEST_ID);
         Intent notificationIntent = new Intent(this, MainMenuActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, PERMISSION_REQUEST_ID,
                 notificationIntent,
@@ -203,6 +204,8 @@ public class ForeGroundService extends Service
 
     private void createNotificationChannel()
     {
+        Log.e("Log","sdkInt" + Build.VERSION.SDK_INT);
+        Log.e("Log","O" + Build.VERSION_CODES.O);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             NotificationChannel serviceChannel = new NotificationChannel(

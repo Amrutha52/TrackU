@@ -111,7 +111,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private boolean isContinue = false;
     private boolean isGPS = false;
-    private static final int PERMISSION_REQUEST_ID = 1000;
+  //  private static final int PERMISSION_REQUEST_ID = 1000;
     String userNameString, passwordString;
 
     @SuppressLint("MissingPermission")
@@ -181,10 +181,10 @@ public class MainMenuActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-
+            Log.e("Log", "location not allowed");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSION_REQUEST_ID);
+                    501);
         } else {
             Log.e("Log", "Service calling");
             Intent serviceIntent = new Intent(this, ForeGroundService.class);
@@ -664,17 +664,39 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+//    {
+//        Log.e("Log", "onRequestPermissionsResult");
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        Intent serviceIntent = new Intent(this, ForeGroundService.class);
+//        startService(serviceIntent);
+//
+//    }
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        Log.e("Log", "onRequestPermissionsResult");
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 501) { // Check for the request code used above
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-        Intent serviceIntent = new Intent(this, ForeGroundService.class);
-        startService(serviceIntent);
+                // Permission granted for at least the first one (Coarse)
+                // You should also check for Fine, but if Coarse is granted,
+                // you can generally proceed to start the service.
 
+                Log.e("Log", "Permission granted, starting service");
+                Intent serviceIntent = new Intent(this, ForeGroundService.class);
+                startService(serviceIntent); // Start the service *after* permission is granted
+
+            } else {
+                // Permission denied
+                Toast.makeText(this,"Permission denied by user", Toast.LENGTH_LONG).show();
+                Log.e("Log", "Permission denied by user");
+            }
+        }
     }
-
 
 
 
