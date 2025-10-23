@@ -560,11 +560,11 @@
                                     android:backgroundTint="@color/white"
                                     app:strokeColor="#004d00"
                                     app:strokeWidth="1dp"
-                                    android:visibility="invisible"
+                                    android:visibility="visible"
                                     app:cardElevation="10dp">
 
                                     <LinearLayout
-
+                                        android:id="@+id/deliveryReportLL"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:onClick="listeners"
@@ -575,13 +575,13 @@
                                         <ImageView
                                             android:layout_width="40dp"
                                             android:layout_height="40dp"
-                                            android:src="@drawable/customervisit" />
+                                            android:src="@drawable/deliveryreport" />
 
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:paddingTop="8dp"
-                                            android:text="Customer\nVisit"
+                                            android:text="Delivery\nReport"
                                             android:textAlignment="center" />
 
                                     </LinearLayout>
