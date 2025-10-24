@@ -110,6 +110,22 @@
         android:text="Get Report"
         android:textColor="#ffffff" />
 
+    <LinearLayout
+        android:id="@+id/search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchbox_vendor_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:queryHint="Search VendorName"
+            android:layout_gravity="center"
+            android:layout_weight="1" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/delivery_report_recycler_view"

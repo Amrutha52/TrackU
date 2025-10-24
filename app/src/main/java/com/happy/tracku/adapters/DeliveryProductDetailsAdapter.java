@@ -88,6 +88,7 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
                     {
 
                         if(row.getVendorName().toLowerCase().contains(charString.toLowerCase())||
+                                row.getVendorName().toUpperCase().contains(charString.toUpperCase()) ||
                                 row.getInvoiceNumber().contains(charString.toLowerCase()))
 
                         {

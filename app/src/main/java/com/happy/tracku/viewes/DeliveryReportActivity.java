@@ -4,6 +4,8 @@ import static com.happy.tracku.utils.Const.URL_UPDATE_DELIVERY_STATUS;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -190,6 +193,7 @@ public class DeliveryReportActivity extends AppCompatActivity
         UpdateDeliveryStatusJson updateDeliveryStatusJson;
         RecyclerView deliveryReportRecyclerView;
         String fromDateString, toDateString;
+        SearchView searchByVendorName;
 
         public GetDeliveryReport(DeliveryReportActivity context, String fromDateString, String toDateString)
         {
@@ -315,6 +319,32 @@ public class DeliveryReportActivity extends AppCompatActivity
                 deliveryReportRecyclerView.setLayoutManager(layoutManager);
                 deliveryReportRecyclerView.setItemAnimator(new DefaultItemAnimator());
                 deliveryReportRecyclerView.setAdapter(deliveryReportAdapters);
+
+                searchByVendorName = context.get().findViewById(R.id.searchbox_vendor_name);
+                SearchManager searchManager = (SearchManager) context.get().getSystemService(Context.SEARCH_SERVICE);
+                searchByVendorName.setSearchableInfo(searchManager
+                        .getSearchableInfo(context.get().getComponentName()));
+                searchByVendorName.setMaxWidth(Integer.MAX_VALUE);
+
+                searchByVendorName.setOnQueryTextListener(new SearchView.OnQueryTextListener()
+                {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+
+                        deliveryReportAdapters.getFilter().filter(query);
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+
+                        deliveryReportAdapters.getFilter().filter(newText);
+
+                        return false;
+                    }
+
+                });
 
             } else if (s.equals("nullException"))
             {

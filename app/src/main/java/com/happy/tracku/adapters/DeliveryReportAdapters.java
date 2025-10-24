@@ -54,14 +54,14 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportV
         holder.vendorNameTV.setText(deliveryStatusUpdate.getVendorName());
         holder.salesDateTV.setText(deliveryStatusUpdate.getSalesDate());
         holder.invoiceNumberTV.setText(deliveryStatusUpdate.getInvoiceNumber());
-        if (deliveryStatusUpdate.getItemsCount() != null)
-        {
-            holder.itemsCountTV.setText(deliveryStatusUpdate.getItemsCount());
-        }
-        if (deliveryStatusUpdate.getDeliveredItemsCount() != null)
-        {
-            holder.deliveredItemsCountTV.setText(deliveryStatusUpdate.getDeliveredItemsCount());
-        }
+       // if (deliveryStatusUpdate.getItemsCount() != null)
+       // {
+            holder.itemsCountTV.setText(deliveryStatusUpdate.getItemsCount().toString());
+      //  }
+      //  if (deliveryStatusUpdate.getDeliveredItemsCount() != null)
+      //  {
+            holder.deliveredItemsCountTV.setText(deliveryStatusUpdate.getDeliveredItemsCount().toString());
+      //  }
 
         holder.deliveryStatusTV.setText(deliveryStatusUpdate.getDeliveryStatus());
         holder.allocatedToTV.setText(deliveryStatusUpdate.getAllocatedTo());
@@ -70,7 +70,7 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportV
     @Override
     public int getItemCount()
     {
-        return getDeliveryReportFilterList.size()+1;
+        return getDeliveryReportFilterList.size();
     }
 
     public Filter getFilter()
