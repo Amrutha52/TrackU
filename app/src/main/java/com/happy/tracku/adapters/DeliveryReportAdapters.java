@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +18,7 @@ import com.happy.tracku.gson.updatedeliverystatus.DeliveryStatusUpdate;
 import com.happy.tracku.viewholders.DeliveryReportViewHolder;
 import com.happy.tracku.viewholders.PhotoPunchHistoryViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -24,12 +26,14 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportV
 {
 
     List<DeliveryStatusUpdate> getDeliveryReportList;
+    List<DeliveryStatusUpdate> getDeliveryReportFilterList;
     Context context;
 
     public DeliveryReportAdapters(Context context, List<DeliveryStatusUpdate> getDeliveryReportList)
     {
         this.context = context;
         this.getDeliveryReportList = getDeliveryReportList;
+        this.getDeliveryReportFilterList = getDeliveryReportList;
     }
 
     @NonNull
@@ -45,7 +49,7 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportV
     @Override
     public void onBindViewHolder(@NonNull DeliveryReportViewHolder holder, int position)
     {
-        DeliveryStatusUpdate deliveryStatusUpdate = getDeliveryReportList.get(position);
+        DeliveryStatusUpdate deliveryStatusUpdate = getDeliveryReportFilterList.get(position);
 
         holder.vendorNameTV.setText(deliveryStatusUpdate.getVendorName());
         holder.salesDateTV.setText(deliveryStatusUpdate.getSalesDate());
@@ -66,7 +70,63 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportV
     @Override
     public int getItemCount()
     {
-        return getDeliveryReportList.size()+1;
+        return getDeliveryReportFilterList.size()+1;
+    }
+
+    public Filter getFilter()
+    {
+
+        return new Filter()
+        {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence)
+            {
+
+                String charString = charSequence.toString();
+
+                if (charString.isEmpty()) {
+                    Log.e("Log", "InsidecharString.isEmpty()");
+                    getDeliveryReportFilterList = getDeliveryReportList;
+                }else
+                {
+
+                    List<DeliveryStatusUpdate> filteredList = new ArrayList<>();
+                    Log.e("Log", "getDeliveryReportList" + getDeliveryReportList);
+
+
+                    for(DeliveryStatusUpdate row: getDeliveryReportList)
+                    {
+
+                        if(row.getVendorName().toLowerCase().contains(charString.toLowerCase())||
+                                row.getVendorName().toUpperCase().contains(charString.toUpperCase()))
+
+                        {
+
+                            filteredList.add(row);
+                            Log.e("Log", "filteredList" + filteredList);
+                        }
+
+                    }
+
+                    getDeliveryReportFilterList = filteredList;
+
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = getDeliveryReportFilterList;
+                Log.e("Log", "filterResults" + filterResults.toString());
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+
+                getDeliveryReportFilterList = (ArrayList<DeliveryStatusUpdate>)filterResults.values;
+                notifyDataSetChanged();
+
+            }
+        };
+
     }
 }
 
