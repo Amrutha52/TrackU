@@ -664,7 +664,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
             case R.id.deliveryReportLL:
             {
-                startActivity(new Intent(this, DeliveryStatusActivity.class));
+                startActivity(new Intent(this, DeliveryReportActivity.class));
             }
             break;
         }

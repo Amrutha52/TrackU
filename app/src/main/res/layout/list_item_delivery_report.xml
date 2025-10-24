@@ -107,10 +107,10 @@
                         android:layout_weight="1"
                         android:layout_marginTop="10dp"
                         android:gravity="left"
-                        android:text="Amount" />
+                        android:text="Items Count" />
 
                     <TextView
-                        android:id="@+id/amountTV"
+                        android:id="@+id/itemsCountTV"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -131,10 +131,10 @@
                         android:layout_weight="1"
                         android:layout_marginTop="10dp"
                         android:gravity="left"
-                        android:text="Item Name" />
+                        android:text="Delivered Items Count" />
 
                     <TextView
-                        android:id="@+id/itemNameTV"
+                        android:id="@+id/deliveredItemsCountTV"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -146,37 +146,52 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="35dp"
                     android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:layout_marginTop="10dp"
                         android:gravity="left"
-                        android:text="Quantity"
-                        android:layout_gravity="center"/>
+                        android:text="Delivery Status" />
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="100dp"
+                    <TextView
+                        android:id="@+id/deliveryStatusTV"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        app:boxBackgroundColor="@android:color/transparent">
+                        android:layout_weight="1"
+                        android:layout_marginTop="10dp"
+                        android:gravity="right"
+                        android:text="9032489123" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/quantityET"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:enabled="false"
-                            android:textStyle="bold"
-                            android:textColor="@color/red_button"
-                            android:inputType="numberDecimal"
-                            />
-
-                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginTop="10dp"
+                        android:gravity="left"
+                        android:text="Allocated To" />
+
+                    <TextView
+                        android:id="@+id/allocatedToTV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginTop="10dp"
+                        android:gravity="right"
+                        android:text="9032489123" />
+
+                </LinearLayout>
+
 
             </LinearLayout>
 

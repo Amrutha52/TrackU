@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.happy.tracku.R;
 import com.happy.tracku.adapters.DeliveryReportAdapters;
 import com.happy.tracku.adapters.PhotoPunchHistoryAdapters;
@@ -33,7 +34,9 @@ import com.happy.tracku.gson.updatedeliverystatus.DeliveryStatusUpdate;
 import com.happy.tracku.gson.updatedeliverystatus.UpdateDeliveryStatusJson;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
+import com.happy.tracku.utils.Fns;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
@@ -156,8 +159,19 @@ public class DeliveryReportActivity extends AppCompatActivity
         {
             case R.id.pull_delivery_report_data:
             {
+                Log.e("Log", "fromDate" + binding.fromDateET.getText().toString());
+                if (binding.fromDateET.getText().toString().isEmpty() || binding.toDateET.getText().toString().isEmpty())
+                {
+                    Fns.neutralAlert("Alert", "Please Select From Date", this);
+                    return;
+                }
+                else
+                {
+                    new GetDeliveryReport(this, binding.fromDateET.getText().toString(), binding.toDateET.getText().toString()).execute();
 
-                new GetDeliveryReport(this, binding.fromDateET.getText().toString(), binding.toDateET.getText().toString()).execute();
+                }
+
+
             }
             break;
         }
@@ -175,10 +189,13 @@ public class DeliveryReportActivity extends AppCompatActivity
         DbHelper dbHelper;
         UpdateDeliveryStatusJson updateDeliveryStatusJson;
         RecyclerView deliveryReportRecyclerView;
+        String fromDateString, toDateString;
 
         public GetDeliveryReport(DeliveryReportActivity context, String fromDateString, String toDateString)
         {
             this.context = new WeakReference<>(context);
+            this.fromDateString = fromDateString;
+            this.toDateString = toDateString;
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
 
@@ -210,17 +227,31 @@ public class DeliveryReportActivity extends AppCompatActivity
         {
             try {
 
-
-                JSONObject pushDataObj = dbHelper.getDeliveryPendingDetails(0,shp.getString(Const.Shp_Employee_Code,""));
-
-
                 url = Const.USING_IP + URL_UPDATE_DELIVERY_STATUS;
 
+                JSONArray deliveryJsonArray = new JSONArray();
+
+                JSONObject singleDataObj = new JSONObject();
+                singleDataObj.put("idDetail",0);
+                singleDataObj.put("deliveredQty",0);
+
+                deliveryJsonArray.put(singleDataObj);
+
+
                 Log.e("Log","deliveryReportURL" +url);
-                Log.e("Log","deliveryReportObject"+pushDataObj.toString());
+                Log.e("Log","deliverysingleDataObj"+singleDataObj.toString());
 
+                JSONObject jsonObjectDeliveryPending = new JSONObject();
+                jsonObjectDeliveryPending.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
+                jsonObjectDeliveryPending.put("action", 5);
+                jsonObjectDeliveryPending.put("id", 0);
+                jsonObjectDeliveryPending.put("fromDate", fromDateString);
+                jsonObjectDeliveryPending.put("toDate", toDateString);
+                jsonObjectDeliveryPending.put("deliveryDetails",deliveryJsonArray);
 
-                RequestBody body = RequestBody.create(pushDataObj.toString(), JSON);
+                Log.e("Log","jsonObjectDeliveryPending"+jsonObjectDeliveryPending.toString());
+
+                RequestBody body = RequestBody.create(jsonObjectDeliveryPending.toString(), JSON);
                 request = new Request.Builder()
                         //.header("X-Client-Type", "Android")
                         .url(url)

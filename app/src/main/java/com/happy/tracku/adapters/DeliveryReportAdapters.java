@@ -11,14 +11,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.happy.tracku.R;
+import com.happy.tracku.gson.deliverypendinglist.DeliveryPending;
 import com.happy.tracku.gson.photopunchhistoryjson.GetPunchHistoryDetail;
 import com.happy.tracku.gson.updatedeliverystatus.DeliveryStatusUpdate;
+import com.happy.tracku.viewholders.DeliveryReportViewHolder;
 import com.happy.tracku.viewholders.PhotoPunchHistoryViewHolder;
 
 import java.util.List;
 
 
-public class DeliveryReportAdapters extends RecyclerView.Adapter<PhotoPunchHistoryViewHolder>
+public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportViewHolder>
 {
 
     List<DeliveryStatusUpdate> getDeliveryReportList;
@@ -32,54 +34,39 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<PhotoPunchHisto
 
     @NonNull
     @Override
-    public PhotoPunchHistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    public DeliveryReportViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_photo_punch_history_adapters, parent, false);
-        return new PhotoPunchHistoryViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_delivery_report, parent, false);
+        return new DeliveryReportViewHolder(view);
 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PhotoPunchHistoryViewHolder holder, int position)
+    public void onBindViewHolder(@NonNull DeliveryReportViewHolder holder, int position)
     {
+        DeliveryStatusUpdate deliveryStatusUpdate = getDeliveryReportList.get(position);
 
-        Log.e("Log", "emi position" + position);
-
-        if (position == 0)
+        holder.vendorNameTV.setText(deliveryStatusUpdate.getVendorName());
+        holder.salesDateTV.setText(deliveryStatusUpdate.getSalesDate());
+        holder.invoiceNumberTV.setText(deliveryStatusUpdate.getInvoiceNumber());
+        if (deliveryStatusUpdate.getItemsCount() != null)
         {
-            holder.punchDateTV.setText("Date");
-            holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
-            //holder.punchDateTV.setBackgroundColor(ContextCompat.getColor(holder.punchDateTV.getContext(), R.color.purple_200));
-            holder.employeeCodeTV.setText("Employee");
-            holder.employeeCodeTV.setTypeface(Typeface.DEFAULT_BOLD);
-            holder.punchINTV.setText("IN Time");
-            holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
-            //holder.punchINTV.setBackgroundColor(ContextCompat.getColor(holder.punchINTV.getContext(), R.color.purple_200));
-
+            holder.itemsCountTV.setText(deliveryStatusUpdate.getItemsCount());
         }
-        else{
-
-            GetPunchHistoryDetail getPunchHistoryDetail = getPunchHistoryDetailList.get(position-1);
-
-            holder.punchDateTV.setText(getPunchHistoryDetail.getDate());
-            holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
-            // holder.punchDateTV.setBackgroundColor(ContextCompat.getColor(holder.punchDateTV.getContext(), R.color.white));
-
-            holder.employeeCodeTV.setText(getPunchHistoryDetail.getEmployeeCode() + '-' + getPunchHistoryDetail.getEmployeeName());
-            holder.employeeCodeTV.setTypeface(Typeface.DEFAULT_BOLD);
-
-            holder.punchINTV.setText(getPunchHistoryDetail.getPunchTime());
-            holder.punchDateTV.setTypeface(Typeface.DEFAULT_BOLD);
-            //holder.punchINTV.setBackgroundColor(ContextCompat.getColor(holder.punchINTV.getContext(), R.color.white));
-
+        if (deliveryStatusUpdate.getDeliveredItemsCount() != null)
+        {
+            holder.deliveredItemsCountTV.setText(deliveryStatusUpdate.getDeliveredItemsCount());
         }
+
+        holder.deliveryStatusTV.setText(deliveryStatusUpdate.getDeliveryStatus());
+        holder.allocatedToTV.setText(deliveryStatusUpdate.getAllocatedTo());
     }
 
     @Override
     public int getItemCount()
     {
-        return getPunchHistoryDetailList.size()+1;
+        return getDeliveryReportList.size()+1;
     }
 }
 

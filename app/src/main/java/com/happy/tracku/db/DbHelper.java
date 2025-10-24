@@ -774,4 +774,49 @@ public class DbHelper extends SQLiteOpenHelper
         return finalJson;
     }
 
+    public JSONObject getDeliveryPendingReportDetails(int idSalesHeader, String createdBy)
+    {
+        JSONObject finalJson = new JSONObject();
+        JSONArray dataArray = new JSONArray();
+
+        try {
+
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor cur = db.rawQuery("select idSalesDetails, quantity from "+ DELIVERY_PENDING_DETAILS_TABLE +" where idSalesHeader="+idSalesHeader,null);
+
+            if(cur.getCount() > 0)
+            {
+
+                cur.moveToFirst();
+
+                for (int i = 0; i < cur.getCount(); i++) {
+
+                    JSONObject singleDataObj = new JSONObject();
+                    singleDataObj.put("idDetail",cur.getInt(cur.getColumnIndex("idSalesDetails")));
+                    singleDataObj.put("deliveredQty",cur.getDouble(cur.getColumnIndex("quantity")));
+
+                    dataArray.put(singleDataObj);
+
+
+                    cur.moveToNext();
+
+                }
+
+            }
+            cur.close();
+
+            finalJson.put("createdBy", createdBy);
+            finalJson.put("id", idSalesHeader);
+            finalJson.put("action", 1);
+            finalJson.put("deliveryDetails",dataArray);
+            Log.e("Log", "finalJsonDBDel"+finalJson);
+            Log.e("Log", "dataarrayDel"+dataArray);
+
+        } catch (JSONException e) {
+            Log.e("Log", "exception" + e);
+        }
+
+        return finalJson;
+    }
 }
