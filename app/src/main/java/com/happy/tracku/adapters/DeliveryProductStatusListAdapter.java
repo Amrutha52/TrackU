@@ -34,7 +34,7 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
     {
         this.context = context;
         this.deliveryPendingList = deliveryPendingList;
-        this.deliveryPendingFilterList = deliveryPendingList;
+        this.deliveryPendingFilterList = new ArrayList<>(deliveryPendingList);//deliveryPendingList;
         Log.e("Log", "deliveryPendingList" + deliveryPendingList);
     }
 
@@ -96,22 +96,28 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
             {
 
                 String charString = charSequence.toString();
+                List<DeliveryPending> filteredList = new ArrayList<>();
+                Log.e("Log", "deliveryPendingList" + deliveryPendingList);
 
-                if (charString.isEmpty()) {
+                if (charString.isEmpty())
+                {
                     Log.e("Log", "InsidecharString.isEmpty()");
-                    deliveryPendingFilterList = deliveryPendingList;
+                    //deliveryPendingFilterList = deliveryPendingList;
+                    filteredList.addAll(deliveryPendingList);
                 }else
                 {
 
-                    List<DeliveryPending> filteredList = new ArrayList<>();
-                    Log.e("Log", "deliveryPendingList" + deliveryPendingList);
+
 
 
                     for(DeliveryPending row: deliveryPendingList)
                     {
 
-                        if(row.getVendorName().toLowerCase().contains(charString.toLowerCase())||
-                                row.getInvoiceNumber().contains(charString.toLowerCase()))
+                        // Corrected case-insensitive search logic
+                        String vendorName = row.getVendorName().toLowerCase();
+                        String searchString = charString.toString().toLowerCase();
+
+                        if(vendorName.contains(searchString))
 
                         {
 
@@ -121,12 +127,12 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
 
                     }
 
-                    deliveryPendingFilterList = filteredList;
+                   // deliveryPendingFilterList = filteredList;
 
                 }
 
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = deliveryPendingFilterList;
+                filterResults.values = filteredList;//deliveryPendingFilterList;
                 Log.e("Log", "filterResults" + filterResults.toString());
                 return filterResults;
             }

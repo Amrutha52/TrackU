@@ -38,7 +38,7 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
     {
         this.context = context;
         this.purchaseOrderList = purchaseOrderList;
-        this.purchaseOrderFilterList = purchaseOrderList;
+        this.purchaseOrderFilterList = new ArrayList<>(purchaseOrderList);//purchaseOrderList;
         Log.e("Log", "purchaseOrderList" + purchaseOrderList);
 
 
@@ -113,24 +113,29 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
             protected FilterResults performFiltering(CharSequence charSequence) {
 
                 String charString = charSequence.toString();
+                List<PurchaseOrder> filteredList = new ArrayList<>();
+                Log.e("Log", "filterlist" + purchaseOrderList);
 
                 if (charString.isEmpty())
                 {
                     Log.e("Log", "InsidecharString.isEmpty()");
-                    purchaseOrderFilterList = purchaseOrderList;
+                    //  purchaseOrderFilterList = purchaseOrderList;
+                    filteredList.addAll(purchaseOrderList);
                 }
                 else
                 {
 
-                    List<PurchaseOrder> filteredList = new ArrayList<>();
-                    Log.e("Log", "filterlist" + purchaseOrderList);
+
 
 
                     for(PurchaseOrder row: purchaseOrderList)
                     {
 
-                        if(row.getVendorName().toLowerCase().contains(charString.toLowerCase()))
+                        // Corrected case-insensitive search logic
+                        String vendorName = row.getVendorName().toLowerCase();
+                        String searchString = charString.toString().toLowerCase();
 
+                        if(vendorName.contains(searchString))
                         {
 
                             filteredList.add(row);
@@ -139,12 +144,12 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
 
                     }
 
-                    purchaseOrderFilterList = filteredList;
+                  //  purchaseOrderFilterList = filteredList;
 
                 }
 
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = purchaseOrderFilterList;
+                filterResults.values = filteredList;//purchaseOrderFilterList;
                 Log.e("Log", "filterResults" + filterResults.toString());
                 return filterResults;
             }

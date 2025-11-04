@@ -33,7 +33,7 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportV
     {
         this.context = context;
         this.getDeliveryReportList = getDeliveryReportList;
-        this.getDeliveryReportFilterList = getDeliveryReportList;
+        this.getDeliveryReportFilterList = new ArrayList<>(getDeliveryReportList);//getDeliveryReportList;
     }
 
     @NonNull
@@ -83,23 +83,27 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportV
             {
 
                 String charString = charSequence.toString();
+                List<DeliveryStatusUpdate> filteredList = new ArrayList<>();
+                Log.e("Log", "getDeliveryReportList" + getDeliveryReportList);
 
                 if (charString.isEmpty()) {
                     Log.e("Log", "InsidecharString.isEmpty()");
-                    getDeliveryReportFilterList = getDeliveryReportList;
+                   // getDeliveryReportFilterList = getDeliveryReportList;
+                    filteredList.addAll(getDeliveryReportList);
                 }else
                 {
 
-                    List<DeliveryStatusUpdate> filteredList = new ArrayList<>();
-                    Log.e("Log", "getDeliveryReportList" + getDeliveryReportList);
+
 
 
                     for(DeliveryStatusUpdate row: getDeliveryReportList)
                     {
 
-                        if(row.getVendorName().toLowerCase().contains(charString.toLowerCase())||
-                                row.getVendorName().toUpperCase().contains(charString.toUpperCase()))
+                        // Corrected case-insensitive search logic
+                        String vendorName = row.getVendorName().toLowerCase();
+                        String searchString = charString.toString().toLowerCase();
 
+                        if(vendorName.contains(searchString))
                         {
 
                             filteredList.add(row);
@@ -108,12 +112,12 @@ public class DeliveryReportAdapters extends RecyclerView.Adapter<DeliveryReportV
 
                     }
 
-                    getDeliveryReportFilterList = filteredList;
+                  //  getDeliveryReportFilterList = filteredList;
 
                 }
 
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = getDeliveryReportFilterList;
+                filterResults.values = filteredList;//getDeliveryReportFilterList;
                 Log.e("Log", "filterResults" + filterResults.toString());
                 return filterResults;
             }
