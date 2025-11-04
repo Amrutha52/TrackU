@@ -34,7 +34,7 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
     {
         this.context = context;
         this.stockOutPurchaseOrderList = stockOutPurchaseOrderList;
-        this.stockOutPurchaseOrderFilterList = stockOutPurchaseOrderList;
+        this.stockOutPurchaseOrderFilterList = new ArrayList<>(stockOutPurchaseOrderList);//stockOutPurchaseOrderList;
         Log.e("Log", "stockOutPurchaseOrderList" + stockOutPurchaseOrderList);
 
 
@@ -102,30 +102,38 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
         return stockOutPurchaseOrderFilterList.size()+1;
     }
 
-    public Filter getFilter() {
+    public Filter getFilter()
+    {
 
         return new Filter() {
             @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
+            protected FilterResults performFiltering(CharSequence charSequence)
+            {
 
                 String charString = charSequence.toString();
+
+                List<StockOutPurchaseOrder> filteredList = new ArrayList<>();
+                Log.e("Log", "filterlist" + stockOutPurchaseOrderList);
 
                 if (charString.isEmpty())
                 {
                     Log.e("Log", "InsidecharString.isEmpty()");
-                    stockOutPurchaseOrderFilterList = stockOutPurchaseOrderList;
+                   // stockOutPurchaseOrderFilterList = stockOutPurchaseOrderList;
+                    // Correct: Use the full, original list when the search is empty
+                    filteredList.addAll(stockOutPurchaseOrderList);
                 }
                 else
                 {
-
-                    List<StockOutPurchaseOrder> filteredList = new ArrayList<>();
-                    Log.e("Log", "filterlist" + stockOutPurchaseOrderList);
+                    // Loop through the original list (stockOutPurchaseOrderList)
 
 
                     for(StockOutPurchaseOrder row: stockOutPurchaseOrderList)
                     {
+                        // Corrected case-insensitive search logic
+                        String vendorName = row.getVendorName().toLowerCase();
+                        String searchString = charString.toString().toLowerCase();
 
-                        if(row.getVendorName().toLowerCase().contains(charString.toLowerCase()))
+                        if(vendorName.contains(searchString))
 
                         {
 
@@ -135,12 +143,12 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
 
                     }
 
-                    stockOutPurchaseOrderList = filteredList;
+                   // stockOutPurchaseOrderList = filteredList;
 
                 }
 
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = stockOutPurchaseOrderFilterList;
+                filterResults.values = filteredList;//stockOutPurchaseOrderFilterList;
                 Log.e("Log", "filterResults" + filterResults.toString());
                 return filterResults;
             }
