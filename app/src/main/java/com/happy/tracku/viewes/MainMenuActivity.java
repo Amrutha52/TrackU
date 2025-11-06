@@ -628,13 +628,13 @@ public class MainMenuActivity extends AppCompatActivity {
 
             case R.id.purchaseOrderListLL:
             {
-                startActivity(new Intent(this, PurchaseOrderListActivity.class));
+                startActivity(new Intent(this, PurchaseOrderInitialActivity.class));
             }
             break;
 
             case R.id.stockOutListLL:
             {
-                startActivity(new Intent(this, StockOutOrderListActivity.class));
+                startActivity(new Intent(this, StockOutInitialActivity.class));
             }
             break;
 

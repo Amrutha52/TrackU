@@ -5,6 +5,7 @@ import static com.happy.tracku.utils.Const.URL_PURCHASE_ORDER_LIST;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,6 +48,8 @@ public class PurchaseOrderListActivity extends AppCompatActivity
 {
 
     private ActivityPurchaseOrderListBinding binding;
+    int companyValue;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -73,7 +76,11 @@ public class PurchaseOrderListActivity extends AppCompatActivity
         getSupportActionBar().setTitle("Purchase Order List");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        new PullPurchaseOrderListDetails(this).execute();
+        intent = getIntent();
+        companyValue = intent.getIntExtra("company", 0);
+        Log.e("Log","companyPurchase"+ companyValue);
+
+        new PullPurchaseOrderListDetails(this, companyValue).execute();
     }
 
     private static class PullPurchaseOrderListDetails extends AsyncTask<String, String, String>
@@ -89,9 +96,12 @@ public class PurchaseOrderListActivity extends AppCompatActivity
         List<PurchaseOrder> purchaseOrderList;
         SearchView vendorNameSearchView;
         String employeeCode;
-        public PullPurchaseOrderListDetails(PurchaseOrderListActivity context)
+        int companyValue;
+
+        public PullPurchaseOrderListDetails(PurchaseOrderListActivity context, int companyValue)
         {
             this.context = new WeakReference<>(context);
+            this.companyValue = companyValue;
 
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
@@ -128,7 +138,7 @@ public class PurchaseOrderListActivity extends AppCompatActivity
                 JSONObject jsonObjectPurchaseOrderList = new JSONObject();
 
                 jsonObjectPurchaseOrderList.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
-
+                jsonObjectPurchaseOrderList.put("company", companyValue);
 
                 Log.e("Log", "jsonObjectpurchaseOrderList" + jsonObjectPurchaseOrderList);
 

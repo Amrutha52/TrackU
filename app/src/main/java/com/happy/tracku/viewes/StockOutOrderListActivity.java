@@ -6,6 +6,7 @@ import static com.happy.tracku.utils.Const.URL_STOCKOUT_PURCHASE_ORDER_LIST;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -52,6 +53,8 @@ public class StockOutOrderListActivity extends AppCompatActivity
 {
 
     private ActivityStockOutOrderListBinding binding;
+    Intent intent;
+    int companyValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -78,7 +81,11 @@ public class StockOutOrderListActivity extends AppCompatActivity
         getSupportActionBar().setTitle("StockOut Order List");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        new PullStockOutOrderListDetails(this).execute();
+        intent = getIntent();
+        companyValue = intent.getIntExtra("company", 0);
+        Log.e("Log", "companyValue" + companyValue);
+
+        new PullStockOutOrderListDetails(this, companyValue).execute();
     }
 
     private static class PullStockOutOrderListDetails extends AsyncTask<String, String, String>
@@ -91,12 +98,14 @@ public class StockOutOrderListActivity extends AppCompatActivity
         String url;
         SharedPreferences shp;
         StockOutPurchaseOrderListJson stockOutPurchaseOrderListJson;
+        int companyValue;
 
         SearchView vendorNameSearchView;
         String employeeCode;
-        public PullStockOutOrderListDetails(StockOutOrderListActivity context)
+        public PullStockOutOrderListDetails(StockOutOrderListActivity context, int companyValue)
         {
             this.context = new WeakReference<>(context);
+            this.companyValue = companyValue;
 
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
@@ -133,7 +142,7 @@ public class StockOutOrderListActivity extends AppCompatActivity
                 JSONObject jsonObjectPurchaseOrderList = new JSONObject();
 
                 jsonObjectPurchaseOrderList.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
-
+                jsonObjectPurchaseOrderList.put("company", companyValue);
 
                 Log.e("Log", "jsonObjectpurchaseOrderList" + jsonObjectPurchaseOrderList);
 

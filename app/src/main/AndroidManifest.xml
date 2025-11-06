@@ -32,10 +32,20 @@
         android:theme="@style/Theme.Tracku"
         tools:targetApi="31">
         <activity
+            android:name=".viewes.PurchaseOrderInitialActivity"
+            android:exported="false"
+            android:parentActivityName=".viewes.MainMenuActivity"
+            android:theme="@style/AppThemeMaterial" />
+        <activity
+            android:name=".viewes.StockOutInitialActivity"
+            android:exported="false"
+            android:parentActivityName=".viewes.MainMenuActivity"
+            android:theme="@style/AppThemeMaterial" />
+        <activity
             android:name=".viewes.DeliveryReportActivity"
             android:exported="false"
             android:parentActivityName=".viewes.MainMenuActivity"
-            android:theme="@style/AppThemeMaterial"/>
+            android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.DeliveryProductDetailsActivity"
             android:exported="false"
@@ -77,7 +87,7 @@
         <activity
             android:name=".viewes.StockOutOrderListActivity"
             android:exported="false"
-            android:parentActivityName=".viewes.MainMenuActivity"
+            android:parentActivityName=".viewes.StockOutInitialActivity"
             android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.PurchaseOrderItemListActivity"
@@ -87,7 +97,7 @@
         <activity
             android:name=".viewes.PurchaseOrderListActivity"
             android:exported="false"
-            android:parentActivityName=".viewes.MainMenuActivity"
+            android:parentActivityName=".viewes.PurchaseOrderInitialActivity"
             android:theme="@style/AppThemeMaterial" />
         <activity
             android:name=".viewes.TravelLogActivity"
