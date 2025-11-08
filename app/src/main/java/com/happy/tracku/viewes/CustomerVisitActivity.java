@@ -454,7 +454,7 @@ public class CustomerVisitActivity extends AppCompatActivity
             else if (s.equals("failure"))
             {
                 Fns.neutralAlert("Alert", customerVisitDetailsJson.getData().getCustomerVisitDetailsStatus().get(0).getStatusMsg(), mContext.get());
-                mContext.get().clearDetails();
+                //mContext.get().clearDetails();
                 // Toast.makeText(textWatcher, "Updation Failed", Toast.LENGTH_SHORT).show();
             }
             else if (s.equals("nullException"))
