@@ -190,7 +190,7 @@ public class PurchaseOrderListActivity extends AppCompatActivity
                 purchaseOrderListRecyclerview.setItemAnimator(new DefaultItemAnimator());
 
 
-                PurchaseOrderListAdapter purchaseOrderListAdapter = new PurchaseOrderListAdapter(context.get(), purchaseOrderListJson.getData().getPurchaseOrderList());
+                PurchaseOrderListAdapter purchaseOrderListAdapter = new PurchaseOrderListAdapter(context.get(), purchaseOrderListJson.getData().getPurchaseOrderList(), companyValue);
                 purchaseOrderListRecyclerview.setAdapter(purchaseOrderListAdapter);
 
                 vendorNameSearchView = context.get().findViewById(R.id.searchbox_vendor_name);

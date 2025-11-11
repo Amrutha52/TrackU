@@ -75,7 +75,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 {
     private ActivityStockOutPurchaseOrderItemListBinding binding;
     Intent intent;
-    Integer idPurchaseOrder;
+    Integer idPurchaseOrder, companyValue;
     DbHelper dbHelper;
 
     /**
@@ -129,7 +129,10 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         idPurchaseOrder = intent.getIntExtra("idPurchaseOrder",0);
         Log.e("Log", "idPurchaseOrderOrderItem" + idPurchaseOrder);
 
-        new PullStockoutPurchaseOrderItemListDetails(this, idPurchaseOrder).execute();
+        companyValue = intent.getIntExtra("company",0);
+        Log.e("Log", "companyValue" + companyValue);
+
+        new PullStockoutPurchaseOrderItemListDetails(this, idPurchaseOrder,companyValue).execute();
 
     }
 
@@ -342,14 +345,15 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         String url;
         SharedPreferences shp;
         StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson;
-        int idPurchaseOrder;
+        int idPurchaseOrder, companyValue;
 
         DbHelper dbHelper;
 
-        public PullStockoutPurchaseOrderItemListDetails(StockOutPurchaseOrderItemListActivity context, int idPurchaseOrder)
+        public PullStockoutPurchaseOrderItemListDetails(StockOutPurchaseOrderItemListActivity context, int idPurchaseOrder, int companyValue)
         {
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
+            this.companyValue = companyValue;
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
 

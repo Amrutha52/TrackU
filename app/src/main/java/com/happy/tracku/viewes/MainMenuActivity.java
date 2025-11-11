@@ -20,6 +20,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -191,6 +192,8 @@ public class MainMenuActivity extends AppCompatActivity {
             startService(serviceIntent);
         }
 
+        String deviceId = getAndroidId(this.getContentResolver());
+        Log.e("Log", "deviceId" + deviceId);
 
 
         userNameString = shp.getString(Const.Shp_UserName, "");
@@ -213,6 +216,15 @@ public class MainMenuActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private String getAndroidId(ContentResolver contentResolver)
+    {
+        String androidId = Settings.Secure.getString(
+                contentResolver,
+                Settings.Secure.ANDROID_ID
+        );
+        return androidId;
     }
 
     @Override
@@ -977,7 +989,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 jsonObject.put("password", passwordString);
                 jsonObject.put("versionCode", shp.getString(Const.Shp_Version_No, ""));
                 jsonObject.put("androidId", shp.getString(Const.Shp_Android_Id, ""));
-                jsonObject.put("createdBy", "");
+                jsonObject.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
 
 
                 inputAndOutputJson = jsonObject.toString();

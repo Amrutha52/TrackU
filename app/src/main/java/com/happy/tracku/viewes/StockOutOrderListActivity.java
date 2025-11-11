@@ -198,7 +198,7 @@ public class StockOutOrderListActivity extends AppCompatActivity
                 stockOutPurchaseOrderListRecyclerview.setItemAnimator(new DefaultItemAnimator());
 
 
-                StockoutPurchaseOrderListAdapter purchaseOrderListAdapter = new StockoutPurchaseOrderListAdapter(context.get(), stockOutPurchaseOrderListJson.getData().getStockOutPurchaseOrderList());
+                StockoutPurchaseOrderListAdapter purchaseOrderListAdapter = new StockoutPurchaseOrderListAdapter(context.get(), stockOutPurchaseOrderListJson.getData().getStockOutPurchaseOrderList(), companyValue);
                 stockOutPurchaseOrderListRecyclerview.setAdapter(purchaseOrderListAdapter);
 
                 vendorNameSearchView = context.get().findViewById(R.id.searchbox_vendor_name);

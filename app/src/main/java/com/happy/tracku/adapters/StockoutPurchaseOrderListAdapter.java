@@ -14,10 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.happy.tracku.R;
-import com.happy.tracku.gson.purchaseorderlist.PurchaseOrder;
 import com.happy.tracku.gson.stockoutorderlist.StockOutPurchaseOrder;
-import com.happy.tracku.viewes.PurchaseOrderItemListActivity;
-import com.happy.tracku.viewes.PurchaseOrderListActivity;
 import com.happy.tracku.viewes.StockOutOrderListActivity;
 import com.happy.tracku.viewes.StockOutPurchaseOrderItemListActivity;
 import com.happy.tracku.viewholders.PurchaseOrderListViewHolder;
@@ -29,13 +26,15 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
     Context context;
     List<StockOutPurchaseOrder> stockOutPurchaseOrderList;
     List<StockOutPurchaseOrder> stockOutPurchaseOrderFilterList;
+    int companyValue;
 
-    public StockoutPurchaseOrderListAdapter(StockOutOrderListActivity context, List<StockOutPurchaseOrder> stockOutPurchaseOrderList)
+    public StockoutPurchaseOrderListAdapter(StockOutOrderListActivity context, List<StockOutPurchaseOrder> stockOutPurchaseOrderList, int companyValue)
     {
         this.context = context;
         this.stockOutPurchaseOrderList = stockOutPurchaseOrderList;
         this.stockOutPurchaseOrderFilterList = new ArrayList<>(stockOutPurchaseOrderList);//stockOutPurchaseOrderList;
         Log.e("Log", "stockOutPurchaseOrderList" + stockOutPurchaseOrderList);
+        this.companyValue = companyValue;
 
 
     }
@@ -88,6 +87,7 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
 
             holder.viewTV.setOnClickListener(this);
             holder.viewTV.setTag(R.string.key_one, purchaseOrder.getIdSalesHeader());
+            holder.viewTV.setTag(R.string.key_two, companyValue);
 
 
         }
@@ -175,9 +175,12 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
                 Integer idPurchaseOrder = (Integer) view.getTag(R.string.key_one);
                 Log.e("Log", "idPurchaseOrderAdapter" + idPurchaseOrder);
 
+                int company = (int) view.getTag(R.string.key_two);
+
 
                 Intent intent = new Intent(context, StockOutPurchaseOrderItemListActivity.class);
                 intent.putExtra("idPurchaseOrder", idPurchaseOrder);
+                intent.putExtra("company", companyValue);
                 context.startActivity(intent);
             }
             break;

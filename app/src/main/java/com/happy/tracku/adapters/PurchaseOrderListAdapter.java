@@ -3,8 +3,6 @@ package com.happy.tracku.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.transition.AutoTransition;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +11,6 @@ import android.widget.Filter;
 import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.happy.tracku.R;
@@ -33,12 +28,14 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
     Context context;
     List<PurchaseOrder> purchaseOrderList;
     List<PurchaseOrder> purchaseOrderFilterList;
+    int companyValue;
 
-    public PurchaseOrderListAdapter(PurchaseOrderListActivity context, List<PurchaseOrder> purchaseOrderList)
+    public PurchaseOrderListAdapter(PurchaseOrderListActivity context, List<PurchaseOrder> purchaseOrderList, int companyValue)
     {
         this.context = context;
         this.purchaseOrderList = purchaseOrderList;
         this.purchaseOrderFilterList = new ArrayList<>(purchaseOrderList);//purchaseOrderList;
+        this.companyValue = companyValue;
         Log.e("Log", "purchaseOrderList" + purchaseOrderList);
 
 
@@ -92,7 +89,7 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
 
             holder.viewTV.setOnClickListener(this);
             holder.viewTV.setTag(R.string.key_one, purchaseOrder.getIdPurchaseOrderHeader());
-
+            holder.viewTV.setTag(R.string.key_two, companyValue);
 
         }
 
@@ -176,10 +173,14 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
                 Integer idPurchaseOrder = (Integer) view.getTag(R.string.key_one);
                 Log.e("Log", "idPurchaseOrderAdapter" + idPurchaseOrder);
 
+                Integer companyValue = (Integer) view.getTag(R.string.key_two);
+                Log.e("Log", "companyValue" + companyValue);
 
                 Intent intent = new Intent(context, PurchaseOrderItemListActivity.class);
                 intent.putExtra("idPurchaseOrder", idPurchaseOrder);
+                intent.putExtra("company", companyValue);
                 context.startActivity(intent);
+
             }
             break;
         }

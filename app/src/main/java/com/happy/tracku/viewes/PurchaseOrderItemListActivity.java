@@ -68,7 +68,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
 {
     private ActivityPurchaseOrderItemListBinding binding;
     Intent intent;
-    Integer idPurchaseOrder;
+    Integer idPurchaseOrder, companyValue;
     DbHelper dbHelper;
     /**
      *
@@ -120,6 +120,9 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
 
         idPurchaseOrder = intent.getIntExtra("idPurchaseOrder",0);
         Log.e("Log", "idPurchaseOrderOrderItem" + idPurchaseOrder);
+
+        companyValue = intent.getIntExtra("company",0);
+        Log.e("Log", "companyValuePurchaseOrderItemListActivity" + companyValue);
 
         new PullPurchaseOrderItemListDetails(this, idPurchaseOrder).execute();
 
