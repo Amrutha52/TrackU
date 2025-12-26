@@ -52,7 +52,7 @@ public class PurchaseOrderInitialActivity extends AppCompatActivity
         {
             case R.id.ecopackbutton:
             {
-                Intent firstIntent = new Intent(this, StockOutOrderListActivity.class);
+                Intent firstIntent = new Intent(this, PurchaseOrderListActivity.class);
                 firstIntent.putExtra("company", 1);
                 this.startActivity(firstIntent);
                 // startActivity(new Intent(this, StockOutOrderListActivity.class));
@@ -62,7 +62,7 @@ public class PurchaseOrderInitialActivity extends AppCompatActivity
             case R.id.ecofiedbutton:
             {
 
-                Intent secondIntent = new Intent(this, StockOutOrderListActivity.class);
+                Intent secondIntent = new Intent(this, PurchaseOrderListActivity.class);
                 secondIntent.putExtra("company", 2);
                 this.startActivity(secondIntent);
                 //startActivity(new Intent(this, StockOutOrderListActivity.class));
