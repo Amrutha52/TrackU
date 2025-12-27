@@ -19,7 +19,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,7 +26,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
@@ -250,7 +248,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
 
                     }
 
-                    new PushPurchaseOrderRequest(this, idPurchaseOrder, fileName, base64).execute();
+                    new PushPurchaseOrderRequest(this, idPurchaseOrder, fileName, base64, companyValue).execute();
                 }
 
 
@@ -462,13 +460,15 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
         SendPurchaseRequestStatusJson sendPurchaseRequestStatusJson;
         String message, fileName, base64;
         int idPurchaseOrder;
+        Integer companyValue;
 
-        public PushPurchaseOrderRequest(PurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64)
+        public PushPurchaseOrderRequest(PurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64, Integer companyValue)
         {
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
             this.fileName = fileName;
             this.base64 = base64;
+            this.companyValue = companyValue;
 
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
@@ -502,7 +502,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendPurchaseRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64);
+                JSONObject pushDataObj = dbHelper.getSendPurchaseRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64, companyValue);
                // pushDataObj.put("fileName", fileName);
                 //pushDataObj.put("customerPhoto", base64);
 

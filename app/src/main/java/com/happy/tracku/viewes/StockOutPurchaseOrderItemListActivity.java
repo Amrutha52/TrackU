@@ -1,7 +1,5 @@
 package com.happy.tracku.viewes;
 
-import static com.happy.tracku.utils.Const.URL_PURCHASE_ORDER_ITEM_LIST;
-import static com.happy.tracku.utils.Const.URL_SEND_PURCHASE_REQUEST;
 import static com.happy.tracku.utils.Const.URL_STOCKOUT_PURCHASE_ORDER_ITEM_LIST;
 import static com.happy.tracku.utils.Const.URL_STOCKOUT_SEND_PURCHASE_REQUEST;
 
@@ -21,7 +19,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,10 +26,8 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -42,13 +37,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
-import com.happy.tracku.adapters.PurchaseOrderItemListAdapter;
 import com.happy.tracku.adapters.StockoutPurchaseOrderItemListAdapter;
-import com.happy.tracku.databinding.ActivityPurchaseOrderItemListBinding;
 import com.happy.tracku.databinding.ActivityStockOutPurchaseOrderItemListBinding;
 import com.happy.tracku.db.DbHelper;
-import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItemListJson;
-import com.happy.tracku.gson.sendpurchaserequest.SendPurchaseRequestStatusJson;
 import com.happy.tracku.gson.sendstockoutrequest.StockOutSendPurchaseRequestJson;
 import com.happy.tracku.gson.stockoutpurchaseorderitemlist.StockOutPurchaseOrderItemListJson;
 import com.happy.tracku.ssl.CustomTrust;
@@ -259,7 +250,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                         base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                     }
-                    new PushStockOutRequest(this, idPurchaseOrder, fileName, base64).execute();
+                    new PushStockOutRequest(this, idPurchaseOrder, fileName, base64, companyValue).execute();
                 }
 
 
@@ -485,13 +476,15 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         String message, fileName, base64;
         int idPurchaseOrder;
         int status;
+        Integer companyValue;
 
-        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64)
+        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64, Integer companyValue)
         {
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
             this.fileName = fileName;
             this.base64 = base64;
+            this.companyValue = companyValue;
 
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
@@ -525,7 +518,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64);
+                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64, companyValue);
                // pushDataObj.put("fileName", fileName);
                // pushDataObj.put("customerPhoto", base64);
 
