@@ -47,6 +47,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
@@ -121,12 +122,132 @@ public class PhotoPunchActivity extends AppCompatActivity
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+      //  Button punchButton = findViewById(R.id.punchButon);
+       // punchButton.setOnClickListener(v -> checkLocationAndEnablePunch());
+
         // method to get the location
-        getLastLocation();
+       // getLastLocation();
 
 
     }
 
+    private void checkLocationAndEnablePunch() {
+        // 1. Check Permissions
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+            return;
+        }
+
+        // 2. Request High Accuracy Location
+        mFusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        double userLat = location.getLatitude();
+                        double userLng = location.getLongitude();
+
+                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                        try
+                        {
+                            // throw new RuntimeException("Exception For Testing");
+
+                            List<Address> addresses = geocoder.getFromLocation(userLat, userLng, 1);
+                            Log.e("Log", userLat + "" + userLng);
+
+                            if (addresses != null && addresses.size() != 0)
+                            {
+                                locationAddress = addresses.get(0).getAddressLine(0);
+                                Log.e("address", locationAddress);
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            locationAddress = "Not Able To Get Address";
+                            Log.e("ExceptionAddress", locationAddress);
+                            Log.e("Log", "Exception", e);
+                        }
+
+                        // 3. Use your Haversine Formula
+                        double dist = LocationUtils.calculateDistance(userLat, userLng, 25.179769, 55.335452);
+
+                        if (dist <= 2.0)
+                        {
+                           // toast("Within range! Punching...");
+                            // proceedWithPunch();
+
+                            /**
+                             * Today's Date
+                             */
+                            Calendar calendar = Calendar.getInstance();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            String currentDateAndTime = sdf.format(calendar.getTime());
+                            Log.e("Log", "currentDateAndTime" + currentDateAndTime);
+
+                            /**
+                             * Bitmap to base64
+                             */
+
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                            byte[] bytearray = stream.toByteArray();
+
+                            InputStream myInputStream = new ByteArrayInputStream(bytearray);
+                            Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+                            //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+                            //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+
+
+                            //previewImageView.setImageDrawable(image);
+                            resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+                            if(bytearray.length<=1024)
+                            {
+
+                                resizedBitmapBig = bitmap;
+
+                            }
+
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                            byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+                            String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+                            new PushPhotoPunchingDetails(this, currentDateAndTime, base64, userLng,userLat,locationAddress).execute();
+
+                        }
+                        else
+                        {
+                            Fns.neutralAlert("Alert","Please move within 2 km of the office to enable photo punching.Too far! You are "+ String.format("%.2f", dist) + " km away.", this);
+                            //toast("Please move within 2 km of the office to enable photo punching.Too far! You are " + String.format("%.2f", dist) + " km away.");
+                        }
+                    }
+                });
+    }
+
+    private void toast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    public static class LocationUtils {
+
+        // Radius of the earth in kilometers
+        private static final int EARTH_RADIUS = 6371;
+
+        public static double calculateDistance(double userLat, double userLng,
+                                               double officeLat, double officeLng) {
+
+            double latDistance = Math.toRadians(officeLat - userLat);
+            double lngDistance = Math.toRadians(officeLng - userLng);
+
+            double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                    + Math.cos(Math.toRadians(userLat)) * Math.cos(Math.toRadians(officeLat))
+                    * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return EARTH_RADIUS * c; // returns distance in kilometers
+        }
+    }
     private void getLastLocation() {
         // check if permissions are given
         if (checkPermissions()) {
@@ -286,46 +407,22 @@ public class PhotoPunchActivity extends AppCompatActivity
             }
             break;
 
-            case R.id.submitButon:
+            case R.id.punchButon:
             {
-                /**
-                 * Today's Date
-                 */
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String currentDateAndTime = sdf.format(calendar.getTime());
-                Log.e("Log", "currentDateAndTime" + currentDateAndTime);
 
-                /**
-                 * Bitmap to base64
-                 */
+                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                boolean gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] bytearray = stream.toByteArray();
-
-                InputStream myInputStream = new ByteArrayInputStream(bytearray);
-                Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
-                //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
-                //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
-
-
-                //previewImageView.setImageDrawable(image);
-                resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
-                if(bytearray.length<=1024)
+                if (!gps_enabled) {
+                     toast("Please Enable Location...");
+                    // Show dialog to user to turn on GPS
+                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                }
+                else
                 {
-
-                    resizedBitmapBig = bitmap;
-
+                    checkLocationAndEnablePunch();
                 }
 
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                byte[] byteArray = byteArrayOutputStream .toByteArray();
-
-                String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-                new PushPhotoPunchingDetails(this, currentDateAndTime, base64, longitude,latitude,locationAddress).execute();
 
             }
             break;

@@ -24,11 +24,12 @@
         android:layout_marginTop="100dp"
         android:layout_marginBottom="10dp" />
     <Button
-        android:id="@+id/submitButon"
+        android:id="@+id/punchButon"
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_marginStart="150dp"
         android:layout_marginTop="600dp"
         android:onClick="listeners"
-        android:text="Submit" />
+        android:visibility="visible"
+        android:text="Punch" />
 </RelativeLayout>

@@ -48,7 +48,7 @@ public class Fns {
 
         TextView titletxtview = new TextView(context);
         titletxtview.setText(title);
-        titletxtview.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        titletxtview.setBackgroundColor(ContextCompat.getColor(context, R.color.yellow));
         titletxtview.setPadding(10, 10, 10, 10);
         titletxtview.setGravity(Gravity.CENTER);
         titletxtview.setTextColor(Color.WHITE);
