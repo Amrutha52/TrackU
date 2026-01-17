@@ -73,6 +73,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -122,6 +123,9 @@ public class SalesRequestActivity extends AppCompatActivity
     String fileName="", base64="";
 
     ProductDetailsResponseJson productDetailsResponseJson;
+
+    Uri photoURI;
+    File photoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -210,15 +214,23 @@ public class SalesRequestActivity extends AppCompatActivity
         Log.e("Log", "requestCode" + requestCode);
         //Log.e("Log", "pic_id" + pic_id);
         // Match the request 'pic id with requestCode
-        if (requestCode == 123) // Camera
+        if (requestCode == 123 && resultCode == RESULT_OK) // Camera
         {
             // BitMap is data structure of image file which store the image in memory
           //  if (photo != null)
           //  {
-                photo = (Bitmap) data.getExtras().get("data");
-                // Set the image in imageview for display
-                click_image_id.setImageBitmap(photo);
+//                photo = (Bitmap) data.getExtras().get("data");
+//                // Set the image in imageview for display
+//                click_image_id.setImageBitmap(photo);
           //  }
+
+            try {
+                // Read the full resolution image from the file URI
+                photo = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                click_image_id.setImageBitmap(photo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         // Check if the result is from our gallery pick request and was successful
         else if (requestCode == 124)  // && resultCode == RESULT_OK  // Gallery
@@ -384,7 +396,25 @@ public class SalesRequestActivity extends AppCompatActivity
 
                 Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 // Start the activity with camera_intent, and request pic id
-                startActivityForResult(camera_intent, 123);
+               // startActivityForResult(camera_intent, 123);
+                if (camera_intent.resolveActivity(getPackageManager()) != null) {
+                    try {
+                        // Create an empty file
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new java.util.Date());
+                        File storageDir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
+                        photoFile = File.createTempFile("JPEG_" + timeStamp + "_", ".jpg", storageDir);
+
+                        // Get the URI using FileProvider
+                        photoURI = androidx.core.content.FileProvider.getUriForFile(this,
+                                getApplicationContext().getPackageName() + ".fileprovider", photoFile);
+
+                        // Tell the camera where to save the full image
+                        camera_intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(camera_intent, 123);
+                    } catch (IOException ex) {
+                        Toast.makeText(this, "Error creating file", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
             break;
 
