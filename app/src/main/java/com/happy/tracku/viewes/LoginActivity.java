@@ -426,6 +426,7 @@ public class LoginActivity extends AppCompatActivity
                 edt.putBoolean(Const.Shp_Is_LoggedIn, true);
                 edt.putString(Const.Shp_UserName, usernameString);
                 edt.putString(Const.Shp_PassWord, passwordString);
+                edt.putInt(Const.Shp_IsLocationCheckRequired, loginStatusJson.getData().getLoginResponseStatus().get(0).getIsLocationCheckRequired());
                 edt.apply();
 
                 mContext.startActivity(new Intent(mContext, MainMenuActivity.class));

@@ -33,8 +33,6 @@ public class LoginResponsestatus {
     @Expose
     private String employeeCode;
 
-
-
     @SerializedName("statusMessage")
     @Expose
     private String statusMessage;
@@ -42,17 +40,17 @@ public class LoginResponsestatus {
     @Expose
     private String version;
 
-    public Integer getIsAdmin() {
-        return isAdmin;
-    }
-
-    public void setIsAdmin(Integer isAdmin) {
-        this.isAdmin = isAdmin;
-    }
-
     @SerializedName("isAdmin")
     @Expose
     private Integer isAdmin;
+
+    @SerializedName("isLocationCheckRequired")
+    @Expose
+    private Integer isLocationCheckRequired;
+
+    @SerializedName("location")
+    @Expose
+    private String location;
 
     public Integer getStatus() {
         return status;
@@ -142,4 +140,27 @@ public class LoginResponsestatus {
         this.version = version;
     }
 
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Integer getIsLocationCheckRequired() {
+        return isLocationCheckRequired;
+    }
+
+    public void setIsLocationCheckRequired(Integer isLocationCheckRequired) {
+        this.isLocationCheckRequired = isLocationCheckRequired;
+    }
 }

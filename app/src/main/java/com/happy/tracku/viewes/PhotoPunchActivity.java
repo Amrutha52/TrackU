@@ -87,6 +87,8 @@ public class PhotoPunchActivity extends AppCompatActivity
     Double latitude=0.0, longitude=0.0;
     String locationAddress;
     FusedLocationProviderClient mFusedLocationClient;
+    SharedPreferences shp;
+    int isLocationChecked = 0;
 
 
     @SuppressLint("MissingInflatedId")
@@ -120,7 +122,12 @@ public class PhotoPunchActivity extends AppCompatActivity
 //            startActivityForResult(camera_intent, pic_id);
 //        });
 
+        shp = this.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        isLocationChecked = shp.getInt(Const.Shp_IsLocationCheckRequired, 0);
+        Log.e("Log", "isLocationChecked" + isLocationChecked);
 
       //  Button punchButton = findViewById(R.id.punchButon);
        // punchButton.setOnClickListener(v -> checkLocationAndEnablePunch());
@@ -170,11 +177,61 @@ public class PhotoPunchActivity extends AppCompatActivity
                         // 3. Use your Haversine Formula
                         double dist = LocationUtils.calculateDistance(userLat, userLng, 25.179769, 55.335452);
 
-                        if (dist <= 2.0)
+                        if (isLocationChecked == 1)
                         {
-                           // toast("Within range! Punching...");
-                            // proceedWithPunch();
+                            if (dist <= 2.0)
+                            {
+                                // toast("Within range! Punching...");
+                                // proceedWithPunch();
 
+                                /**
+                                 * Today's Date
+                                 */
+                                Calendar calendar = Calendar.getInstance();
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                String currentDateAndTime = sdf.format(calendar.getTime());
+                                Log.e("Log", "currentDateAndTime" + currentDateAndTime);
+
+                                /**
+                                 * Bitmap to base64
+                                 */
+
+                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                                byte[] bytearray = stream.toByteArray();
+
+                                InputStream myInputStream = new ByteArrayInputStream(bytearray);
+                                Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+                                //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+                                //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+
+
+                                //previewImageView.setImageDrawable(image);
+                                resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+                                if(bytearray.length<=1024)
+                                {
+
+                                    resizedBitmapBig = bitmap;
+
+                                }
+
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                                byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+                                String base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+                                new PushPhotoPunchingDetails(this, currentDateAndTime, base64, userLng,userLat,locationAddress).execute();
+
+                            }
+                            else
+                            {
+                                Fns.neutralAlert("Alert","Please move within 2 km of the office to enable photo punching.Too far! You are "+ String.format("%.2f", dist) + " km away.", this);
+                                //toast("Please move within 2 km of the office to enable photo punching.Too far! You are " + String.format("%.2f", dist) + " km away.");
+                            }
+                        }
+                        else
+                        {
                             /**
                              * Today's Date
                              */
@@ -215,11 +272,7 @@ public class PhotoPunchActivity extends AppCompatActivity
                             new PushPhotoPunchingDetails(this, currentDateAndTime, base64, userLng,userLat,locationAddress).execute();
 
                         }
-                        else
-                        {
-                            Fns.neutralAlert("Alert","Please move within 2 km of the office to enable photo punching.Too far! You are "+ String.format("%.2f", dist) + " km away.", this);
-                            //toast("Please move within 2 km of the office to enable photo punching.Too far! You are " + String.format("%.2f", dist) + " km away.");
-                        }
+
                     }
                 });
     }

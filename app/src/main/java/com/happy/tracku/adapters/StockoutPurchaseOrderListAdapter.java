@@ -131,9 +131,10 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
                     {
                         // Corrected case-insensitive search logic
                         String vendorName = row.getVendorName().toLowerCase();
+                        String invoiceNo = row.getPurchaseOrderNumber().toLowerCase();
                         String searchString = charString.toString().toLowerCase();
 
-                        if(vendorName.contains(searchString))
+                        if(vendorName.contains(searchString) || invoiceNo.contains(charString))
 
                         {
 
