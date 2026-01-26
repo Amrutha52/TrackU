@@ -145,9 +145,15 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
              //   click_image_id.setImageBitmap(photo);
           //  }
             try {
-                // Read the full resolution image from the file URI
-                photo = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                // inSampleSize = 2 means the image is decoded at 1/2 width and 1/2 height
+                // (saving 4x the memory). Use 1 for maximum possible quality.
+                options.inSampleSize = 1;
+
+                photo = BitmapFactory.decodeFile(photoFile.getAbsolutePath(), options);
                 click_image_id.setImageBitmap(photo);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -226,35 +232,63 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
                      * Bitmap to base64
                      */
 
-                    if (photo != null)
-                    {
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        byte[] bytearray = stream.toByteArray();
+//                    if (photo != null)
+//                    {
+//                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                        photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//                        byte[] bytearray = stream.toByteArray();
+//
+//                        InputStream myInputStream = new ByteArrayInputStream(bytearray);
+//                        Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
+//                        //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
+//                        //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+//
+//
+//                        //previewImageView.setImageDrawable(image);
+//                        resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
+//                        if(bytearray.length<=1024)
+//                        {
+//
+//                            resizedBitmapBig = bitmap;
+//
+//                        }
+//
+//                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//                        resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+//                        byte[] byteArray = byteArrayOutputStream .toByteArray();
+//
+//                        fileName = idPurchaseOrder+"_"+currentDateAndTime+".jpg";
+//
+//                        base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+//
+//                    }
+                    if (photo != null) {
+                        // 1. Calculate a reasonable scale (e.g., Max 1920px for the longest side)
+                        // This provides "Full HD" quality which is usually perfect for servers.
+                        int maxDimension = 1920;
+                        int width = photo.getWidth();
+                        int height = photo.getHeight();
+                        float ratio = Math.min((float) maxDimension / width, (float) maxDimension / height);
 
-                        InputStream myInputStream = new ByteArrayInputStream(bytearray);
-                        Bitmap bitmap = BitmapFactory.decodeStream(myInputStream);
-                        //Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
-                        //Drawable image = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length));
+                        int finalWidth = Math.round(ratio * width);
+                        int finalHeight = Math.round(ratio * height);
 
-
-                        //previewImageView.setImageDrawable(image);
-                        resizedBitmapBig = Bitmap.createScaledBitmap(bitmap, 480, 800, true);
-                        if(bytearray.length<=1024)
-                        {
-
-                            resizedBitmapBig = bitmap;
-
+                        // Only scale down if the photo is actually larger than the max dimension
+                        Bitmap finalBitmap;
+                        if (ratio < 1.0) {
+                            finalBitmap = Bitmap.createScaledBitmap(photo, finalWidth, finalHeight, true);
+                        } else {
+                            finalBitmap = photo;
                         }
 
+                        // 2. Compress directly to JPEG (Use 80-90 quality for best balance)
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        resizedBitmapBig.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                        byte[] byteArray = byteArrayOutputStream .toByteArray();
+                        finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+                        byte[] byteArray = byteArrayOutputStream.toByteArray();
 
-                        fileName = idPurchaseOrder+"_"+currentDateAndTime+".jpg";
-
+                        // 3. Prepare for upload
+                        fileName = idPurchaseOrder + "_" + System.currentTimeMillis() + ".jpg";
                         base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
                     }
 
                     new PushPurchaseOrderRequest(this, idPurchaseOrder, fileName, base64, companyValue).execute();
