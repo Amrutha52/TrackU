@@ -116,6 +116,8 @@ public class LoginActivity extends AppCompatActivity
 //            startActivity(new Intent(this, MainMenuActivity.class));
 //        }
 
+        new PullEmployeeMasterDetails(this).execute();
+
         new PullMasterData(this).execute();
 
     }

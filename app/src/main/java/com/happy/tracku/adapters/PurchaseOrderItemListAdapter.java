@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.LinearLayout;
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.happy.tracku.R;
 import com.happy.tracku.db.DbHelper;
+import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
 import com.happy.tracku.gson.purchaseorderlist.PurchaseOrder;
 import com.happy.tracku.utils.Fns;
@@ -37,7 +40,9 @@ import java.util.List;
 public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseOrderItemListViewHolder> implements View.OnClickListener {
     Context context;
     List<PurchaseOrderItem> purchaseOrderItemList;
+    List<EmployeeMasterDetail> employeeMasterDetailList;
     DbHelper dbHelper;
+    String employeeCode;
     public PurchaseOrderItemListAdapter(PurchaseOrderItemListActivity context, List<PurchaseOrderItem> purchaseOrderItemList)
     {
         this.context = context;
@@ -60,6 +65,31 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
     public void onBindViewHolder(@NonNull PurchaseOrderItemListViewHolder holder, int position)
     {
         PurchaseOrderItem purchaseOrderItem = purchaseOrderItemList.get(position);
+
+        employeeMasterDetailList = dbHelper.getEmployeeMaster();
+        Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
+
+        ArrayAdapter<EmployeeMasterDetail> adpterEmployeeMaster = new ArrayAdapter<EmployeeMasterDetail>(context, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
+        holder.employeeCodeMATV.setAdapter(adpterEmployeeMaster);
+
+        holder.employeeCodeMATV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                holder.employeeCodeMATV.showDropDown();
+            }
+        });
+
+        holder.employeeCodeMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                employeeCode = employeeMasterDetailList.get(position).getEmployeeCode();
+                Log.e("Log", "employeeCode" + employeeCode);
+
+            }
+        });
 
         holder.itemTV.setText(purchaseOrderItem.getItemName());
         holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());

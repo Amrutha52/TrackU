@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.happy.tracku.R;
 
@@ -18,6 +19,7 @@ public class PurchaseOrderItemListViewHolder extends RecyclerView.ViewHolder
     public TextInputEditText acceptedQtyET;
     public Button acceptedQtyOkButton;
     public LinearLayout verifiedQtyLL;
+    public MaterialAutoCompleteTextView employeeCodeMATV, vehicleMATV;
     public PurchaseOrderItemListViewHolder(@NonNull View itemView)
     {
         super(itemView);
@@ -30,6 +32,8 @@ public class PurchaseOrderItemListViewHolder extends RecyclerView.ViewHolder
         acceptedQtyOkButton = itemView.findViewById(R.id.acceptedQtyOkButton);
         verifiedQtyTV = itemView.findViewById(R.id.verifiQtyTV);
         verifiedQtyLL = itemView.findViewById(R.id.verifiedQtyLL);
+        employeeCodeMATV = itemView.findViewById(R.id.employeecodeMATV);
+        vehicleMATV = itemView.findViewById(R.id.vehicleModelMATV);
 
     }
 }
