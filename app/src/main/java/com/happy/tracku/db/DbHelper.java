@@ -401,6 +401,8 @@ public class DbHelper extends SQLiteOpenHelper
                     singleDataObj.put("idUnit",cur.getInt(cur.getColumnIndex("idUnit")));
                     singleDataObj.put("Quantity",cur.getInt(cur.getColumnIndex("AcceptedQty")));
                     singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idPurchaseOrder")));
+                    singleDataObj.put("employeeCode",cur.getInt(cur.getColumnIndex("employeeCode")));
+                    singleDataObj.put("idVehicle",cur.getInt(cur.getColumnIndex("idVehicle")));
 
 
                     dataArray.put(singleDataObj);
@@ -509,6 +511,8 @@ public class DbHelper extends SQLiteOpenHelper
                     singleDataObj.put("idUnit",cur.getInt(cur.getColumnIndex("idUnit")));
                     singleDataObj.put("Quantity",cur.getInt(cur.getColumnIndex("StockOutQuantity")));
                     singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idPurchaseOrder")));
+                    singleDataObj.put("employeeCode",cur.getInt(cur.getColumnIndex("employeeCode")));
+                    singleDataObj.put("idVehicle",cur.getInt(cur.getColumnIndex("idVehicle")));
 
 
                     dataArray.put(singleDataObj);
