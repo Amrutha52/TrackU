@@ -3,7 +3,7 @@ package com.happy.tracku.gson.login;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class LoginStatusJson {
+public class Validateloginresponsejson {
 
     @SerializedName("data")
     @Expose

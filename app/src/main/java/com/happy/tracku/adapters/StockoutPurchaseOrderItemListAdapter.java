@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.happy.tracku.R;
 import com.happy.tracku.db.DbHelper;
+import com.happy.tracku.gson.login.ValidateLoginResponseEmployeeDatum;
+import com.happy.tracku.gson.login.ValidateLoginResponseVehicle;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
 import com.happy.tracku.gson.stockoutpurchaseorderitemlist.StockOutPurchaseOrderItem;
 import com.happy.tracku.utils.Fns;
@@ -31,6 +35,9 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
     Context context;
     List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList;
     DbHelper dbHelper;
+    List<ValidateLoginResponseEmployeeDatum> employeeMasterDetailList;
+    List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
+    int employeeCode, idVehicle;
     public StockoutPurchaseOrderItemListAdapter(StockOutPurchaseOrderItemListActivity context, List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList)
     {
         this.context = context;
@@ -54,6 +61,56 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
     {
         StockOutPurchaseOrderItem purchaseOrderItem = stockOutPurchaseOrderItemList.get(position);
 
+        employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
+        Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
+
+        ArrayAdapter<ValidateLoginResponseEmployeeDatum> adpterEmployeeMaster = new ArrayAdapter<ValidateLoginResponseEmployeeDatum>(context, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
+        holder.employeeCodeMATV.setAdapter(adpterEmployeeMaster);
+
+        holder.employeeCodeMATV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                holder.employeeCodeMATV.showDropDown();
+            }
+        });
+
+        holder.employeeCodeMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                employeeCode = employeeMasterDetailList.get(position).getEmployeeCode();
+                Log.e("Log", "employeeCode" + employeeCode);
+
+            }
+        });
+
+        validateLoginResponseVehicleList = dbHelper.getLoginVehicleMaster();
+        Log.e("Log", "validateLoginResponseVehicleList" + validateLoginResponseVehicleList);
+
+        ArrayAdapter<ValidateLoginResponseVehicle> adapterVehicle = new ArrayAdapter<ValidateLoginResponseVehicle>(context, android.R.layout.simple_dropdown_item_1line, validateLoginResponseVehicleList);
+        holder.vehicleMATV.setAdapter(adapterVehicle);
+
+        holder.vehicleMATV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                holder.vehicleMATV.showDropDown();
+            }
+        });
+
+        holder.vehicleMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                idVehicle = validateLoginResponseVehicleList.get(position).getIdVehicle();
+                Log.e("Log", "idVehiclePurchaseOrderItemList" + idVehicle);
+
+            }
+        });
+
         holder.itemTV.setText(purchaseOrderItem.getItemName());
         holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());
         holder.rackNoTV.setText(purchaseOrderItem.getRackNumber().toString());
@@ -66,6 +123,8 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
         holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
         holder.acceptedQtyOkButton.setTag(R.string.key_three, holder.verifiedQtyTV);
         holder.acceptedQtyOkButton.setTag(R.string.key_four, holder.verifiedQtyLL);
+        holder.acceptedQtyOkButton.setTag(R.string.key_five, employeeCode);
+        holder.acceptedQtyOkButton.setTag(R.string.key_six, idVehicle);
         holder.acceptedQtyOkButton.setOnClickListener(this);
 
     }
@@ -88,6 +147,8 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
                 TextInputEditText acceptedQtyTextInput = (TextInputEditText)view.getTag(R.string.key_two);
                 TextView verifiedQuantityTV = (TextView) view.getTag(R.string.key_three);
                 LinearLayout verifiedQtyLL = (LinearLayout) view.getTag(R.string.key_four);
+                int employeeCode = (Integer) view.getTag(R.string.key_five);
+                int idVehicle = (Integer) view.getTag(R.string.key_six);
 
                 double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
                 Log.e("Log","acceptedQtyAdapter" + acceptedQty);
@@ -98,7 +159,7 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
                 purchaseOrderItem.setStockOutQuantity(acceptedQty);
 
 
-                    dbHelper.updateStockOutQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
+                    dbHelper.updateStockOutQuantity(purchaseOrderItem.getIdItem(), acceptedQty, employeeCode, idVehicle);
                     dbHelper.updateStockOutQuantityVerified(purchaseOrderItem.getIdItem());
 
                     Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);

@@ -23,6 +23,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.happy.tracku.R;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
+import com.happy.tracku.gson.login.ValidateLoginResponseEmployeeDatum;
+import com.happy.tracku.gson.login.ValidateLoginResponseVehicle;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
 import com.happy.tracku.gson.purchaseorderlist.PurchaseOrder;
 import com.happy.tracku.utils.Fns;
@@ -40,9 +42,10 @@ import java.util.List;
 public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseOrderItemListViewHolder> implements View.OnClickListener {
     Context context;
     List<PurchaseOrderItem> purchaseOrderItemList;
-    List<EmployeeMasterDetail> employeeMasterDetailList;
+    List<ValidateLoginResponseEmployeeDatum> employeeMasterDetailList;
+    List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
     DbHelper dbHelper;
-    String employeeCode;
+    int employeeCode, idVehicle;
     public PurchaseOrderItemListAdapter(PurchaseOrderItemListActivity context, List<PurchaseOrderItem> purchaseOrderItemList)
     {
         this.context = context;
@@ -66,10 +69,10 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
     {
         PurchaseOrderItem purchaseOrderItem = purchaseOrderItemList.get(position);
 
-        employeeMasterDetailList = dbHelper.getEmployeeMaster();
+        employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
         Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
 
-        ArrayAdapter<EmployeeMasterDetail> adpterEmployeeMaster = new ArrayAdapter<EmployeeMasterDetail>(context, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
+        ArrayAdapter<ValidateLoginResponseEmployeeDatum> adpterEmployeeMaster = new ArrayAdapter<ValidateLoginResponseEmployeeDatum>(context, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
         holder.employeeCodeMATV.setAdapter(adpterEmployeeMaster);
 
         holder.employeeCodeMATV.setOnClickListener(new View.OnClickListener()
@@ -91,6 +94,31 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
             }
         });
 
+        validateLoginResponseVehicleList = dbHelper.getLoginVehicleMaster();
+        Log.e("Log", "validateLoginResponseVehicleList" + validateLoginResponseVehicleList);
+
+        ArrayAdapter<ValidateLoginResponseVehicle> adapterVehicle = new ArrayAdapter<ValidateLoginResponseVehicle>(context, android.R.layout.simple_dropdown_item_1line, validateLoginResponseVehicleList);
+        holder.vehicleMATV.setAdapter(adapterVehicle);
+
+        holder.vehicleMATV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                holder.vehicleMATV.showDropDown();
+            }
+        });
+
+        holder.vehicleMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                idVehicle = validateLoginResponseVehicleList.get(position).getIdVehicle();
+                Log.e("Log", "idVehiclePurchaseOrderItemList" + idVehicle);
+
+            }
+        });
+
         holder.itemTV.setText(purchaseOrderItem.getItemName());
         holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());
         holder.rackNoTV.setText(purchaseOrderItem.getRackNumber().toString());
@@ -103,6 +131,8 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
         holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
         holder.acceptedQtyOkButton.setTag(R.string.key_three, holder.verifiedQtyTV);
         holder.acceptedQtyOkButton.setTag(R.string.key_four, holder.verifiedQtyLL);
+        holder.acceptedQtyOkButton.setTag(R.string.key_five, employeeCode);
+        holder.acceptedQtyOkButton.setTag(R.string.key_six, idVehicle);
         holder.acceptedQtyOkButton.setOnClickListener(this);
 
     }
@@ -125,6 +155,8 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
              TextInputEditText acceptedQtyTextInput = (TextInputEditText)view.getTag(R.string.key_two);
              TextView verifiedQuantityTV = (TextView) view.getTag(R.string.key_three);
              LinearLayout verifiedQtyLL = (LinearLayout) view.getTag(R.string.key_four);
+             int employeeCode = (Integer) view.getTag(R.string.key_five);
+             int idVehicle = (Integer) view.getTag(R.string.key_six);
 
              double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
              Log.e("Log","acceptedQtyAdapter" + acceptedQty);
@@ -135,7 +167,7 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
              purchaseOrderItem.setAcceptedQuantity(acceptedQty);
 
 
-                 dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty);
+                 dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty, employeeCode,idVehicle);
                  dbHelper.updateAcceptedQuantityVerified(purchaseOrderItem.getIdItem());
 
                  Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);

@@ -3,7 +3,7 @@ package com.happy.tracku.gson.login;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class LoginResponsestatus {
+public class ValidateLoginResponsestatus {
 
     @SerializedName("status")
     @Expose
@@ -28,26 +28,22 @@ public class LoginResponsestatus {
     private String email;
     @SerializedName("loginID")
     @Expose
-    private String loginID;
+    private Integer loginID;
     @SerializedName("employeeCode")
     @Expose
-    private String employeeCode;
-
+    private Integer employeeCode;
+    @SerializedName("isAdmin")
+    @Expose
+    private Integer isAdmin;
     @SerializedName("statusMessage")
     @Expose
     private String statusMessage;
     @SerializedName("version")
     @Expose
     private String version;
-
-    @SerializedName("isAdmin")
-    @Expose
-    private Integer isAdmin;
-
     @SerializedName("isLocationCheckRequired")
     @Expose
     private Integer isLocationCheckRequired;
-
     @SerializedName("location")
     @Expose
     private String location;
@@ -108,20 +104,28 @@ public class LoginResponsestatus {
         this.email = email;
     }
 
-    public String getLoginID() {
+    public Integer getLoginID() {
         return loginID;
     }
 
-    public void setLoginID(String loginID) {
+    public void setLoginID(Integer loginID) {
         this.loginID = loginID;
     }
 
-    public String getEmployeeCode() {
+    public Integer getEmployeeCode() {
         return employeeCode;
     }
 
-    public void setEmployeeCode(String employeeCode) {
+    public void setEmployeeCode(Integer employeeCode) {
         this.employeeCode = employeeCode;
+    }
+
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
     }
 
     public String getStatusMessage() {
@@ -140,12 +144,12 @@ public class LoginResponsestatus {
         this.version = version;
     }
 
-    public Integer getIsAdmin() {
-        return isAdmin;
+    public Integer getIsLocationCheckRequired() {
+        return isLocationCheckRequired;
     }
 
-    public void setIsAdmin(Integer isAdmin) {
-        this.isAdmin = isAdmin;
+    public void setIsLocationCheckRequired(Integer isLocationCheckRequired) {
+        this.isLocationCheckRequired = isLocationCheckRequired;
     }
 
     public String getLocation() {
@@ -156,11 +160,4 @@ public class LoginResponsestatus {
         this.location = location;
     }
 
-    public Integer getIsLocationCheckRequired() {
-        return isLocationCheckRequired;
-    }
-
-    public void setIsLocationCheckRequired(Integer isLocationCheckRequired) {
-        this.isLocationCheckRequired = isLocationCheckRequired;
-    }
 }

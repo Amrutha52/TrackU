@@ -10,6 +10,9 @@ import android.util.Log;
 
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPending;
 import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
+import com.happy.tracku.gson.login.ValidateLoginResponseEmployeeDatum;
+import com.happy.tracku.gson.login.ValidateLoginResponseVehicle;
+import com.happy.tracku.gson.login.Validateloginresponsejson;
 import com.happy.tracku.gson.masterdata.ItemMaster;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
 import com.happy.tracku.gson.masterdata.UnitMaster;
@@ -31,7 +34,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 10;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -41,6 +44,8 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String ITEM_MASTER =  "ItemMaster";
     public static final String UNIT_MASTER = "UnitMaster";
     public static final String DELIVERY_PENDING_DETAILS_TABLE = "DeliveryPending";
+    public static final String VALIDATE_LOGIN_EMPLOYEE_DATA = "ValidateLoginEmployeeData";
+    public static final String VALIDATE_LOGIN_VEHICLE_DATA = "ValidateLoginVehicleData";
 
     private SharedPreferences shp;
     private Context context;
@@ -58,9 +63,9 @@ public class DbHelper extends SQLiteOpenHelper
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+EMPLOYEE_MASTER+" (idEmployee INTEGER,employeeCode TEXT, employeeName TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, AcceptedQty Double, CreatedBy Text, IsVerified INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, AcceptedQty Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+VENDOR_MASTER+" (idVendor INTEGER,vendorName TEXT)");
 
@@ -69,6 +74,10 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("CREATE TABLE IF NOT EXISTS "+UNIT_MASTER+" (idUnit INTEGER,unitName TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+DELIVERY_PENDING_DETAILS_TABLE+" (idSalesHeader INTEGER,vendorName TEXT, salesDate TEXT, grandTotal DOUBLE,itemName TEXT, quantity DOUBLE, idSalesDetails INTEGER)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_EMPLOYEE_DATA+" (employeeCode INTEGER,employeeName TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_VEHICLE_DATA+" (idVehicle INTEGER, vehicleNumber TEXT)");
 
     }
 
@@ -112,6 +121,21 @@ public class DbHelper extends SQLiteOpenHelper
         if (oldVersion <= 8)
         {
             db.execSQL("CREATE TABLE IF NOT EXISTS "+DELIVERY_PENDING_DETAILS_TABLE+" (idSalesHeader INTEGER,vendorName TEXT, salesDate TEXT, grandTotal DOUBLE,itemName TEXT, quantity DOUBLE, idSalesDetails INTEGER)");
+
+        }
+        if (oldVersion <= 9)
+        {
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_EMPLOYEE_DATA+" (employeeCode INTEGER,employeeName TEXT)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_VEHICLE_DATA+" (idVehicle INTEGER, vehicleNumber TEXT)");
+
+        }
+        if (oldVersion <= 10)
+        {
+            db.execSQL("ALTER TABLE " + SAVE_PURCHASE_ORDER_TABLE + " ADD employeeCode INTEGER") ;
+            db.execSQL("ALTER TABLE " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " ADD employeeCode INTEGER") ;
+            db.execSQL("ALTER TABLE " + SAVE_PURCHASE_ORDER_TABLE + " ADD idVehicle INTEGER") ;
+            db.execSQL("ALTER TABLE " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " ADD idVehicle INTEGER") ;
 
         }
         onCreate(db);
@@ -327,14 +351,14 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("DELETE FROM " + SAVE_PURCHASE_ORDER_TABLE);
     }
 
-    public void updateAcceptedQuantity(int idItem, double acceptedQty)
+    public void updateAcceptedQuantity(int idItem, double acceptedQty, int employeeCode, int idVehicle)
     {
         Log.e("Log", "updateAcceptedQuantity");
         Log.e("Log", "acceptedQtyDB" + acceptedQty);
         Log.e("Log", "idItemDB" + idItem);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update " + SAVE_PURCHASE_ORDER_TABLE + " set AcceptedQty="+acceptedQty+", IsVerified = 1 where idItem='" + idItem + "'");
+        db.execSQL("update " + SAVE_PURCHASE_ORDER_TABLE + " set AcceptedQty="+acceptedQty+", IsVerified = 1, employeeCode = "+employeeCode+", idVehicle = "+idVehicle+" where idItem='" + idItem + "'");
 
        // db.execSQL("update "+SAVE_PURCHASE_ORDER_TABLE+" set AcceptedQty="+acceptedQty+" where idItem="+idItem);
 
@@ -442,13 +466,13 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("DELETE FROM " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE);
     }
 
-    public void updateStockOutQuantity(Integer idItem, double stockOutQuantity)
+    public void updateStockOutQuantity(Integer idItem, double stockOutQuantity, int employeeCode, int idVehicle)
     {
         Log.e("Log", "updateStockoutQuantity");
         Log.e("Log", "stockoutQtyDB" + stockOutQuantity);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set StockOutQuantity="+stockOutQuantity+" where idItem='" + idItem + "'");
+        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set StockOutQuantity="+stockOutQuantity+", employeeCode = "+employeeCode+", idVehicle = "+idVehicle+" where idItem='" + idItem + "'");
 
 
     }
@@ -821,4 +845,100 @@ public class DbHelper extends SQLiteOpenHelper
 
         return finalJson;
     }
+
+    public void insertValidateMasterData(Validateloginresponsejson validateloginresponsejson)
+    {
+        Log.e("LogDB", "validateloginresponsejson" + validateloginresponsejson);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (validateloginresponsejson.getData().getValidateLoginResponseEmployeeData() != null)
+        {
+            List<ValidateLoginResponseEmployeeDatum> validateLoginResponseEmployeeDatumList = validateloginresponsejson.getData().getValidateLoginResponseEmployeeData();
+
+            for (ValidateLoginResponseEmployeeDatum validateLoginResponseEmployeeDatum : validateLoginResponseEmployeeDatumList)
+            {
+                ContentValues cv = new ContentValues();
+                cv.put("employeeCode", validateLoginResponseEmployeeDatum.getEmployeeCode());
+                cv.put("employeeName", validateLoginResponseEmployeeDatum.getEmployeeName());
+
+                db.insert( VALIDATE_LOGIN_EMPLOYEE_DATA , null, cv);
+                Log.e("LogDB", "employeeMasterCV" + cv);
+            }
+        }
+
+        if (validateloginresponsejson.getData().getValidateLoginResponseVehicle() != null)
+        {
+            List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList = validateloginresponsejson.getData().getValidateLoginResponseVehicle();
+
+            for (ValidateLoginResponseVehicle validateLoginResponseVehicle : validateLoginResponseVehicleList)
+            {
+                ContentValues cv = new ContentValues();
+                cv.put("idVehicle", validateLoginResponseVehicle.getIdVehicle());
+                cv.put("vehicleNumber", validateLoginResponseVehicle.getVehicleNumber());
+
+
+                db.insert( VALIDATE_LOGIN_VEHICLE_DATA , null, cv);
+                Log.e("LogDB", "vehicleMasterCV" + cv);
+
+            }
+        }
+
+    }
+    public void deleteLoginEmployeeData()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + VALIDATE_LOGIN_EMPLOYEE_DATA);
+    }
+
+    public void deleteLoginVehicleData()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + VALIDATE_LOGIN_VEHICLE_DATA);
+    }
+
+    public ArrayList<ValidateLoginResponseEmployeeDatum> getLoginEmployeeMaster()
+    {
+        ArrayList<ValidateLoginResponseEmployeeDatum> validateLoginResponseEmployeeDatumArrayList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select * from " + VALIDATE_LOGIN_EMPLOYEE_DATA + " order by employeeCode asc", null);
+        cur.moveToFirst();
+
+        for (int i = 0; i < cur.getCount(); i++)
+        {
+            ValidateLoginResponseEmployeeDatum employeeMasterDetail = new ValidateLoginResponseEmployeeDatum();
+
+            employeeMasterDetail.setEmployeeCode(cur.getInt(cur.getColumnIndex("employeeCode")));
+            employeeMasterDetail.setEmployeeName(cur.getString(cur.getColumnIndex("employeeName")));
+            cur.moveToNext();
+
+            validateLoginResponseEmployeeDatumArrayList.add(employeeMasterDetail);
+        }
+
+        return validateLoginResponseEmployeeDatumArrayList;
+    }
+
+    public ArrayList<ValidateLoginResponseVehicle> getLoginVehicleMaster()
+    {
+        ArrayList<ValidateLoginResponseVehicle> validateLoginResponseVehicleArrayList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select * from " + VALIDATE_LOGIN_VEHICLE_DATA + " order by idVehicle asc", null);
+        cur.moveToFirst();
+
+        for (int i = 0; i < cur.getCount(); i++)
+        {
+            ValidateLoginResponseVehicle validateLoginResponseVehicle = new ValidateLoginResponseVehicle();
+
+            validateLoginResponseVehicle.setIdVehicle(cur.getInt(cur.getColumnIndex("idVehicle")));
+            validateLoginResponseVehicle.setVehicleNumber(cur.getString(cur.getColumnIndex("vehicleNumber")));
+            cur.moveToNext();
+
+            validateLoginResponseVehicleArrayList.add(validateLoginResponseVehicle);
+        }
+
+        return validateLoginResponseVehicleArrayList;
+    }
+
 }

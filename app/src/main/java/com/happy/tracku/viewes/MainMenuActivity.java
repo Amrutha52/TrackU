@@ -12,28 +12,19 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -46,17 +37,13 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.databinding.ActivityMainMenuBinding;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.gpsstatusjson.GPSUpdateStatusJson;
-import com.happy.tracku.gson.login.LoginStatusJson;
+import com.happy.tracku.gson.login.Validateloginresponsejson;
 import com.happy.tracku.gson.logouttrackjson.LogoutTrackJson;
 import com.happy.tracku.models.DailyTravelModel;
 //import com.happy.tracku.service.ForeGroundService;
@@ -74,10 +61,6 @@ import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -935,7 +918,7 @@ public class MainMenuActivity extends AppCompatActivity {
         String failureMsg;
         boolean exceptionOccured = false,timeOutExceptionOccured = false;
         String inputAndOutputJson = "";
-        LoginStatusJson loginStatusJson;
+        Validateloginresponsejson loginStatusJson;
         public LoginTaskForVersionCheck(MainMenuActivity mContext, String userNameString, String passwordString)
         {
             this.mContext = mContext;
@@ -1037,18 +1020,17 @@ public class MainMenuActivity extends AppCompatActivity {
 
               */
 
-                loginStatusJson = gsonTwo.fromJson(resultOne, LoginStatusJson.class);
+                loginStatusJson = gsonTwo.fromJson(resultOne, Validateloginresponsejson.class);
 
-                if (loginStatusJson.getData().getLoginResponseStatus().isEmpty() || loginStatusJson.getData().getLoginResponseStatus().size() == 0)
+                if (loginStatusJson.getData().getValidateLoginResponseStatus().isEmpty() || loginStatusJson.getData().getValidateLoginResponseStatus().size() == 0 || loginStatusJson.getData().getValidateLoginResponseStatus() == null || loginStatusJson.getData().getValidateLoginResponseEmployeeData().isEmpty() || loginStatusJson.getData().getValidateLoginResponseEmployeeData().size() == 0 || loginStatusJson.getData().getValidateLoginResponseEmployeeData() == null || loginStatusJson.getData().getValidateLoginResponseVehicle().isEmpty() || loginStatusJson.getData().getValidateLoginResponseVehicle().size() == 0 || loginStatusJson.getData().getValidateLoginResponseVehicle() == null)                {
+                    return "failure";
+                }
+                else if (loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getStatus() != 1)
                 {
                     return "failure";
                 }
-                else if (loginStatusJson.getData().getLoginResponseStatus().get(0).getStatus() != 1)
-                {
-                    return "failure";
-                }
 
-                double versionAtServer = Double.parseDouble(loginStatusJson.getData().getLoginResponseStatus().get(0).getVersion());
+                double versionAtServer = Double.parseDouble(loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getVersion());
                 double currentVersion = Double.parseDouble(Fns.getAppVersionName(mContext));
 
 
@@ -1056,7 +1038,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 {
 
                     SharedPreferences.Editor edt = shp.edit();
-                    edt.putString(Const.Shp_NEW_APP_VERSION,loginStatusJson.getData().getLoginResponseStatus().get(0).getVersion());
+                    edt.putString(Const.Shp_NEW_APP_VERSION,loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getVersion());
                     edt.apply();
                     return "update";
 

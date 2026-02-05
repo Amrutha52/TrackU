@@ -9,20 +9,39 @@ public class Data {
 
     @SerializedName("validateLoginResponseStatus")
     @Expose
-    private List<LoginResponsestatus> loginResponseStatus;
+    private List<ValidateLoginResponsestatus> validateLoginResponseStatus;
+    @SerializedName("validateLoginResponseEmployeeData")
+    @Expose
+    private List<ValidateLoginResponseEmployeeDatum> validateLoginResponseEmployeeData;
+    @SerializedName("validateLoginResponseVehicle")
+    @Expose
+    private List<ValidateLoginResponseVehicle> validateLoginResponseVehicle;
     @SerializedName("exceptionData")
     @Expose
     private Object exceptionData;
-    @SerializedName("token")
-    @Expose
-    private String token;
 
-    public List<LoginResponsestatus> getLoginResponseStatus() {
-        return loginResponseStatus;
+    public List<ValidateLoginResponsestatus> getValidateLoginResponseStatus() {
+        return validateLoginResponseStatus;
     }
 
-    public void setLoginResponseStatus(List<LoginResponsestatus> loginResponseStatus) {
-        this.loginResponseStatus = loginResponseStatus;
+    public void setValidateLoginResponseStatus(List<ValidateLoginResponsestatus> validateLoginResponseStatus) {
+        this.validateLoginResponseStatus = validateLoginResponseStatus;
+    }
+
+    public List<ValidateLoginResponseEmployeeDatum> getValidateLoginResponseEmployeeData() {
+        return validateLoginResponseEmployeeData;
+    }
+
+    public void setValidateLoginResponseEmployeeData(List<ValidateLoginResponseEmployeeDatum> validateLoginResponseEmployeeData) {
+        this.validateLoginResponseEmployeeData = validateLoginResponseEmployeeData;
+    }
+
+    public List<ValidateLoginResponseVehicle> getValidateLoginResponseVehicle() {
+        return validateLoginResponseVehicle;
+    }
+
+    public void setValidateLoginResponseVehicle(List<ValidateLoginResponseVehicle> validateLoginResponseVehicle) {
+        this.validateLoginResponseVehicle = validateLoginResponseVehicle;
     }
 
     public Object getExceptionData() {
@@ -31,14 +50,6 @@ public class Data {
 
     public void setExceptionData(Object exceptionData) {
         this.exceptionData = exceptionData;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
 }

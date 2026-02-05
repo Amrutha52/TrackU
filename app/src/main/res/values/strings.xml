@@ -17,6 +17,8 @@
     <string name="key_two">KeyTwo</string>
     <string name="key_three">KeyThree</string>
     <string name="key_four">KeyFour</string>
+    <string name="key_five">KeyFive</string>
+    <string name="key_six">KeySix</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

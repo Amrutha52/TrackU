@@ -6,57 +6,37 @@ import static com.happy.tracku.utils.Const.USING_IP;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.databinding.ActivityLoginBinding;
 import com.happy.tracku.db.DbHelper;
-import com.happy.tracku.gson.login.LoginStatusJson;
+import com.happy.tracku.gson.login.Validateloginresponsejson;
 import com.happy.tracku.gson.masterdata.MasterDataJson;
-import com.happy.tracku.gson.masterdata.UnitMaster;
-import com.happy.tracku.gson.masterdata.VendorMaster;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InterruptedIOException;
 import java.lang.ref.WeakReference;
 import java.net.SocketTimeoutException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -116,7 +96,6 @@ public class LoginActivity extends AppCompatActivity
 //            startActivity(new Intent(this, MainMenuActivity.class));
 //        }
 
-        new PullEmployeeMasterDetails(this).execute();
 
         new PullMasterData(this).execute();
 
@@ -227,7 +206,8 @@ public class LoginActivity extends AppCompatActivity
         String failureMsg;
         boolean exceptionOccured = false,timeOutExceptionOccured = false;
         String inputAndOutputJson = "";
-        LoginStatusJson loginStatusJson;
+        Validateloginresponsejson loginStatusJson;
+        DbHelper dbHelper;
 
         public LoginTask(LoginActivity mContext, String usernameString, String passwordString)
         {
@@ -246,7 +226,7 @@ public class LoginActivity extends AppCompatActivity
                     .build();*/
             pd = new ProgressDialog(mContext);
             shp = mContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
-
+            dbHelper = new DbHelper(mContext);
 
 
             pd.setTitle("Please wait");
@@ -343,18 +323,18 @@ public class LoginActivity extends AppCompatActivity
 
                 }
 
-                 loginStatusJson = gsonTwo.fromJson(resultOne, LoginStatusJson.class);
+                 loginStatusJson = gsonTwo.fromJson(resultOne, Validateloginresponsejson.class);
 
-                if (loginStatusJson.getData().getLoginResponseStatus().isEmpty() || loginStatusJson.getData().getLoginResponseStatus().size() == 0)
+                if (loginStatusJson.getData().getValidateLoginResponseStatus().isEmpty() || loginStatusJson.getData().getValidateLoginResponseStatus().size() == 0 || loginStatusJson.getData().getValidateLoginResponseStatus() == null || loginStatusJson.getData().getValidateLoginResponseEmployeeData().isEmpty() || loginStatusJson.getData().getValidateLoginResponseEmployeeData().size() == 0 || loginStatusJson.getData().getValidateLoginResponseEmployeeData() == null || loginStatusJson.getData().getValidateLoginResponseVehicle().isEmpty() || loginStatusJson.getData().getValidateLoginResponseVehicle().size() == 0 || loginStatusJson.getData().getValidateLoginResponseVehicle() == null)
                 {
                     return "failure";
                 }
-                else if (loginStatusJson.getData().getLoginResponseStatus().get(0).getStatus() != 1)
+                else if (loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getStatus() != 1)
                 {
                     return "failure";
                 }
 
-                double versionAtServer = Double.parseDouble(loginStatusJson.getData().getLoginResponseStatus().get(0).getVersion());
+                double versionAtServer = Double.parseDouble(loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getVersion());
                 double currentVersion = Double.parseDouble(Fns.getAppVersionName(mContext));
 
 
@@ -362,7 +342,7 @@ public class LoginActivity extends AppCompatActivity
                 {
 
                     SharedPreferences.Editor edt = shp.edit();
-                    edt.putString(Const.Shp_NEW_APP_VERSION,loginStatusJson.getData().getLoginResponseStatus().get(0).getVersion());
+                    edt.putString(Const.Shp_NEW_APP_VERSION,loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getVersion());
                     edt.apply();
                     return "update";
 
@@ -417,18 +397,21 @@ public class LoginActivity extends AppCompatActivity
 
             if (s.equals("success"))
             {
+                dbHelper.deleteLoginVehicleData();
+                dbHelper.deleteLoginEmployeeData();
+                dbHelper.insertValidateMasterData(loginStatusJson);
 
                 Log.e("Log", "username" + usernameString);
                 SharedPreferences.Editor edt = shp.edit();
-                edt.putInt(Const.Shp_Id_Employee,loginStatusJson.getData().getLoginResponseStatus().get(0).getIdEmployee());
+                edt.putInt(Const.Shp_Id_Employee,loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getIdEmployee());
                 edt.putString(Const.Shp_Employee_Code, usernameString);
-                edt.putString(Const.Shp_Employee_Name, loginStatusJson.getData().getLoginResponseStatus().get(0).getName());
-                edt.putString(Const.Shp_Token, loginStatusJson.getData().getToken());
-                edt.putInt(Const.Shp_Is_Admin, loginStatusJson.getData().getLoginResponseStatus().get(0).getIsAdmin());
+                edt.putString(Const.Shp_Employee_Name, loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getName());
+               // edt.putString(Const.Shp_Token, loginStatusJson.getData().get);
+                edt.putInt(Const.Shp_Is_Admin, loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getIsAdmin());
                 edt.putBoolean(Const.Shp_Is_LoggedIn, true);
                 edt.putString(Const.Shp_UserName, usernameString);
                 edt.putString(Const.Shp_PassWord, passwordString);
-                edt.putInt(Const.Shp_IsLocationCheckRequired, loginStatusJson.getData().getLoginResponseStatus().get(0).getIsLocationCheckRequired());
+                edt.putInt(Const.Shp_IsLocationCheckRequired, loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getIsLocationCheckRequired());
                 edt.apply();
 
                 mContext.startActivity(new Intent(mContext, MainMenuActivity.class));
@@ -454,7 +437,7 @@ public class LoginActivity extends AppCompatActivity
                 }
                 else
                 {
-                    String message = loginStatusJson.getData().getLoginResponseStatus().get(0).getStatusMessage();
+                    String message = loginStatusJson.getData().getValidateLoginResponseStatus().get(0).getStatusMessage();
                     Fns.neutralAlert("Alert",message,mContext);
                 }
 
