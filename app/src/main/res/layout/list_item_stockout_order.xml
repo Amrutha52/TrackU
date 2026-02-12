@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardElevation="5dp"
+    app:cardCornerRadius="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0">
+            <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/cell_border"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/itemTV"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:text="Medicine Alpha"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/orderQtyTV"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="10" />
+
+            <TextView
+                android:id="@+id/rateTV"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="250" />
+
+            <TextView
+                android:id="@+id/rackNoTV"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="R12" />
+
+            <TextView
+                android:id="@+id/floorNoTV"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="F2" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/acceptedQtyET"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Qty"
+                        android:inputType="number"
+                        android:padding="8dp"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/acceptedQtyOkButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="48dp"
+                    android:text="OK"
+                    android:textColor="@color/teal_700"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </TableRow>
+
+            <TableRow
+                android:id="@+id/verifiedQtyLL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="8dp"
+                android:paddingBottom="8dp"
+                android:paddingRight="10dp"
+                android:visibility="gone"> <TextView
+                android:layout_span="5"
+                android:text="Verified Quantity:"
+                android:textColor="#E91E63"
+                android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/verifiQtyTV"
+                    android:gravity="end"
+                    android:text="1200"
+                    android:paddingRight="12dp"
+                    android:paddingLeft="12dp"
+                    android:textColor="#E91E63"
+                    android:textStyle="bold" />
+            </TableRow>
+
+        </TableLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#DDDDDD" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

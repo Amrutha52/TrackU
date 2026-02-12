@@ -20,6 +20,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,11 +37,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.adapters.StockoutPurchaseOrderItemListAdapter;
 import com.happy.tracku.databinding.ActivityStockOutPurchaseOrderItemListBinding;
 import com.happy.tracku.db.DbHelper;
+import com.happy.tracku.gson.login.ValidateLoginResponseEmployeeDatum;
+import com.happy.tracku.gson.login.ValidateLoginResponseVehicle;
 import com.happy.tracku.gson.sendstockoutrequest.StockOutSendPurchaseRequestJson;
 import com.happy.tracku.gson.stockoutpurchaseorderitemlist.StockOutPurchaseOrderItemListJson;
 import com.happy.tracku.ssl.CustomTrust;
@@ -48,14 +53,13 @@ import com.happy.tracku.utils.Fns;
 
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -86,6 +90,10 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
     String fileName, base64;
     Uri photoURI;
     File photoFile;
+    MaterialAutoCompleteTextView employeeCodeMATV, vehicleModelMATV;
+    List<ValidateLoginResponseEmployeeDatum> employeeMasterDetailList;
+    List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
+    int employeeCode, idVehicle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -109,7 +117,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             return WindowInsetsCompat.CONSUMED;
         });
 
-        getSupportActionBar().setTitle("Purchase Order Item List");
+        getSupportActionBar().setTitle("Stockout Order Item List");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         dbHelper = new DbHelper(this);
@@ -125,6 +133,59 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
         companyValue = intent.getIntExtra("company",0);
         Log.e("Log", "companyValue" + companyValue);
+
+        employeeCodeMATV = findViewById(R.id.employeecodeMATV);
+        vehicleModelMATV = findViewById(R.id.vehicleModelMATV);
+
+        employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
+        Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
+
+        ArrayAdapter<ValidateLoginResponseEmployeeDatum> adpterEmployeeMaster = new ArrayAdapter<ValidateLoginResponseEmployeeDatum>(this, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
+        employeeCodeMATV.setAdapter(adpterEmployeeMaster);
+
+        employeeCodeMATV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                employeeCodeMATV.showDropDown();
+            }
+        });
+
+        employeeCodeMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                employeeCode = employeeMasterDetailList.get(position).getEmployeeCode();
+                Log.e("Log", "employeeCodeSP" + employeeCode);
+
+            }
+        });
+
+        validateLoginResponseVehicleList = dbHelper.getLoginVehicleMaster();
+        Log.e("Log", "validateLoginResponseVehicleList" + validateLoginResponseVehicleList);
+
+        ArrayAdapter<ValidateLoginResponseVehicle> adapterVehicle = new ArrayAdapter<ValidateLoginResponseVehicle>(this, android.R.layout.simple_dropdown_item_1line, validateLoginResponseVehicleList);
+        vehicleModelMATV.setAdapter(adapterVehicle);
+
+        vehicleModelMATV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                vehicleModelMATV.showDropDown();
+            }
+        });
+
+        vehicleModelMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                idVehicle = validateLoginResponseVehicleList.get(position).getIdVehicle();
+                Log.e("Log", "idVehiclePurchaseOrderItemList" + idVehicle);
+
+            }
+        });
 
         new PullStockoutPurchaseOrderItemListDetails(this, idPurchaseOrder,companyValue).execute();
 
@@ -293,7 +354,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                         fileName = idPurchaseOrder + "_" + System.currentTimeMillis() + ".jpg";
                         base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     }
-                    new PushStockOutRequest(this, idPurchaseOrder, fileName, base64, companyValue).execute();
+                    new PushStockOutRequest(this, idPurchaseOrder, fileName, base64, companyValue, employeeCode, idVehicle).execute();
                 }
 
 
@@ -539,13 +600,17 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         int status;
         Integer companyValue;
 
-        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64, Integer companyValue)
+        int employeeCode, idVehicle;
+
+        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64, Integer companyValue, int employeeCode, int idVehicle)
         {
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
             this.fileName = fileName;
             this.base64 = base64;
             this.companyValue = companyValue;
+            this.employeeCode = employeeCode;
+            this.idVehicle = idVehicle;
 
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
@@ -579,7 +644,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64, companyValue);
+                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64, companyValue, employeeCode, idVehicle);
                // pushDataObj.put("fileName", fileName);
                // pushDataObj.put("customerPhoto", base64);
 

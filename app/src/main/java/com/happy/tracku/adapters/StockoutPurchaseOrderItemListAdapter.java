@@ -3,6 +3,9 @@ package com.happy.tracku.adapters;
 import static android.view.View.VISIBLE;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,22 +25,23 @@ import com.happy.tracku.gson.login.ValidateLoginResponseEmployeeDatum;
 import com.happy.tracku.gson.login.ValidateLoginResponseVehicle;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
 import com.happy.tracku.gson.stockoutpurchaseorderitemlist.StockOutPurchaseOrderItem;
+import com.happy.tracku.models.stockoutitem.StockoutItemModel;
 import com.happy.tracku.utils.Fns;
 import com.happy.tracku.viewes.PurchaseOrderItemListActivity;
 import com.happy.tracku.viewes.StockOutPurchaseOrderItemListActivity;
 import com.happy.tracku.viewholders.PurchaseOrderItemListViewHolder;
+import com.happy.tracku.viewholders.StockoutOrderItemListViewHolder;
 
 import java.util.List;
 
 
-public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseOrderItemListViewHolder> implements View.OnClickListener
+public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<StockoutOrderItemListViewHolder> implements View.OnClickListener
 {
     Context context;
     List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList;
     DbHelper dbHelper;
-    List<ValidateLoginResponseEmployeeDatum> employeeMasterDetailList;
-    List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
     int employeeCode, idVehicle;
+    private List<StockoutItemModel> itemList;
     public StockoutPurchaseOrderItemListAdapter(StockOutPurchaseOrderItemListActivity context, List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList)
     {
         this.context = context;
@@ -50,66 +54,18 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
 
     @NonNull
     @Override
-    public PurchaseOrderItemListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    public StockoutOrderItemListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_purchase_order_item, parent, false);
-        return new PurchaseOrderItemListViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_stockout_order, parent, false);
+        return new StockoutOrderItemListViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PurchaseOrderItemListViewHolder holder, int position)
+    public void onBindViewHolder(@NonNull StockoutOrderItemListViewHolder holder, int position)
     {
         StockOutPurchaseOrderItem purchaseOrderItem = stockOutPurchaseOrderItemList.get(position);
 
-        employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
-        Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
 
-        ArrayAdapter<ValidateLoginResponseEmployeeDatum> adpterEmployeeMaster = new ArrayAdapter<ValidateLoginResponseEmployeeDatum>(context, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
-        holder.employeeCodeMATV.setAdapter(adpterEmployeeMaster);
-
-        holder.employeeCodeMATV.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(final View arg0)
-            {
-                holder.employeeCodeMATV.showDropDown();
-            }
-        });
-
-        holder.employeeCodeMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                employeeCode = employeeMasterDetailList.get(position).getEmployeeCode();
-                Log.e("Log", "employeeCode" + employeeCode);
-
-            }
-        });
-
-        validateLoginResponseVehicleList = dbHelper.getLoginVehicleMaster();
-        Log.e("Log", "validateLoginResponseVehicleList" + validateLoginResponseVehicleList);
-
-        ArrayAdapter<ValidateLoginResponseVehicle> adapterVehicle = new ArrayAdapter<ValidateLoginResponseVehicle>(context, android.R.layout.simple_dropdown_item_1line, validateLoginResponseVehicleList);
-        holder.vehicleMATV.setAdapter(adapterVehicle);
-
-        holder.vehicleMATV.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(final View arg0)
-            {
-                holder.vehicleMATV.showDropDown();
-            }
-        });
-
-        holder.vehicleMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                idVehicle = validateLoginResponseVehicleList.get(position).getIdVehicle();
-                Log.e("Log", "idVehiclePurchaseOrderItemList" + idVehicle);
-
-            }
-        });
 
         holder.itemTV.setText(purchaseOrderItem.getItemName());
         holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());
@@ -117,7 +73,62 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<P
         holder.rateTV.setText(purchaseOrderItem.getTotalAmount().toString());
         holder.floorNoTV.setText(purchaseOrderItem.getFloor().toString());
 
-        holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getOrderQuantity()));
+       // holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getOrderQuantity()));
+
+        // 2. Clear old TextWatcher to prevent recycling bugs
+        if (holder.qtyTextWatcher != null) {
+            holder.acceptedQtyET.removeTextChangedListener(holder.qtyTextWatcher);
+        }
+
+        // 3. Set the initial text (Prefix with order quantity if empty)
+        double currentAccepted = purchaseOrderItem.getStockOutQuantity();
+
+        // If it's a new entry (0.0), you might want to show the order quantity as prefix
+        holder.acceptedQtyET.setText(String.valueOf(currentAccepted > 0 ? currentAccepted : purchaseOrderItem.getOrderQuantity()));
+
+        // 4. Color Logic Function
+        Runnable applyColorLogic = () -> {
+            try {
+                String input = holder.acceptedQtyET.getText().toString();
+                double accepted = input.isEmpty() ? 0.0 : Double.parseDouble(input);
+                double order = purchaseOrderItem.getOrderQuantity();
+
+                if (accepted == 0) {
+                    holder.itemView.setBackgroundColor(Color.parseColor("#f0120b")); // RED
+                } else if (accepted == order) {
+                    holder.itemView.setBackgroundColor(Color.parseColor("#C8E6C9")); // GREEN
+                } else if (accepted < order) {
+                    holder.itemView.setBackgroundColor(Color.parseColor("#FFF9C4")); // YELLOW
+                } else {
+                    holder.itemView.setBackgroundColor(Color.WHITE); // Default
+                }
+            } catch (Exception e) {
+                holder.itemView.setBackgroundColor(Color.WHITE);
+            }
+        };
+
+        // Apply color immediately on bind
+        applyColorLogic.run();
+
+        // 5. Update color in real-time as user types
+        holder.qtyTextWatcher = new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                applyColorLogic.run();
+            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+        };
+        holder.acceptedQtyET.addTextChangedListener(holder.qtyTextWatcher);
+
+        // 6. Handle Sub-row Visibility (Verified Quantity)
+        // If already verified in DB/Model, show it
+        if (purchaseOrderItem.getStockOutQuantity() > 0) {
+            holder.verifiedQtyLL.setVisibility(View.VISIBLE);
+            holder.verifiedQtyTV.setText(String.valueOf(purchaseOrderItem.getStockOutQuantity()));
+        } else {
+            holder.verifiedQtyLL.setVisibility(View.GONE);
+        }
 
         holder.acceptedQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
         holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
