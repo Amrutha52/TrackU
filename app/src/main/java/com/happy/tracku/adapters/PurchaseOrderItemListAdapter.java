@@ -45,7 +45,7 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
     List<ValidateLoginResponseEmployeeDatum> employeeMasterDetailList;
     List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
     DbHelper dbHelper;
-    int employeeCode, idVehicle;
+    int employeeCode = 0, idVehicle=0;
     public PurchaseOrderItemListAdapter(PurchaseOrderItemListActivity context, List<PurchaseOrderItem> purchaseOrderItemList)
     {
         this.context = context;
@@ -69,55 +69,55 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
     {
         PurchaseOrderItem purchaseOrderItem = purchaseOrderItemList.get(position);
 
-        employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
-        Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
-
-        ArrayAdapter<ValidateLoginResponseEmployeeDatum> adpterEmployeeMaster = new ArrayAdapter<ValidateLoginResponseEmployeeDatum>(context, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
-        holder.employeeCodeMATV.setAdapter(adpterEmployeeMaster);
-
-        holder.employeeCodeMATV.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(final View arg0)
-            {
-                holder.employeeCodeMATV.showDropDown();
-            }
-        });
-
-        holder.employeeCodeMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                employeeCode = employeeMasterDetailList.get(position).getEmployeeCode();
-                Log.e("Log", "employeeCode" + employeeCode);
-
-            }
-        });
-
-        validateLoginResponseVehicleList = dbHelper.getLoginVehicleMaster();
-        Log.e("Log", "validateLoginResponseVehicleList" + validateLoginResponseVehicleList);
-
-        ArrayAdapter<ValidateLoginResponseVehicle> adapterVehicle = new ArrayAdapter<ValidateLoginResponseVehicle>(context, android.R.layout.simple_dropdown_item_1line, validateLoginResponseVehicleList);
-        holder.vehicleMATV.setAdapter(adapterVehicle);
-
-        holder.vehicleMATV.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(final View arg0)
-            {
-                holder.vehicleMATV.showDropDown();
-            }
-        });
-
-        holder.vehicleMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                idVehicle = validateLoginResponseVehicleList.get(position).getIdVehicle();
-                Log.e("Log", "idVehiclePurchaseOrderItemList" + idVehicle);
-
-            }
-        });
+//        employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
+//        Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
+//
+//        ArrayAdapter<ValidateLoginResponseEmployeeDatum> adpterEmployeeMaster = new ArrayAdapter<ValidateLoginResponseEmployeeDatum>(context, android.R.layout.simple_dropdown_item_1line, employeeMasterDetailList);
+//        holder.employeeCodeMATV.setAdapter(adpterEmployeeMaster);
+//
+//        holder.employeeCodeMATV.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(final View arg0)
+//            {
+//                holder.employeeCodeMATV.showDropDown();
+//            }
+//        });
+//
+//        holder.employeeCodeMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+//
+//                employeeCode = employeeMasterDetailList.get(position).getEmployeeCode();
+//                Log.e("Log", "employeeCode" + employeeCode);
+//
+//            }
+//        });
+//
+//        validateLoginResponseVehicleList = dbHelper.getLoginVehicleMaster();
+//        Log.e("Log", "validateLoginResponseVehicleList" + validateLoginResponseVehicleList);
+//
+//        ArrayAdapter<ValidateLoginResponseVehicle> adapterVehicle = new ArrayAdapter<ValidateLoginResponseVehicle>(context, android.R.layout.simple_dropdown_item_1line, validateLoginResponseVehicleList);
+//        holder.vehicleMATV.setAdapter(adapterVehicle);
+//
+//        holder.vehicleMATV.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(final View arg0)
+//            {
+//                holder.vehicleMATV.showDropDown();
+//            }
+//        });
+//
+//        holder.vehicleMATV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+//
+//                idVehicle = validateLoginResponseVehicleList.get(position).getIdVehicle();
+//                Log.e("Log", "idVehiclePurchaseOrderItemList" + idVehicle);
+//
+//            }
+//        });
 
         holder.itemTV.setText(purchaseOrderItem.getItemName());
         holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());

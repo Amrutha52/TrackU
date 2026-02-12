@@ -40,7 +40,7 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<S
     Context context;
     List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList;
     DbHelper dbHelper;
-    int employeeCode, idVehicle;
+    int employeeCode=0, idVehicle=0;
     private List<StockoutItemModel> itemList;
     public StockoutPurchaseOrderItemListAdapter(StockOutPurchaseOrderItemListActivity context, List<StockOutPurchaseOrderItem> stockOutPurchaseOrderItemList)
     {
