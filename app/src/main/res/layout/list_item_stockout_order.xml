@@ -37,6 +37,12 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="10" />
+            <TextView
+                    android:id="@+id/unitTV"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="R12" />
 
             <TextView
                 android:id="@+id/rateTV"
@@ -44,20 +50,6 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="250" />
-
-            <TextView
-                android:id="@+id/rackNoTV"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="R12" />
-
-            <TextView
-                android:id="@+id/floorNoTV"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="F2" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -73,7 +65,7 @@
                     android:layout_weight="1">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/acceptedQtyET"
+                        android:id="@+id/orderQtyET"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Qty"
@@ -83,7 +75,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/acceptedQtyOkButton"
+                    android:id="@+id/orderQtyOkButton"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

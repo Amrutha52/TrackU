@@ -84,7 +84,13 @@
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:gravity="center"
-                android:text="Order"
+                android:text="Quantity"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:text="Unit"
                 android:textStyle="bold" />
             <TextView
                 android:layout_width="0dp"
@@ -92,23 +98,12 @@
                 android:gravity="center"
                 android:text="Rate"
                 android:textStyle="bold" />
-            <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="Rack\nNo"
-                    android:textStyle="bold" />
-            <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="Floor\nNo"
-                    android:textStyle="bold" />
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_weight="3"
                 android:gravity="center"
-                android:text="Accepted\nQty"
+                android:text="Order\nQty"
                 android:textStyle="bold" />
 
         </TableRow>

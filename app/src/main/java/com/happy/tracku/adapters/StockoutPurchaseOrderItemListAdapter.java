@@ -69,27 +69,27 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<S
 
         holder.itemTV.setText(purchaseOrderItem.getItemName());
         holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());
-        holder.rackNoTV.setText(purchaseOrderItem.getRackNumber().toString());
+
         holder.rateTV.setText(purchaseOrderItem.getTotalAmount().toString());
-        holder.floorNoTV.setText(purchaseOrderItem.getFloor().toString());
+
 
        // holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getOrderQuantity()));
 
         // 2. Clear old TextWatcher to prevent recycling bugs
         if (holder.qtyTextWatcher != null) {
-            holder.acceptedQtyET.removeTextChangedListener(holder.qtyTextWatcher);
+            holder.orderQtyET.removeTextChangedListener(holder.qtyTextWatcher);
         }
 
         // 3. Set the initial text (Prefix with order quantity if empty)
         double currentAccepted = purchaseOrderItem.getStockOutQuantity();
 
         // If it's a new entry (0.0), you might want to show the order quantity as prefix
-        holder.acceptedQtyET.setText(String.valueOf(currentAccepted > 0 ? currentAccepted : purchaseOrderItem.getOrderQuantity()));
+        holder.orderQtyET.setText(String.valueOf(currentAccepted > 0 ? currentAccepted : purchaseOrderItem.getOrderQuantity()));
 
         // 4. Color Logic Function
         Runnable applyColorLogic = () -> {
             try {
-                String input = holder.acceptedQtyET.getText().toString();
+                String input = holder.orderQtyET.getText().toString();
                 double accepted = input.isEmpty() ? 0.0 : Double.parseDouble(input);
                 double order = purchaseOrderItem.getOrderQuantity();
 
@@ -119,7 +119,7 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<S
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
         };
-        holder.acceptedQtyET.addTextChangedListener(holder.qtyTextWatcher);
+        holder.orderQtyET.addTextChangedListener(holder.qtyTextWatcher);
 
         // 6. Handle Sub-row Visibility (Verified Quantity)
         // If already verified in DB/Model, show it
@@ -130,13 +130,13 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<S
             holder.verifiedQtyLL.setVisibility(View.GONE);
         }
 
-        holder.acceptedQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
-        holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
-        holder.acceptedQtyOkButton.setTag(R.string.key_three, holder.verifiedQtyTV);
-        holder.acceptedQtyOkButton.setTag(R.string.key_four, holder.verifiedQtyLL);
-        holder.acceptedQtyOkButton.setTag(R.string.key_five, employeeCode);
-        holder.acceptedQtyOkButton.setTag(R.string.key_six, idVehicle);
-        holder.acceptedQtyOkButton.setOnClickListener(this);
+        holder.orderQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
+        holder.orderQtyOkButton.setTag(R.string.key_two,holder.orderQtyET);
+        holder.orderQtyOkButton.setTag(R.string.key_three, holder.verifiedQtyTV);
+        holder.orderQtyOkButton.setTag(R.string.key_four, holder.verifiedQtyLL);
+        holder.orderQtyOkButton.setTag(R.string.key_five, employeeCode);
+        holder.orderQtyOkButton.setTag(R.string.key_six, idVehicle);
+        holder.orderQtyOkButton.setOnClickListener(this);
 
     }
 
