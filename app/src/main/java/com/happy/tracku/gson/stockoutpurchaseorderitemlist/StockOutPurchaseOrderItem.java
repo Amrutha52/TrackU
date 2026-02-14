@@ -48,11 +48,30 @@ public class StockOutPurchaseOrderItem {
     @Expose
     private String idStatus;
 
-
-
     @SerializedName("StockOutQuantity")
     @Expose
     private double stockoutQuantity;
+
+    @SerializedName("unit")
+    @Expose
+    private String unit;
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public double getStockoutQuantity() {
+        return stockoutQuantity;
+    }
+
+    public void setStockoutQuantity(double stockoutQuantity) {
+        this.stockoutQuantity = stockoutQuantity;
+    }
+
+
 
     public String getVendorName() {
         return vendorName;

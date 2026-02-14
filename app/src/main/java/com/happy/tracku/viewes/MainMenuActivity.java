@@ -919,6 +919,7 @@ public class MainMenuActivity extends AppCompatActivity {
         boolean exceptionOccured = false,timeOutExceptionOccured = false;
         String inputAndOutputJson = "";
         Validateloginresponsejson loginStatusJson;
+        DbHelper dbHelper;
         public LoginTaskForVersionCheck(MainMenuActivity mContext, String userNameString, String passwordString)
         {
             this.mContext = mContext;
@@ -934,6 +935,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
             pd = new ProgressDialog(mContext);
             shp = mContext.getSharedPreferences(Const.Shared_Pref_name, MODE_PRIVATE);
+            dbHelper = new DbHelper(mContext);
 
 
             pd.setTitle("Please wait");
@@ -1092,6 +1094,10 @@ public class MainMenuActivity extends AppCompatActivity {
 
             if (s.equals("success"))
             {
+                dbHelper.deleteLoginVehicleData();
+                dbHelper.deleteLoginEmployeeData();
+                dbHelper.insertValidateMasterData(loginStatusJson);
+
                 Toast.makeText(mContext, "Success ", Toast.LENGTH_LONG).show();
 
             }

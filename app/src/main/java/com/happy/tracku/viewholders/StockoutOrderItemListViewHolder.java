@@ -15,7 +15,7 @@ import com.happy.tracku.R;
 
 public class StockoutOrderItemListViewHolder extends RecyclerView.ViewHolder
 {
-    public TextView itemTV, orderQtyTV, rackNoTV, rateTV, floorNoTV, verifiedQtyTV;
+    public TextView itemTV, orderQtyTV, rackNoTV, rateTV, floorNoTV, verifiedQtyTV, unitTv;
     public TextInputEditText orderQtyET;
     public Button orderQtyOkButton;
     public LinearLayout verifiedQtyLL;
@@ -26,15 +26,17 @@ public class StockoutOrderItemListViewHolder extends RecyclerView.ViewHolder
         super(itemView);
         itemTV = itemView.findViewById(R.id.itemTV);
         orderQtyTV = itemView.findViewById(R.id.orderQtyTV);
-        rackNoTV = itemView.findViewById(R.id.rackNoTV);
+       // rackNoTV = itemView.findViewById(R.id.rackNoTV);
         rateTV = itemView.findViewById(R.id.rateTV);
-        floorNoTV = itemView.findViewById(R.id.floorNoTV);
+       // floorNoTV = itemView.findViewById(R.id.floorNoTV);
         orderQtyET = itemView.findViewById(R.id.orderQtyET);
         orderQtyOkButton = itemView.findViewById(R.id.orderQtyOkButton);
         verifiedQtyTV = itemView.findViewById(R.id.verifiQtyTV);
         verifiedQtyLL = itemView.findViewById(R.id.verifiedQtyLL);
         employeeCodeMATV = itemView.findViewById(R.id.employeecodeMATV);
         vehicleMATV = itemView.findViewById(R.id.vehicleModelMATV);
+        unitTv = itemView.findViewById(R.id.unitTV);
+
 
     }
 }

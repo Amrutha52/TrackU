@@ -69,7 +69,7 @@ public class StockoutPurchaseOrderItemListAdapter extends RecyclerView.Adapter<S
 
         holder.itemTV.setText(purchaseOrderItem.getItemName());
         holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());
-
+        holder.unitTv.setText(purchaseOrderItem.getUnit());
         holder.rateTV.setText(purchaseOrderItem.getTotalAmount().toString());
 
 
