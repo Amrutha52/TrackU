@@ -92,7 +92,7 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
     MaterialAutoCompleteTextView employeeCodeMATV, vehicleModelMATV;
     List<ValidateLoginResponseEmployeeDatum> employeeMasterDetailList;
     List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
-    int employeeCode, idVehicle;
+    int employeeCode = 0, idVehicle=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
