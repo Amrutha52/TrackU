@@ -41,9 +41,9 @@ public class StockOutPurchaseOrderItem {
     @SerializedName("orderQuantity")
     @Expose
     private Double orderQuantity;
-    @SerializedName("idSalesHeader")
+    @SerializedName("idSalesDetails")
     @Expose
-    private Integer idSalesHeader;
+    private Integer idSalesDetails;
     @SerializedName("idStatus")
     @Expose
     private String idStatus;
@@ -169,12 +169,12 @@ public class StockOutPurchaseOrderItem {
         this.orderQuantity = orderQuantity;
     }
 
-    public Integer getIdSalesHeader() {
-        return idSalesHeader;
+    public Integer getIdSalesDetails() {
+        return idSalesDetails;
     }
 
-    public void setIdSalesHeader(Integer idSalesHeader) {
-        this.idSalesHeader = idSalesHeader;
+    public void setIdSalesDetails(Integer idSalesDetails) {
+        this.idSalesDetails = idSalesDetails;
     }
 
     public String getIdStatus() {

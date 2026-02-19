@@ -34,7 +34,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 10;
+    public static final int DATABASE_VERSION = 11;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -46,6 +46,7 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String DELIVERY_PENDING_DETAILS_TABLE = "DeliveryPending";
     public static final String VALIDATE_LOGIN_EMPLOYEE_DATA = "ValidateLoginEmployeeData";
     public static final String VALIDATE_LOGIN_VEHICLE_DATA = "ValidateLoginVehicleData";
+    public static final String SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW = "SaveStockOutPurchaseDetailsNew";
 
     private SharedPreferences shp;
     private Context context;
@@ -78,6 +79,8 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_EMPLOYEE_DATA+" (employeeCode INTEGER,employeeName TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_VEHICLE_DATA+" (idVehicle INTEGER, vehicleNumber TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idSalesDetails INTEGER,orderQuantity DOUBLE, rackNumber TEXT, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
 
     }
 
@@ -138,6 +141,12 @@ public class DbHelper extends SQLiteOpenHelper
             db.execSQL("ALTER TABLE " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " ADD idVehicle INTEGER") ;
 
         }
+        if (oldVersion <= 11)
+        {
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idSalesDetails INTEGER,orderQuantity DOUBLE, rackNumber TEXT, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
+
+        }
+
         onCreate(db);
     }
 
@@ -446,10 +455,10 @@ public class DbHelper extends SQLiteOpenHelper
             ContentValues cv = new ContentValues();
             cv.put("idItem",stockOutPurchaseOrderItem.getIdItem());
             cv.put("idUnit",stockOutPurchaseOrderItem.getIdUnit());
-            cv.put("idPurchaseOrder",stockOutPurchaseOrderItem.getIdSalesHeader());
+            cv.put("idSalesDetails",stockOutPurchaseOrderItem.getIdSalesDetails());
             cv.put("Item",stockOutPurchaseOrderItem.getItemName());
-            cv.put("OrderQty",stockOutPurchaseOrderItem.getOrderQuantity());
-            cv.put("RackNo",stockOutPurchaseOrderItem.getRackNumber());
+            cv.put("orderQuantity",stockOutPurchaseOrderItem.getOrderQuantity());
+            cv.put("rackNumber",stockOutPurchaseOrderItem.getRackNumber());
             cv.put("Rate",stockOutPurchaseOrderItem.getTotalAmount());
             cv.put("FloorNo",stockOutPurchaseOrderItem.getFloor());
             cv.put("StockOutQuantity",stockOutPurchaseOrderItem.getStockOutQuantity());
@@ -457,7 +466,7 @@ public class DbHelper extends SQLiteOpenHelper
 
 
             Log.e("Log", "stockoutpurchaseOrderItemList" + stockOutPurchaseOrderItemList);
-            db.insert(SAVE_STOCKOUT_PURCHASE_ORDER_TABLE, null, cv);
+            db.insert(SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW, null, cv);
 
         }
         //db.close();
@@ -467,7 +476,7 @@ public class DbHelper extends SQLiteOpenHelper
     public void deleteStockOutRequest()
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DELETE FROM " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE);
+        db.execSQL("DELETE FROM " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW);
     }
 
     public void updateStockOutQuantity(Integer idItem, double stockOutQuantity, int employeeCode, int idVehicle)
@@ -476,7 +485,7 @@ public class DbHelper extends SQLiteOpenHelper
         Log.e("Log", "stockoutQtyDB" + stockOutQuantity);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set StockOutQuantity="+stockOutQuantity+", employeeCode = "+employeeCode+", idVehicle = "+idVehicle+" where idItem='" + idItem + "'");
+        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW+" set StockOutQuantity="+stockOutQuantity+", employeeCode = "+employeeCode+", idVehicle = "+idVehicle+" where idItem='" + idItem + "'");
 
 
     }
@@ -487,11 +496,11 @@ public class DbHelper extends SQLiteOpenHelper
         Log.e("Log", "idItemstockoutQtyDB" + idItem);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" set IsVerified = 1 where idItem='" + idItem + "'");
+        db.execSQL("update "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW+" set IsVerified = 1 where idItem='" + idItem + "'");
 
 
     }
-    public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idPurchaseOrder, String fileName, String base64, Integer companyValue, int employeeCode, int idVehicle)
+    public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idSalesDetails, String fileName, String base64, Integer companyValue, int employeeCode, int idVehicle)
     {
         JSONObject finalJson = new JSONObject();
         JSONArray dataArray = new JSONArray();
@@ -499,7 +508,7 @@ public class DbHelper extends SQLiteOpenHelper
 
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor cur = db.rawQuery("select * from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE +" where idPurchaseOrder="+idPurchaseOrder+" and CreatedBy="+createdBy,null);
+            Cursor cur = db.rawQuery("select * from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW +" where idSalesDetails="+idSalesDetails+" and CreatedBy="+createdBy,null);
 
             if(cur.getCount() > 0)
             {
@@ -512,7 +521,7 @@ public class DbHelper extends SQLiteOpenHelper
                     singleDataObj.put("idItem",cur.getInt(cur.getColumnIndex("idItem")));
                     singleDataObj.put("idUnit",cur.getInt(cur.getColumnIndex("idUnit")));
                     singleDataObj.put("Quantity",cur.getInt(cur.getColumnIndex("StockOutQuantity")));
-                    singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idPurchaseOrder")));
+                    singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idSalesDetails")));
                     singleDataObj.put("employeeCode",cur.getInt(cur.getColumnIndex("employeeCode")));
                     singleDataObj.put("idVehicle",cur.getInt(cur.getColumnIndex("idVehicle")));
 
@@ -721,7 +730,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE + " where IsVerified IS NULL", null);
+        Cursor cur = db.rawQuery("select COUNT(*) from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW + " where IsVerified IS NULL", null);
 
         if (cur.getCount() > 0)
         {

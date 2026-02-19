@@ -71,7 +71,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 {
     private ActivityStockOutPurchaseOrderItemListBinding binding;
     Intent intent;
-    Integer idPurchaseOrder, companyValue;
+    int idPurchaseOrder, companyValue;
     DbHelper dbHelper;
 
     /**
@@ -94,6 +94,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
     List<ValidateLoginResponseEmployeeDatum> employeeMasterDetailList;
     List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
     int employeeCode, idVehicle;
+    int pulledIdSalesDetails;
+    StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -274,6 +276,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         {
             case R.id.complete_save_button:
             {
+
                 int count = dbHelper.getPendingStockOutPurchaseOrder();
                 Log.e("Log", "count" + count);
                 if(count > 0)
@@ -354,7 +357,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                         fileName = idPurchaseOrder + "_" + System.currentTimeMillis() + ".jpg";
                         base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     }
-                    new PushStockOutRequest(this, idPurchaseOrder, fileName, base64, companyValue, employeeCode, idVehicle).execute();
+                    new PushStockOutRequest(this, pulledIdSalesDetails, fileName, base64, companyValue, employeeCode, idVehicle).execute();
                 }
 
 
@@ -458,7 +461,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         String url;
         SharedPreferences shp;
         StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson;
-        int idPurchaseOrder, companyValue;
+        int idPurchaseOrder, companyValue, pulledIdPurchaseOrder;
 
         DbHelper dbHelper;
 
@@ -467,6 +470,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
             this.companyValue = companyValue;
+            //this.pulledIdPurchaseOrder = pulledIdPurchaseOrder;
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
 
@@ -560,6 +564,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             if (s.equals("success"))
             {
 
+                context.get().getPulledDetails(stockOutPurchaseOrderItemListJson);
+                Log.e("Log","pulledPurchaseOrder" + pulledIdPurchaseOrder);
                 RecyclerView purchaseOrderItemListRecyclerview = context.get().findViewById(R.id.purchaseorderitemlistrecyclerview);
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context.get());
                 purchaseOrderItemListRecyclerview.setLayoutManager(layoutManager);
@@ -582,6 +588,15 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             }
             pd.dismiss();
         }
+
+    }
+
+    private void getPulledDetails(StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson)
+    {
+        this.stockOutPurchaseOrderItemListJson = stockOutPurchaseOrderItemListJson;
+
+        pulledIdSalesDetails = stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdSalesDetails();
+
     }
 
     private static class PushStockOutRequest extends AsyncTask<String, String, String>
@@ -596,23 +611,23 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         DbHelper dbHelper;
         StockOutSendPurchaseRequestJson stockOutSendPurchaseRequestJson;
         String message, fileName, base64;
-        int idPurchaseOrder;
+        int pulledIdSalesDetails;
         int status;
         Integer companyValue;
 
         int employeeCode, idVehicle;
 
-        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, Integer idPurchaseOrder, String fileName, String base64, Integer companyValue, int employeeCode, int idVehicle)
+        public PushStockOutRequest(StockOutPurchaseOrderItemListActivity context, int pulledIdSalesDetails, String fileName, String base64, Integer companyValue, int employeeCode, int idVehicle)
         {
             this.context = new WeakReference<>(context);
-            this.idPurchaseOrder = idPurchaseOrder;
+            this.pulledIdSalesDetails = pulledIdSalesDetails;
             this.fileName = fileName;
             this.base64 = base64;
             this.companyValue = companyValue;
             this.employeeCode = employeeCode;
             this.idVehicle = idVehicle;
 
-
+            Log.e("Log", "pulledIdSalesDetailsPush" + pulledIdSalesDetails);
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
 
             dbHelper = new DbHelper(context);
@@ -644,7 +659,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, idPurchaseOrder, fileName, base64, companyValue, employeeCode, idVehicle);
+                JSONObject pushDataObj = dbHelper.getSendStockoutRequest(shp.getString(Const.Shp_Employee_Code,""), 1, pulledIdSalesDetails, fileName, base64, companyValue, employeeCode, idVehicle);
                // pushDataObj.put("fileName", fileName);
                // pushDataObj.put("customerPhoto", base64);
 

@@ -139,7 +139,7 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
                         {
 
                             filteredList.add(row);
-                            Log.e("Log", "filteredList" + filteredList);
+                            //Log.e("Log", "filteredList" + filteredList);
                         }
 
                     }
@@ -150,7 +150,7 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
 
                 FilterResults filterResults = new FilterResults();
                 filterResults.values = filteredList;//stockOutPurchaseOrderFilterList;
-                Log.e("Log", "filterResults" + filterResults.toString());
+                //Log.e("Log", "filterResults" + filterResults.toString());
                 return filterResults;
             }
 
