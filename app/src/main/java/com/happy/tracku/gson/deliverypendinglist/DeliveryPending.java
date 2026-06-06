@@ -38,6 +38,17 @@ public class DeliveryPending {
     @Expose
     private boolean isCashSale;
 
+    @SerializedName("paymentType")
+    @Expose
+    private int paymentType;
+
+    public int getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentTypeId(int paymentType) {
+        this.paymentType = paymentType;
+    }
     public int getAssignedEmployee() {
         return assignedEmployee;
     }

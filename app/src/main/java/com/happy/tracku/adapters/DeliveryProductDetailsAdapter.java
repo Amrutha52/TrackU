@@ -1,10 +1,15 @@
 package com.happy.tracku.adapters;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
 import androidx.annotation.NonNull;
@@ -12,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.happy.tracku.R;
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPending;
+import com.happy.tracku.models.PaymentType;
 import com.happy.tracku.viewes.DeliveryProductDetailsActivity;
 import com.happy.tracku.viewholders.DeliveryProductDetailsViewHolder;
 import com.happy.tracku.viewholders.DeliveryProductStatusViewHolder;
@@ -53,6 +59,60 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
         holder.amountTV.setText(deliveryPending.getGrandTotal().toString());
         holder.itemNameTV.setText(deliveryPending.getItemName());
         holder.quantityET.setText(deliveryPending.getQuantity().toString());
+
+//        if (deliveryPending.getIsCashSale() == true)
+//        {
+//            holder.paymentTypeLL.setVisibility(VISIBLE);
+//        }
+//        else
+//        {
+//            holder.paymentTypeLL.setVisibility(INVISIBLE);
+//        }
+
+
+
+        List<PaymentType> paymentTypes = new ArrayList<>();
+        paymentTypes.add(new PaymentType("Select", 0));
+        paymentTypes.add(new PaymentType("Cash", 1));
+        paymentTypes.add(new PaymentType("Credit", 2));
+
+        ArrayAdapter<PaymentType> adapter = new ArrayAdapter<>(
+                context,
+                android.R.layout.simple_spinner_item,
+                paymentTypes);
+
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+
+        holder.paymentTypeSpinner.setAdapter(adapter);
+
+        holder.paymentTypeSpinner.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent,
+                                               View view,
+                                               int position,
+                                               long id) {
+
+                        PaymentType selectedPaymentType =
+                                (PaymentType) parent.getItemAtPosition(position);
+
+
+                        int paymentId = selectedPaymentType.getValue();
+
+                        // Do something with the selected value
+                        Log.d("Spinner",
+                                ", ID: " + paymentId);
+
+
+                         deliveryPending.setPaymentTypeId(paymentId);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+
     }
 
 

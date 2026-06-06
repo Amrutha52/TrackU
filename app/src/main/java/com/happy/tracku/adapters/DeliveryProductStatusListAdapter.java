@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Spinner;
@@ -63,30 +64,7 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
         holder.invoiceNumberTV.setText(deliveryPending.getInvoiceNumber());
         holder.amountTV.setText(deliveryPending.getGrandTotal().toString());
 
-//        if (deliveryPending.getIsCashSale() == true)
-//        {
-//            holder.paymentTypeLL.setVisibility(VISIBLE);
-//        }
-//        else
-//        {
-//            holder.paymentTypeLL.setVisibility(INVISIBLE);
-//        }
 
-
-
-        List<PaymentType> paymentTypes = new ArrayList<>();
-        paymentTypes.add(new PaymentType("Cash", 1));
-        paymentTypes.add(new PaymentType("Credit", 2));
-
-        ArrayAdapter<PaymentType> adapter = new ArrayAdapter<>(
-                context,
-                android.R.layout.simple_spinner_item,
-                paymentTypes);
-
-        adapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-
-        holder.paymentTypeSpinner.setAdapter(adapter);
 
         holder.detailsTV.setTag(R.string.key_one,deliveryPending.getIdSalesHeader());
         holder.detailsTV.setOnClickListener(this);
