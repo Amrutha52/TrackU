@@ -34,7 +34,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 11;
+    public static final int DATABASE_VERSION = 12;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -74,7 +74,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+UNIT_MASTER+" (idUnit INTEGER,unitName TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+DELIVERY_PENDING_DETAILS_TABLE+" (idSalesHeader INTEGER,vendorName TEXT, salesDate TEXT, grandTotal DOUBLE,itemName TEXT, quantity DOUBLE, idSalesDetails INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+DELIVERY_PENDING_DETAILS_TABLE+" (idSalesHeader INTEGER,vendorName TEXT, salesDate TEXT, grandTotal DOUBLE,itemName TEXT, quantity DOUBLE, idSalesDetails INTEGER, idPaymentType INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_EMPLOYEE_DATA+" (employeeCode INTEGER,employeeName TEXT)");
 
@@ -145,6 +145,10 @@ public class DbHelper extends SQLiteOpenHelper
         {
             db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idSalesDetails INTEGER,orderQuantity DOUBLE, rackNumber TEXT, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
 
+        }
+        if (oldVersion <= 12)
+        {
+            db.execSQL("ALTER TABLE " + DELIVERY_PENDING_DETAILS_TABLE + " ADD idPaymentType INTEGER");
         }
 
         onCreate(db);
@@ -780,7 +784,7 @@ public class DbHelper extends SQLiteOpenHelper
 
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor cur = db.rawQuery("select idSalesDetails, quantity from "+ DELIVERY_PENDING_DETAILS_TABLE +" where idSalesHeader="+idSalesHeader,null);
+            Cursor cur = db.rawQuery("select idSalesDetails, quantity, idPaymentType from "+ DELIVERY_PENDING_DETAILS_TABLE +" where idSalesHeader="+idSalesHeader,null);
 
             if(cur.getCount() > 0)
             {
@@ -792,6 +796,7 @@ public class DbHelper extends SQLiteOpenHelper
                     JSONObject singleDataObj = new JSONObject();
                     singleDataObj.put("idDetail",cur.getInt(cur.getColumnIndex("idSalesDetails")));
                     singleDataObj.put("deliveredQty",cur.getDouble(cur.getColumnIndex("quantity")));
+                    singleDataObj.put("idPaymentMode",cur.getInt(cur.getColumnIndex("idPaymentType")));
 
                     dataArray.put(singleDataObj);
 
@@ -958,4 +963,15 @@ public class DbHelper extends SQLiteOpenHelper
         return validateLoginResponseVehicleArrayList;
     }
 
+
+    public void updateDeliveryPaymentType(int idSalesHeader, int idPaymentType)
+    {
+        Log.e("Log", "updateDeliveryPaymentType");
+        Log.e("Log", "idSalesHeaderDB" + idSalesHeader);
+        Log.e("Log", "idPaymentTypeDB" + idPaymentType);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("update " + DELIVERY_PENDING_DETAILS_TABLE + " set idPaymentType="+idPaymentType+" where idSalesHeader='" + idSalesHeader + "'");
+
+    }
 }

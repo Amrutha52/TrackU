@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.happy.tracku.R;
+import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPending;
 import com.happy.tracku.models.PaymentType;
 import com.happy.tracku.viewes.DeliveryProductDetailsActivity;
@@ -31,12 +32,15 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
     Context context;
     List<DeliveryPending> deliveryPendingList;
     List<DeliveryPending> deliveryPendingFilterList;
+    DbHelper dbHelper;
     public DeliveryProductDetailsAdapter(DeliveryProductDetailsActivity context, List<DeliveryPending> deliveryPendingList)
     {
         this.context = context;
         this.deliveryPendingList = deliveryPendingList;
         this.deliveryPendingFilterList = new ArrayList<>(deliveryPendingList);//deliveryPendingList;
         Log.e("Log", "deliveryPendingList" + deliveryPendingList);
+
+        dbHelper = new DbHelper(context);
     }
 
     @NonNull
@@ -68,7 +72,6 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
 //        {
 //            holder.paymentTypeLL.setVisibility(INVISIBLE);
 //        }
-
 
 
         List<PaymentType> paymentTypes = new ArrayList<>();
@@ -105,6 +108,7 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
                                 ", ID: " + paymentId);
 
 
+                        dbHelper.updateDeliveryPaymentType(deliveryPending.getIdSalesHeader(), paymentId);
                          deliveryPending.setPaymentTypeId(paymentId);
                     }
 
