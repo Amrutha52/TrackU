@@ -1,6 +1,8 @@
 package com.happy.tracku.viewholders;
 
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +13,8 @@ import com.happy.tracku.R;
 public class DeliveryProductStatusViewHolder extends RecyclerView.ViewHolder
 {
     public TextView vendorNameTV, dateTV, amountTV, detailsTV,invoiceNumberTV;
+    public Spinner paymentTypeSpinner;
+    public LinearLayout paymentTypeLL;
     public DeliveryProductStatusViewHolder(@NonNull View itemView)
     {
         super(itemView);
@@ -19,5 +23,7 @@ public class DeliveryProductStatusViewHolder extends RecyclerView.ViewHolder
         amountTV = itemView.findViewById(R.id.amountTV);
         detailsTV = itemView.findViewById(R.id.detailsTV);
         invoiceNumberTV = itemView.findViewById(R.id.invoiceNumberTV);
+        paymentTypeSpinner = itemView.findViewById(R.id.paymentTypeSpinner);
+        paymentTypeLL = itemView.findViewById(R.id.paymentTypeLL);
     }
 }

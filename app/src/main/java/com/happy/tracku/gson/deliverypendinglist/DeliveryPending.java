@@ -30,6 +30,31 @@ public class DeliveryPending {
     @SerializedName("invoiceNumber")
     @Expose
     private String invoiceNumber;
+    @SerializedName("assignedEmployee")
+    @Expose
+    private int assignedEmployee;
+
+    @SerializedName("isCashSale")
+    @Expose
+    private boolean isCashSale;
+
+    public int getAssignedEmployee() {
+        return assignedEmployee;
+    }
+
+    public void setAssignedEmployee(int assignedEmployee) {
+        this.assignedEmployee = assignedEmployee;
+    }
+
+    public boolean getIsCashSale() {
+        return isCashSale;
+    }
+
+    public void setCashSale(boolean cashSale) {
+        isCashSale = cashSale;
+    }
+
+
 
     public Integer getIdSalesHeader() {
         return idSalesHeader;

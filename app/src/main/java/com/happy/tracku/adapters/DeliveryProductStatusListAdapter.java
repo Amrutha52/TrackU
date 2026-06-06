@@ -1,12 +1,17 @@
 package com.happy.tracku.adapters;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Filter;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,12 +20,14 @@ import com.happy.tracku.R;
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPending;
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPendingListJson;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
+import com.happy.tracku.models.PaymentType;
 import com.happy.tracku.viewes.DeliveryProductDetailsActivity;
 import com.happy.tracku.viewes.DeliveryStatusActivity;
 import com.happy.tracku.viewholders.DeliveryProductStatusViewHolder;
 import com.happy.tracku.viewholders.PurchaseOrderItemListViewHolder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,6 +62,31 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
         holder.dateTV.setText(deliveryPending.getSalesDate());
         holder.invoiceNumberTV.setText(deliveryPending.getInvoiceNumber());
         holder.amountTV.setText(deliveryPending.getGrandTotal().toString());
+
+//        if (deliveryPending.getIsCashSale() == true)
+//        {
+//            holder.paymentTypeLL.setVisibility(VISIBLE);
+//        }
+//        else
+//        {
+//            holder.paymentTypeLL.setVisibility(INVISIBLE);
+//        }
+
+
+
+        List<PaymentType> paymentTypes = new ArrayList<>();
+        paymentTypes.add(new PaymentType("Cash", 1));
+        paymentTypes.add(new PaymentType("Credit", 2));
+
+        ArrayAdapter<PaymentType> adapter = new ArrayAdapter<>(
+                context,
+                android.R.layout.simple_spinner_item,
+                paymentTypes);
+
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+
+        holder.paymentTypeSpinner.setAdapter(adapter);
 
         holder.detailsTV.setTag(R.string.key_one,deliveryPending.getIdSalesHeader());
         holder.detailsTV.setOnClickListener(this);
