@@ -1,7 +1,8 @@
 package com.happy.tracku.viewes;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static com.happy.tracku.utils.Const.URL_GET_DELIVERY_PENDING;
-import static com.happy.tracku.utils.Const.URL_SEND_PURCHASE_REQUEST;
 import static com.happy.tracku.utils.Const.URL_UPDATE_DELIVERY_STATUS;
 
 import android.app.ProgressDialog;
@@ -17,13 +18,16 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -33,13 +37,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.happy.tracku.R;
 import com.happy.tracku.adapters.DeliveryProductDetailsAdapter;
-import com.happy.tracku.adapters.DeliveryProductStatusListAdapter;
 import com.happy.tracku.databinding.ActivityDeliveryProductDetailsBinding;
-import com.happy.tracku.databinding.ActivityDeliveryStatusBinding;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPendingListJson;
-import com.happy.tracku.gson.sendpurchaserequest.SendPurchaseRequestStatusJson;
 import com.happy.tracku.gson.updatedeliverystatus.UpdateDeliveryStatusJson;
+import com.happy.tracku.models.PaymentType;
 import com.happy.tracku.ssl.CustomTrust;
 import com.happy.tracku.utils.Const;
 import com.happy.tracku.utils.Fns;
@@ -47,6 +49,8 @@ import com.happy.tracku.utils.Fns;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -59,6 +63,10 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
     private ActivityDeliveryProductDetailsBinding binding;
     Intent intent;
     int idSalesHeader;
+    LinearLayout paymentTypeLL;
+    Spinner paymentModeSpinner;
+    boolean isCashSale;
+    int paymentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +94,60 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
 
         intent = getIntent();
         idSalesHeader = intent.getIntExtra("idSalesHeader", 0);
+        isCashSale = intent.getBooleanExtra("isCashSale", false);
+
+        paymentTypeLL = findViewById(R.id.paymentTypeLL);
+        paymentModeSpinner = findViewById(R.id.paymentTypeSpinner);
+
+//        if (isCashSale == true)
+//        {
+//            paymentTypeLL.setVisibility(VISIBLE);
+//        }
+//        else
+//        {
+//            paymentTypeLL.setVisibility(INVISIBLE);
+//        }
+
+        List<PaymentType> paymentTypes = new ArrayList<>();
+        paymentTypes.add(new PaymentType("Select", 0));
+        paymentTypes.add(new PaymentType("Cash", 1));
+        paymentTypes.add(new PaymentType("Credit", 2));
+
+        ArrayAdapter<PaymentType> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                paymentTypes);
+
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+
+        paymentModeSpinner.setAdapter(adapter);
+
+        paymentModeSpinner.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent,
+                                               View view,
+                                               int position,
+                                               long id) {
+
+                        PaymentType selectedPaymentType =
+                                (PaymentType) parent.getItemAtPosition(position);
+
+
+                        paymentId = selectedPaymentType.getValue();
+
+                        // Do something with the selected value
+                        Log.d("Spinner",
+                                ", ID: " + paymentId);
+
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
 
         new GetDeliveryPendingListFromIdSalesOrder(this, idSalesHeader).execute();
 
@@ -97,7 +159,7 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
         {
             case R.id.update_delivery_status:
             {
-                new UpdateDeliveryStatus(this, idSalesHeader).execute();
+                new UpdateDeliveryStatus(this, idSalesHeader,paymentId).execute();
             }
             break;
         }
@@ -273,11 +335,12 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
         DbHelper dbHelper;
         UpdateDeliveryStatusJson updateDeliveryStatusJson;
         String message, fileName, base64;
-        int idSalesHeader;
-        public UpdateDeliveryStatus(DeliveryProductDetailsActivity context, int idSalesHeader)
+        int idSalesHeader, paymentId;
+        public UpdateDeliveryStatus(DeliveryProductDetailsActivity context, int idSalesHeader, int paymentId)
         {
             this.context = new WeakReference<>(context);
             this.idSalesHeader = idSalesHeader;
+            this.paymentId = paymentId;
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
 
@@ -310,7 +373,7 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
             try {
 
 
-                JSONObject pushDataObj = dbHelper.getDeliveryPendingDetails(idSalesHeader,shp.getString(Const.Shp_Employee_Code,""));
+                JSONObject pushDataObj = dbHelper.getDeliveryPendingDetails(idSalesHeader,shp.getString(Const.Shp_Employee_Code,""), paymentId);
 
 
                 url = Const.USING_IP + URL_UPDATE_DELIVERY_STATUS;

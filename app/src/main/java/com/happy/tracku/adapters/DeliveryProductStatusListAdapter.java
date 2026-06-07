@@ -67,6 +67,7 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
 
 
         holder.detailsTV.setTag(R.string.key_one,deliveryPending.getIdSalesHeader());
+        holder.detailsTV.setTag(R.string.key_two, deliveryPending.getIsCashSale());
         holder.detailsTV.setOnClickListener(this);
 
     }
@@ -88,8 +89,11 @@ public class DeliveryProductStatusListAdapter extends RecyclerView.Adapter<Deliv
                 int idSalesHeader = (int) view.getTag(R.string.key_one);
                 Log.e("Log","idSalesHeader" + idSalesHeader);
 
+                boolean isCashSale = (boolean) view.getTag(R.string.key_two);
+
                 Intent intent = new Intent(context, DeliveryProductDetailsActivity.class);
                 intent.putExtra("idSalesHeader", idSalesHeader);
+                intent.putExtra("isCashSale", isCashSale);
                 context.startActivity(intent);
             }
             break;

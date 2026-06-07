@@ -775,7 +775,7 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("DELETE FROM " + DELIVERY_PENDING_DETAILS_TABLE);
     }
 
-    public JSONObject getDeliveryPendingDetails(int idSalesHeader, String createdBy)
+    public JSONObject getDeliveryPendingDetails(int idSalesHeader, String createdBy, int paymentId)
     {
         JSONObject finalJson = new JSONObject();
         JSONArray dataArray = new JSONArray();
@@ -784,7 +784,7 @@ public class DbHelper extends SQLiteOpenHelper
 
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor cur = db.rawQuery("select idSalesDetails, quantity, idPaymentType from "+ DELIVERY_PENDING_DETAILS_TABLE +" where idSalesHeader="+idSalesHeader,null);
+            Cursor cur = db.rawQuery("select idSalesDetails, quantity from "+ DELIVERY_PENDING_DETAILS_TABLE +" where idSalesHeader="+idSalesHeader,null);
 
             if(cur.getCount() > 0)
             {
@@ -796,7 +796,7 @@ public class DbHelper extends SQLiteOpenHelper
                     JSONObject singleDataObj = new JSONObject();
                     singleDataObj.put("idDetail",cur.getInt(cur.getColumnIndex("idSalesDetails")));
                     singleDataObj.put("deliveredQty",cur.getDouble(cur.getColumnIndex("quantity")));
-                    singleDataObj.put("idPaymentMode",cur.getInt(cur.getColumnIndex("idPaymentType")));
+                    //singleDataObj.put("idPaymentMode",cur.getInt(cur.getColumnIndex("idPaymentType")));
 
                     dataArray.put(singleDataObj);
 
@@ -811,6 +811,7 @@ public class DbHelper extends SQLiteOpenHelper
             finalJson.put("createdBy", createdBy);
             finalJson.put("id", idSalesHeader);
             finalJson.put("action", 1);
+            finalJson.put("idPaymentMode", paymentId);
             finalJson.put("deliveryDetails",dataArray);
             Log.e("Log", "finalJsonDBDel"+finalJson);
             Log.e("Log", "dataarrayDel"+dataArray);

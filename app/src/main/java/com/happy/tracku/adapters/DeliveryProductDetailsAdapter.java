@@ -64,58 +64,9 @@ public class DeliveryProductDetailsAdapter extends RecyclerView.Adapter<Delivery
         holder.itemNameTV.setText(deliveryPending.getItemName());
         holder.quantityET.setText(deliveryPending.getQuantity().toString());
 
-//        if (deliveryPending.getIsCashSale() == true)
-//        {
-//            holder.paymentTypeLL.setVisibility(VISIBLE);
-//        }
-//        else
-//        {
-//            holder.paymentTypeLL.setVisibility(INVISIBLE);
-//        }
 
 
-        List<PaymentType> paymentTypes = new ArrayList<>();
-        paymentTypes.add(new PaymentType("Select", 0));
-        paymentTypes.add(new PaymentType("Cash", 1));
-        paymentTypes.add(new PaymentType("Credit", 2));
 
-        ArrayAdapter<PaymentType> adapter = new ArrayAdapter<>(
-                context,
-                android.R.layout.simple_spinner_item,
-                paymentTypes);
-
-        adapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-
-        holder.paymentTypeSpinner.setAdapter(adapter);
-
-        holder.paymentTypeSpinner.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent,
-                                               View view,
-                                               int position,
-                                               long id) {
-
-                        PaymentType selectedPaymentType =
-                                (PaymentType) parent.getItemAtPosition(position);
-
-
-                        int paymentId = selectedPaymentType.getValue();
-
-                        // Do something with the selected value
-                        Log.d("Spinner",
-                                ", ID: " + paymentId);
-
-
-                        dbHelper.updateDeliveryPaymentType(deliveryPending.getIdSalesHeader(), paymentId);
-                         deliveryPending.setPaymentTypeId(paymentId);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
 
     }
 
