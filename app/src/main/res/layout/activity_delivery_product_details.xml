@@ -48,6 +48,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left"
+                android:textColor="@color/red_button"
+                android:textStyle="bold"
                 android:text="Payment Type"
                 android:layout_gravity="center_vertical"/>
 

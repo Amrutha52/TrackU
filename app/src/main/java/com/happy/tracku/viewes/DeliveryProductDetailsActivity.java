@@ -62,11 +62,12 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
 {
     private ActivityDeliveryProductDetailsBinding binding;
     Intent intent;
-    int idSalesHeader;
+    int idSalesHeader, idDetailsSalesHeader = 0;
     LinearLayout paymentTypeLL;
     Spinner paymentModeSpinner;
     boolean isCashSale;
     int paymentId;
+    DeliveryPendingListJson deliveryPendingListJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,14 +100,14 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
         paymentTypeLL = findViewById(R.id.paymentTypeLL);
         paymentModeSpinner = findViewById(R.id.paymentTypeSpinner);
 
-//        if (isCashSale == true)
-//        {
-//            paymentTypeLL.setVisibility(VISIBLE);
-//        }
-//        else
-//        {
-//            paymentTypeLL.setVisibility(INVISIBLE);
-//        }
+        if (isCashSale == true)
+        {
+            paymentTypeLL.setVisibility(VISIBLE);
+        }
+        else
+        {
+            paymentTypeLL.setVisibility(INVISIBLE);
+        }
 
         List<PaymentType> paymentTypes = new ArrayList<>();
         paymentTypes.add(new PaymentType("Select", 0));
@@ -149,7 +150,7 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
                     }
                 });
 
-        new GetDeliveryPendingListFromIdSalesOrder(this, idSalesHeader).execute();
+        new GetDeliveryPendingListFromIdSalesOrder(this, idSalesHeader, idDetailsSalesHeader).execute();
 
     }
 
@@ -159,7 +160,8 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
         {
             case R.id.update_delivery_status:
             {
-                new UpdateDeliveryStatus(this, idSalesHeader,paymentId).execute();
+                Log.e("Log", "idDetailsSalesHeaderUpdate" + idDetailsSalesHeader);
+                new UpdateDeliveryStatus(this, idDetailsSalesHeader,paymentId).execute();
             }
             break;
         }
@@ -175,13 +177,14 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
         String url;
         SharedPreferences shp;
         DeliveryPendingListJson deliveryPendingListJson;
-        int idSalesHeader;
+        int idSalesHeader, idDetailsSalesHeader;
         DbHelper dbHelper;
         SearchView searchByInvoiceNumber;
-        public GetDeliveryPendingListFromIdSalesOrder(DeliveryProductDetailsActivity context, int idSalesHeader)
+        public GetDeliveryPendingListFromIdSalesOrder(DeliveryProductDetailsActivity context, int idSalesHeader, int idDetailsSalesHeader)
         {
             this.context = new WeakReference<>(context);
             this.idSalesHeader = idSalesHeader;
+            this.idDetailsSalesHeader = idDetailsSalesHeader;
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
 
@@ -271,6 +274,8 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
             if (s.equals("success"))
             {
 
+                context.get().setDetails(deliveryPendingListJson);
+
                 RecyclerView deliveryProductDetailsRecyclerview = context.get().findViewById(R.id.deliveryProductDetailsRecyclerview);
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context.get());
                 deliveryProductDetailsRecyclerview.setLayoutManager(layoutManager);
@@ -289,6 +294,7 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
                 searchByInvoiceNumber.setSearchableInfo(searchManager
                         .getSearchableInfo(context.get().getComponentName()));
                 searchByInvoiceNumber.setMaxWidth(Integer.MAX_VALUE);
+
 
                 searchByInvoiceNumber.setOnQueryTextListener(new SearchView.OnQueryTextListener()
                 {
@@ -321,6 +327,13 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
             }
             pd.dismiss();
         }
+    }
+
+    private void setDetails(DeliveryPendingListJson deliveryPendingListJson)
+    {
+        this.deliveryPendingListJson = deliveryPendingListJson;
+
+        idDetailsSalesHeader = deliveryPendingListJson.getData().getDeliveryPending().get(0).getIdSalesHeader();
     }
 
     private static class UpdateDeliveryStatus extends AsyncTask<String, String, String>
