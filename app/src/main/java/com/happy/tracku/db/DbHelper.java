@@ -35,7 +35,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 13;
+    public static final int DATABASE_VERSION = 14;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -66,7 +66,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+EMPLOYEE_MASTER+" (idEmployee INTEGER,employeeCode TEXT, employeeName TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, AcceptedQty Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, AcceptedQty Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER, idWareHouse INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idPurchaseOrder INTEGER,OrderQty INTEGER, RackNo INTEGER, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
 
@@ -158,7 +158,10 @@ public class DbHelper extends SQLiteOpenHelper
         {
             db.execSQL("CREATE TABLE IF NOT EXISTS "+WAREHOUSE_MASTER+" (idWarehouse INTEGER,warehouse TEXT)");
         }
-
+        if (oldVersion <= 14)
+        {
+            db.execSQL("ALTER TABLE " + SAVE_PURCHASE_ORDER_TABLE + " ADD idWareHouse INTEGER");
+        }
         onCreate(db);
     }
 
@@ -424,7 +427,7 @@ public class DbHelper extends SQLiteOpenHelper
                     singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idPurchaseOrder")));
                     singleDataObj.put("employeeCode",cur.getInt(cur.getColumnIndex("employeeCode")));
                     singleDataObj.put("idVehicle",cur.getInt(cur.getColumnIndex("idVehicle")));
-
+                    singleDataObj.put("idWarehouse", cur.getInt(cur.getColumnIndex("idWareHouse")));
 
                     dataArray.put(singleDataObj);
 
@@ -1027,5 +1030,16 @@ public class DbHelper extends SQLiteOpenHelper
         }
 
         return wareHouseMasterDetailArrayList;
+    }
+
+    public void updateSelectedIDWareHouse(int idItem, int idWareHouse, int employeeCode)
+    {
+        Log.e("Log", "updateAcceptedQuantity");
+        Log.e("Log", "idWareHouseDB" + idWareHouse);
+        Log.e("Log", "idItemDB" + idItem);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("update " + SAVE_PURCHASE_ORDER_TABLE + " set idWareHouse="+idWareHouse+" where idItem='" + idItem + "'");
+
     }
 }

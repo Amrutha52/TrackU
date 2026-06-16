@@ -55,6 +55,19 @@ public class PurchaseOrderItem {
     @Expose
     private Integer idStatus;
 
+
+    private int selectedIDWareHouse;
+
+    public int getSelectedIDWareHouse()
+    {
+        return selectedIDWareHouse;
+    }
+
+    public void setSelectedIDWareHouse(int selectedIDWareHouse)
+    {
+        this.selectedIDWareHouse = selectedIDWareHouse;
+    }
+
     public String getVendorName() {
         return vendorName;
     }

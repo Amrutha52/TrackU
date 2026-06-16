@@ -70,7 +70,7 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
     @Override
     public void onBindViewHolder(@NonNull PurchaseOrderItemListViewHolder holder, int position)
     {
-        PurchaseOrderItem purchaseOrderItem = purchaseOrderItemList.get(position);
+
 
 //        employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
 //        Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
@@ -122,23 +122,17 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
 //            }
 //        });
 
+        PurchaseOrderItem purchaseOrderItem = purchaseOrderItemList.get(position);
         holder.itemTV.setText(purchaseOrderItem.getItemName());
         holder.orderQtyTV.setText(purchaseOrderItem.getOrderQuantity().toString());
         holder.rackNoTV.setText(purchaseOrderItem.getRackNumber().toString());
         holder.rateTV.setText(purchaseOrderItem.getTotalAmount().toString());
         holder.floorNoTV.setText(purchaseOrderItem.getFloor().toString());
 
-        holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getOrderQuantity()));
-
-        holder.acceptedQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
-        holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
-        holder.acceptedQtyOkButton.setTag(R.string.key_three, holder.verifiedQtyTV);
-        holder.acceptedQtyOkButton.setTag(R.string.key_four, holder.verifiedQtyLL);
-        holder.acceptedQtyOkButton.setTag(R.string.key_five, employeeCode);
-        holder.acceptedQtyOkButton.setTag(R.string.key_six, idVehicle);
-        holder.acceptedQtyOkButton.setOnClickListener(this);
+        String prefilledWarehouse = purchaseOrderItem.getWarehouse();
 
         holder.wareHouseSpinner.setText(purchaseOrderItem.getWarehouse());
+
 
         wareHouseMasterDetailList = dbHelper.getWareHouseMaster();
         Log.e("Log", "wareHouseMasterDetailList" + wareHouseMasterDetailList);
@@ -146,6 +140,17 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
         ArrayAdapter<WareHouseMasterDetail> adpterWareHouseMaster = new ArrayAdapter<WareHouseMasterDetail>(context, android.R.layout.simple_dropdown_item_1line, wareHouseMasterDetailList);
 
         holder.wareHouseSpinner.setAdapter(adpterWareHouseMaster);
+
+        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null) {
+            for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
+                if (prefilledWarehouse.equalsIgnoreCase(detail.getWarehouse())) {
+                    idWareHouse = detail.getIdWarehouse();
+                    Log.e("Log", "Default idWareHouse: " + idWareHouse);
+                    break;
+                }
+            }
+        }
+
 
         holder.wareHouseSpinner.setOnClickListener(new View.OnClickListener()
         {
@@ -162,9 +167,23 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
 
                 idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
                 Log.e("Log", "idWareHouse" + idWareHouse);
+                purchaseOrderItem.setSelectedIDWareHouse(idWareHouse);
 
             }
         });
+
+        holder.acceptedQtyET.setText(String.valueOf(purchaseOrderItem.getOrderQuantity()));
+
+        holder.acceptedQtyOkButton.setTag(R.string.key_one,purchaseOrderItem);
+        holder.acceptedQtyOkButton.setTag(R.string.key_two,holder.acceptedQtyET);
+        holder.acceptedQtyOkButton.setTag(R.string.key_three, holder.verifiedQtyTV);
+        holder.acceptedQtyOkButton.setTag(R.string.key_four, holder.verifiedQtyLL);
+        holder.acceptedQtyOkButton.setTag(R.string.key_five, employeeCode);
+        holder.acceptedQtyOkButton.setTag(R.string.key_six, idVehicle);
+        holder.acceptedQtyOkButton.setTag(R.string.key_seven, purchaseOrderItem.getSelectedIDWareHouse());
+        holder.acceptedQtyOkButton.setOnClickListener(this);
+
+
 
     }
 
@@ -188,6 +207,7 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
              LinearLayout verifiedQtyLL = (LinearLayout) view.getTag(R.string.key_four);
              int employeeCode = (Integer) view.getTag(R.string.key_five);
              int idVehicle = (Integer) view.getTag(R.string.key_six);
+             int idWareHouse = (int) view.getTag(R.string.key_seven);
 
              double acceptedQty = Double.parseDouble(acceptedQtyTextInput.getText().toString());
              Log.e("Log","acceptedQtyAdapter" + acceptedQty);
@@ -200,6 +220,7 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
 
                  dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty, employeeCode,idVehicle);
                  dbHelper.updateAcceptedQuantityVerified(purchaseOrderItem.getIdItem());
+                 dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
 
                  Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
 
