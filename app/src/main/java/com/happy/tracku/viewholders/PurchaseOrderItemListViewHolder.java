@@ -1,9 +1,11 @@
 package com.happy.tracku.viewholders;
 
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,6 +22,7 @@ public class PurchaseOrderItemListViewHolder extends RecyclerView.ViewHolder
     public Button acceptedQtyOkButton;
     public LinearLayout verifiedQtyLL;
     //public MaterialAutoCompleteTextView employeeCodeMATV, vehicleMATV;
+    public AutoCompleteTextView wareHouseSpinner;
     public PurchaseOrderItemListViewHolder(@NonNull View itemView)
     {
         super(itemView);
@@ -35,5 +38,6 @@ public class PurchaseOrderItemListViewHolder extends RecyclerView.ViewHolder
        // employeeCodeMATV = itemView.findViewById(R.id.employeecodeMATV);
         //vehicleMATV = itemView.findViewById(R.id.vehicleModelMATV);
 
+        wareHouseSpinner = itemView.findViewById(R.id.warehouseACTV);
     }
 }

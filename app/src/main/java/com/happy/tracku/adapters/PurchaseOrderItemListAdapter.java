@@ -23,6 +23,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.happy.tracku.R;
 import com.happy.tracku.db.DbHelper;
 import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
+import com.happy.tracku.gson.employeemasterdetails.WareHouseMasterDetail;
 import com.happy.tracku.gson.login.ValidateLoginResponseEmployeeDatum;
 import com.happy.tracku.gson.login.ValidateLoginResponseVehicle;
 import com.happy.tracku.gson.purchaseorderitemlist.PurchaseOrderItem;
@@ -46,6 +47,8 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
     List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
     DbHelper dbHelper;
     int employeeCode = 0, idVehicle=0;
+    List<WareHouseMasterDetail> wareHouseMasterDetailList;
+    int idWareHouse = 0;
     public PurchaseOrderItemListAdapter(PurchaseOrderItemListActivity context, List<PurchaseOrderItem> purchaseOrderItemList)
     {
         this.context = context;
@@ -134,6 +137,34 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
         holder.acceptedQtyOkButton.setTag(R.string.key_five, employeeCode);
         holder.acceptedQtyOkButton.setTag(R.string.key_six, idVehicle);
         holder.acceptedQtyOkButton.setOnClickListener(this);
+
+        holder.wareHouseSpinner.setText(purchaseOrderItem.getWarehouse());
+
+        wareHouseMasterDetailList = dbHelper.getWareHouseMaster();
+        Log.e("Log", "wareHouseMasterDetailList" + wareHouseMasterDetailList);
+
+        ArrayAdapter<WareHouseMasterDetail> adpterWareHouseMaster = new ArrayAdapter<WareHouseMasterDetail>(context, android.R.layout.simple_dropdown_item_1line, wareHouseMasterDetailList);
+
+        holder.wareHouseSpinner.setAdapter(adpterWareHouseMaster);
+
+        holder.wareHouseSpinner.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                holder.wareHouseSpinner.showDropDown();
+            }
+        });
+
+        holder.wareHouseSpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
+                Log.e("Log", "idWareHouse" + idWareHouse);
+
+            }
+        });
 
     }
 
