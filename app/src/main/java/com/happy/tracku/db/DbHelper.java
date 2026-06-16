@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.happy.tracku.gson.deliverypendinglist.DeliveryPending;
 import com.happy.tracku.gson.employeemasterdetails.EmployeeMasterDetail;
+import com.happy.tracku.gson.employeemasterdetails.WareHouseMasterDetail;
 import com.happy.tracku.gson.login.ValidateLoginResponseEmployeeDatum;
 import com.happy.tracku.gson.login.ValidateLoginResponseVehicle;
 import com.happy.tracku.gson.login.Validateloginresponsejson;
@@ -34,7 +35,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 12;
+    public static final int DATABASE_VERSION = 13;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -47,6 +48,7 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String VALIDATE_LOGIN_EMPLOYEE_DATA = "ValidateLoginEmployeeData";
     public static final String VALIDATE_LOGIN_VEHICLE_DATA = "ValidateLoginVehicleData";
     public static final String SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW = "SaveStockOutPurchaseDetailsNew";
+    public static final String WAREHOUSE_MASTER = "WareHouseMaster";
 
     private SharedPreferences shp;
     private Context context;
@@ -81,6 +83,8 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_VEHICLE_DATA+" (idVehicle INTEGER, vehicleNumber TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idSalesDetails INTEGER,orderQuantity DOUBLE, rackNumber TEXT, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+WAREHOUSE_MASTER+" (idWarehouse INTEGER,warehouse TEXT)");
 
     }
 
@@ -149,6 +153,10 @@ public class DbHelper extends SQLiteOpenHelper
         if (oldVersion <= 12)
         {
             db.execSQL("ALTER TABLE " + DELIVERY_PENDING_DETAILS_TABLE + " ADD idPaymentType INTEGER");
+        }
+        if (oldVersion <= 13)
+        {
+            db.execSQL("CREATE TABLE IF NOT EXISTS "+WAREHOUSE_MASTER+" (idWarehouse INTEGER,warehouse TEXT)");
         }
 
         onCreate(db);
@@ -886,7 +894,7 @@ public class DbHelper extends SQLiteOpenHelper
                 cv.put("employeeName", validateLoginResponseEmployeeDatum.getEmployeeName());
 
                 db.insert( VALIDATE_LOGIN_EMPLOYEE_DATA , null, cv);
-                Log.e("LogDB", "employeeMasterCV" + cv);
+                //Log.e("LogDB", "employeeMasterCV" + cv);
             }
         }
 
@@ -974,5 +982,50 @@ public class DbHelper extends SQLiteOpenHelper
 
         db.execSQL("update " + DELIVERY_PENDING_DETAILS_TABLE + " set idPaymentType="+idPaymentType+" where idSalesHeader='" + idSalesHeader + "'");
 
+    }
+
+    public void insertWareHouseMaster(List<WareHouseMasterDetail> wareHouseMasterDetailList)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        for (WareHouseMasterDetail wareHouseMasterDetail : wareHouseMasterDetailList)
+        {
+            ContentValues cv = new ContentValues();
+            cv.put("idWarehouse", wareHouseMasterDetail.getIdWarehouse());
+            cv.put("warehouse", wareHouseMasterDetail.getWarehouse());
+
+
+            db.insert(WAREHOUSE_MASTER, null, cv);
+        }
+        db.close();
+    }
+
+
+
+    public void deleteWareHouseMaster()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + WAREHOUSE_MASTER);
+    }
+
+    public ArrayList<WareHouseMasterDetail> getWareHouseMaster()
+    {
+        ArrayList<WareHouseMasterDetail> wareHouseMasterDetailArrayList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cur = db.rawQuery("select * from " + WAREHOUSE_MASTER + " order by warehouse asc", null);
+        cur.moveToFirst();
+
+        for (int i = 0; i < cur.getCount(); i++)
+        {
+            WareHouseMasterDetail wareHouseMasterDetail = new WareHouseMasterDetail();
+            wareHouseMasterDetail.setIdWarehouse(cur.getInt(cur.getColumnIndex("idWarehouse")));
+            wareHouseMasterDetail.setWarehouse(cur.getString(cur.getColumnIndex("warehouse")));
+
+            cur.moveToNext();
+
+            wareHouseMasterDetailArrayList.add(wareHouseMasterDetail);
+        }
+
+        return wareHouseMasterDetailArrayList;
     }
 }

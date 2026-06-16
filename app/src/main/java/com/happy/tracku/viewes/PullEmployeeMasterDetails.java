@@ -79,6 +79,7 @@ public class PullEmployeeMasterDetails extends AsyncTask<String,String,String>
 
             jsonObjectEmployeeMasterFinal.put("CreatedBy", shp.getString(Const.Shp_Employee_Code, ""));
 
+            Log.e("Log", "employeeMasterJSON" + jsonObjectEmployeeMasterFinal);
 
             RequestBody body = RequestBody.create(jsonObjectEmployeeMasterFinal.toString(), JSON);
             request = new Request.Builder()
@@ -101,14 +102,16 @@ public class PullEmployeeMasterDetails extends AsyncTask<String,String,String>
             Gson gson = new Gson();
             employeemasterjson = gson.fromJson(result, Employeemasterjson.class);
 
-            if (employeemasterjson.getData().getEmployeeMasterDetails().isEmpty() || employeemasterjson.getData().getEmployeeMasterDetails().size() == 0)
+            if (employeemasterjson.getData().getEmployeeMasterDetails().isEmpty() || employeemasterjson.getData().getEmployeeMasterDetails().size() == 0 || employeemasterjson.getData().getWareHouseMasterDetails().size() == 0 || employeemasterjson.getData().getWareHouseMasterDetails().isEmpty())
             {
                 return "nullPointerException";
             }
 
             dbHelper.deleteEmployeeMaster();
+            dbHelper.getWareHouseMaster();
 
             dbHelper.insertEmployeeMaster(employeemasterjson.getData().getEmployeeMasterDetails());
+            dbHelper.insertWareHouseMaster(employeemasterjson.getData().getWareHouseMasterDetails());
 
         }
         catch (Exception e)

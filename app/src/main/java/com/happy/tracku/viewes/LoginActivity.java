@@ -98,6 +98,7 @@ public class LoginActivity extends AppCompatActivity
 
 
         new PullMasterData(this).execute();
+        new PullEmployeeMasterDetails(this).execute();
 
     }
 
