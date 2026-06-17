@@ -145,6 +145,8 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
             for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
                 if (prefilledWarehouse.equalsIgnoreCase(detail.getWarehouse())) {
                     idWareHouse = detail.getIdWarehouse();
+                    dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
+
                     Log.e("Log", "Default idWareHouse: " + idWareHouse);
                     break;
                 }
@@ -168,6 +170,8 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
                 idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
                 Log.e("Log", "idWareHouse" + idWareHouse);
                 purchaseOrderItem.setSelectedIDWareHouse(idWareHouse);
+                dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
+
 
             }
         });
@@ -220,7 +224,7 @@ public class PurchaseOrderItemListAdapter extends RecyclerView.Adapter<PurchaseO
 
                  dbHelper.updateAcceptedQuantity(purchaseOrderItem.getIdItem(), acceptedQty, employeeCode,idVehicle);
                  dbHelper.updateAcceptedQuantityVerified(purchaseOrderItem.getIdItem());
-                 dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
+                // dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
 
                  Fns.neutralAlert("Alert", "The accepted quantity is marked as " + acceptedQty, context);
 

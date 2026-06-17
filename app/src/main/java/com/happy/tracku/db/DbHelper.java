@@ -444,8 +444,8 @@ public class DbHelper extends SQLiteOpenHelper
             finalJson.put("createdBy", createdBy);
             finalJson.put("idStatus", idStatus);
             finalJson.put("fileName", fileName);
-            finalJson.put("photoUpload", base64);
             finalJson.put("StockInTable",dataArray);
+            finalJson.put("photoUpload", base64);
             finalJson.put("idCompany", companyValue);
             finalJson.put("employeeCode", employeeCode);
             finalJson.put("idVehicle", idVehicle);
