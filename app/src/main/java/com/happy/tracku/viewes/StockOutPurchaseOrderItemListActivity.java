@@ -22,6 +22,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ import com.happy.tracku.R;
 import com.happy.tracku.adapters.StockoutPurchaseOrderItemListAdapter;
 import com.happy.tracku.databinding.ActivityStockOutPurchaseOrderItemListBinding;
 import com.happy.tracku.db.DbHelper;
+import com.happy.tracku.gson.employeemasterdetails.WareHouseMasterDetail;
 import com.happy.tracku.gson.login.ValidateLoginResponseEmployeeDatum;
 import com.happy.tracku.gson.login.ValidateLoginResponseVehicle;
 import com.happy.tracku.gson.sendstockoutrequest.StockOutSendPurchaseRequestJson;
@@ -96,6 +98,10 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
     int employeeCode, idVehicle;
     int pulledIdSalesDetails;
     StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson;
+    AutoCompleteTextView wareHouseACTV;
+
+    List<WareHouseMasterDetail> wareHouseMasterDetailList;
+    int idWareHouse = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -138,6 +144,52 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
         employeeCodeMATV = findViewById(R.id.employeecodeMATV);
         vehicleModelMATV = findViewById(R.id.vehicleModelMATV);
+        wareHouseACTV = findViewById(R.id.warehouseACTV);
+
+        //String prefilledWarehouse = purchaseOrderItem.getWarehouse();
+
+        wareHouseMasterDetailList = dbHelper.getWareHouseMaster();
+        Log.e("Log", "wareHouseMasterDetailList" + wareHouseMasterDetailList);
+
+        ArrayAdapter<WareHouseMasterDetail> adpterWareHouseMaster = new ArrayAdapter<WareHouseMasterDetail>(this, android.R.layout.simple_dropdown_item_1line, wareHouseMasterDetailList);
+
+        wareHouseACTV.setAdapter(adpterWareHouseMaster);
+
+//        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null) {
+//            for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
+//                if (prefilledWarehouse.equalsIgnoreCase(detail.getWarehouse())) {
+//                    idWareHouse = detail.getIdWarehouse();
+//                    dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
+//
+//                    Log.e("Log", "Default idWareHouse: " + idWareHouse);
+//                    break;
+//                }
+//            }
+//        }
+
+
+        wareHouseACTV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                wareHouseACTV.showDropDown();
+            }
+        });
+
+        wareHouseACTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
+                Log.e("Log", "idWareHouse" + idWareHouse);
+               // purchaseOrderItem.setSelectedIDWareHouse(idWareHouse);
+               // dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
+
+
+            }
+        });
+
 
         employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
         Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
