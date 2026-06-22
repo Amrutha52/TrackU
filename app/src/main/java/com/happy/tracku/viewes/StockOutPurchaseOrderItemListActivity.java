@@ -101,7 +101,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
     AutoCompleteTextView wareHouseACTV;
 
     List<WareHouseMasterDetail> wareHouseMasterDetailList;
-    int idWareHouse = 0;
+    int idWareHouse = 0, idItem = 0;
+    String prefilledWarehouse = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -147,49 +148,6 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         wareHouseACTV = findViewById(R.id.warehouseACTV);
 
         //String prefilledWarehouse = purchaseOrderItem.getWarehouse();
-
-        wareHouseMasterDetailList = dbHelper.getWareHouseMaster();
-        Log.e("Log", "wareHouseMasterDetailList" + wareHouseMasterDetailList);
-
-        ArrayAdapter<WareHouseMasterDetail> adpterWareHouseMaster = new ArrayAdapter<WareHouseMasterDetail>(this, android.R.layout.simple_dropdown_item_1line, wareHouseMasterDetailList);
-
-        wareHouseACTV.setAdapter(adpterWareHouseMaster);
-
-//        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null) {
-//            for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
-//                if (prefilledWarehouse.equalsIgnoreCase(detail.getWarehouse())) {
-//                    idWareHouse = detail.getIdWarehouse();
-//                    dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
-//
-//                    Log.e("Log", "Default idWareHouse: " + idWareHouse);
-//                    break;
-//                }
-//            }
-//        }
-
-
-        wareHouseACTV.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(final View arg0)
-            {
-                wareHouseACTV.showDropDown();
-            }
-        });
-
-        wareHouseACTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
-                Log.e("Log", "idWareHouse" + idWareHouse);
-               // purchaseOrderItem.setSelectedIDWareHouse(idWareHouse);
-               // dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
-
-
-            }
-        });
-
 
         employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
         Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);
@@ -241,7 +199,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             }
         });
 
-        new PullStockoutPurchaseOrderItemListDetails(this, idPurchaseOrder,companyValue).execute();
+        new PullStockoutPurchaseOrderItemListDetails(this, idPurchaseOrder,companyValue, wareHouseACTV).execute();
 
     }
 
@@ -514,14 +472,15 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         SharedPreferences shp;
         StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson;
         int idPurchaseOrder, companyValue, pulledIdPurchaseOrder;
-
         DbHelper dbHelper;
+        AutoCompleteTextView wareHouseACTV;
 
-        public PullStockoutPurchaseOrderItemListDetails(StockOutPurchaseOrderItemListActivity context, int idPurchaseOrder, int companyValue)
+        public PullStockoutPurchaseOrderItemListDetails(StockOutPurchaseOrderItemListActivity context, int idPurchaseOrder, int companyValue, AutoCompleteTextView wareHouseACTV)
         {
             this.context = new WeakReference<>(context);
             this.idPurchaseOrder = idPurchaseOrder;
             this.companyValue = companyValue;
+            this.wareHouseACTV = wareHouseACTV;
             //this.pulledIdPurchaseOrder = pulledIdPurchaseOrder;
 
             shp = context.getSharedPreferences(Const.Shared_Pref_name,MODE_PRIVATE);
@@ -616,7 +575,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             if (s.equals("success"))
             {
 
-                context.get().getPulledDetails(stockOutPurchaseOrderItemListJson);
+                context.get().getPulledDetails(stockOutPurchaseOrderItemListJson, wareHouseACTV);
                 Log.e("Log","pulledPurchaseOrder" + pulledIdPurchaseOrder);
                 RecyclerView purchaseOrderItemListRecyclerview = context.get().findViewById(R.id.purchaseorderitemlistrecyclerview);
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context.get());
@@ -643,11 +602,60 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
     }
 
-    private void getPulledDetails(StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson)
+    private void getPulledDetails(StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson, AutoCompleteTextView wareHouseACTV)
     {
         this.stockOutPurchaseOrderItemListJson = stockOutPurchaseOrderItemListJson;
+        this.wareHouseACTV = wareHouseACTV;
 
         pulledIdSalesDetails = stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdSalesDetails();
+
+        prefilledWarehouse = stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getWarehouse();
+
+        wareHouseACTV.setText(prefilledWarehouse);
+
+        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null) {
+            for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
+                if (prefilledWarehouse.equalsIgnoreCase(detail.getWarehouse())) {
+                    idWareHouse = detail.getIdWarehouse();
+                    dbHelper.updateSelectedIDWareHouse(idItem,idWareHouse,employeeCode);
+
+                    Log.e("Log", "Default idWareHouse: " + idWareHouse);
+                    break;
+                }
+            }
+        }
+
+        wareHouseMasterDetailList = dbHelper.getWareHouseMaster();
+        Log.e("Log", "wareHouseMasterDetailList" + wareHouseMasterDetailList);
+
+        ArrayAdapter<WareHouseMasterDetail> adpterWareHouseMaster = new ArrayAdapter<WareHouseMasterDetail>(this, android.R.layout.simple_dropdown_item_1line, wareHouseMasterDetailList);
+
+        wareHouseACTV.setAdapter(adpterWareHouseMaster);
+
+
+        wareHouseACTV.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View arg0)
+            {
+                wareHouseACTV.showDropDown();
+            }
+        });
+
+        wareHouseACTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
+                Log.e("Log", "idWareHouse" + idWareHouse);
+                // purchaseOrderItem.setSelectedIDWareHouse(idWareHouse);
+                // dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
+
+
+            }
+        });
+
+        idItem = stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdItem();
 
     }
 

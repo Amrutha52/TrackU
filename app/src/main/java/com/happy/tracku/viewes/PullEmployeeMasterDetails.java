@@ -108,7 +108,7 @@ public class PullEmployeeMasterDetails extends AsyncTask<String,String,String>
             }
 
             dbHelper.deleteEmployeeMaster();
-            dbHelper.getWareHouseMaster();
+            dbHelper.deleteWareHouseMaster();
 
             dbHelper.insertEmployeeMaster(employeemasterjson.getData().getEmployeeMasterDetails());
             dbHelper.insertWareHouseMaster(employeemasterjson.getData().getWareHouseMasterDetails());
