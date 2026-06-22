@@ -613,17 +613,17 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
         wareHouseACTV.setText(prefilledWarehouse);
 
-        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null) {
-            for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
-                if (prefilledWarehouse.equalsIgnoreCase(detail.getWarehouse())) {
-                    idWareHouse = detail.getIdWarehouse();
-                    dbHelper.updateSelectedIDWareHouse(idItem,idWareHouse,employeeCode);
-
-                    Log.e("Log", "Default idWareHouse: " + idWareHouse);
-                    break;
-                }
-            }
-        }
+//        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null) {
+//            for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
+//                if (prefilledWarehouse.equalsIgnoreCase(detail.getWarehouse())) {
+//                    idWareHouse = detail.getIdWarehouse();
+//                    dbHelper.updateSelectedIDWareHouse(idItem,idWareHouse,employeeCode);
+//
+//                    Log.e("Log", "Default idWareHouse: " + idWareHouse);
+//                    break;
+//                }
+//            }
+//        }
 
         wareHouseMasterDetailList = dbHelper.getWareHouseMaster();
         Log.e("Log", "wareHouseMasterDetailList" + wareHouseMasterDetailList);
@@ -649,7 +649,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                 idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
                 Log.e("Log", "idWareHouse" + idWareHouse);
                 // purchaseOrderItem.setSelectedIDWareHouse(idWareHouse);
-                // dbHelper.updateSelectedIDWareHouse(purchaseOrderItem.getIdItem(),idWareHouse,employeeCode);
+                 dbHelper.updateSelectedIDWareHouse(stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdItem(),idWareHouse,employeeCode);
 
 
             }
