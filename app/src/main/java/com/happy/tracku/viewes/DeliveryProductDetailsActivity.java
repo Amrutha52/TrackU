@@ -113,6 +113,7 @@ public class DeliveryProductDetailsActivity extends AppCompatActivity
         paymentTypes.add(new PaymentType("Select", 0));
         paymentTypes.add(new PaymentType("Cash", 1));
         paymentTypes.add(new PaymentType("Credit", 2));
+        paymentTypes.add(new PaymentType("Cash Not Received", 3));
 
         ArrayAdapter<PaymentType> adapter = new ArrayAdapter<>(
                 this,
