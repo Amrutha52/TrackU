@@ -611,19 +611,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
         prefilledWarehouse = stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getWarehouse();
 
-        wareHouseACTV.setText(prefilledWarehouse);
+        wareHouseACTV.setText(prefilledWarehouse, false);
 
-//        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null) {
-//            for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
-//                if (prefilledWarehouse.equalsIgnoreCase(detail.getWarehouse())) {
-//                    idWareHouse = detail.getIdWarehouse();
-//                    dbHelper.updateSelectedIDWareHouse(idItem,idWareHouse,employeeCode);
-//
-//                    Log.e("Log", "Default idWareHouse: " + idWareHouse);
-//                    break;
-//                }
-//            }
-//        }
 
         wareHouseMasterDetailList = dbHelper.getWareHouseMaster();
         Log.e("Log", "wareHouseMasterDetailList" + wareHouseMasterDetailList);
@@ -632,6 +621,19 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
         wareHouseACTV.setAdapter(adpterWareHouseMaster);
 
+        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null)
+        {
+            for (WareHouseMasterDetail detail : wareHouseMasterDetailList)
+            {
+                if (prefilledWarehouse.trim() .equalsIgnoreCase(detail.getWarehouse().trim()))
+                {
+                    idWareHouse = detail.getIdWarehouse();
+                    // Update DB here
+                    dbHelper.updateSelectedIDWareHouse( stockOutPurchaseOrderItemListJson.getData() .getStockOutPurchaseOrderItemList() .get(0) .getIdItem(), idWareHouse, employeeCode );
+                    Log.e("Log", "Default warehouse updated: " + idWareHouse); break;
+                }
+            }
+        }
 
         wareHouseACTV.setOnClickListener(new View.OnClickListener()
         {

@@ -539,6 +539,7 @@ public class DbHelper extends SQLiteOpenHelper
                     singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idSalesDetails")));
                     singleDataObj.put("employeeCode",cur.getInt(cur.getColumnIndex("employeeCode")));
                     singleDataObj.put("idVehicle",cur.getInt(cur.getColumnIndex("idVehicle")));
+                    singleDataObj.put("idWarehouse", cur.getInt(cur.getColumnIndex("idWareHouse")));
 
 
                     dataArray.put(singleDataObj);
