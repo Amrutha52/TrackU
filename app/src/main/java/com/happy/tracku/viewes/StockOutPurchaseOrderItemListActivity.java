@@ -621,17 +621,31 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
         wareHouseACTV.setAdapter(adpterWareHouseMaster);
 
-        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null)
-        {
-            for (WareHouseMasterDetail detail : wareHouseMasterDetailList)
-            {
-                if (prefilledWarehouse.trim() .equalsIgnoreCase(detail.getWarehouse().trim()))
-                {
-                    idWareHouse = detail.getIdWarehouse();
+////        if (!wareHouseMasterDetailList.isEmpty() && prefilledWarehouse != null)
+////        {
+//            for (WareHouseMasterDetail detail : wareHouseMasterDetailList)
+//            {
+//                if (prefilledWarehouse.trim() .equalsIgnoreCase(detail.getWarehouse().trim()))
+//                {
+//                    idWareHouse = detail.getIdWarehouse();
+//                    Log.e("Log", "idWareHousewithoutselection" + idWareHouse);
+//                    // Update DB here
+//                    dbHelper.updateStockoutSelectedIDWareHouse( stockOutPurchaseOrderItemListJson.getData() .getStockOutPurchaseOrderItemList() .get(0) .getIdItem(), idWareHouse, employeeCode );
+//                    Log.e("Log", "Default warehouse updated: " + idWareHouse); break;
+//                }
+//            }
+//      //  }
+
+        if (wareHouseMasterDetailList != null) {
+            for (WareHouseMasterDetail detail : wareHouseMasterDetailList) {
+                Log.e("DEBUG", "DB Warehouse = '" + detail.getWarehouse() +
+                        "', id=" + detail.getIdWarehouse());
+                idWareHouse = detail.getIdWarehouse();
+                    Log.e("Log", "idWareHousewithoutselection" + idWareHouse);
                     // Update DB here
-                    dbHelper.updateSelectedIDWareHouse( stockOutPurchaseOrderItemListJson.getData() .getStockOutPurchaseOrderItemList() .get(0) .getIdItem(), idWareHouse, employeeCode );
+                    dbHelper.updateStockoutSelectedIDWareHouse( stockOutPurchaseOrderItemListJson.getData() .getStockOutPurchaseOrderItemList() .get(0) .getIdItem(), idWareHouse, employeeCode );
                     Log.e("Log", "Default warehouse updated: " + idWareHouse); break;
-                }
+
             }
         }
 
@@ -651,7 +665,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                 idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
                 Log.e("Log", "idWareHouse" + idWareHouse);
                 // purchaseOrderItem.setSelectedIDWareHouse(idWareHouse);
-                 dbHelper.updateSelectedIDWareHouse(stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdItem(),idWareHouse,employeeCode);
+                 dbHelper.updateStockoutSelectedIDWareHouse(stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdItem(),idWareHouse,employeeCode);
 
 
             }

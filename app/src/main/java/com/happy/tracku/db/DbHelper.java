@@ -35,7 +35,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper
 {
-    public static final int DATABASE_VERSION = 14;
+    public static final int DATABASE_VERSION = 15;
     public static final String DATABASE_NAME = "TrackUDb";
     public static final String EMPLOYEES_DAILY_TRAVEL_ALL_LOCATION_TABLE = "EmployeesDailyTravelAllLocation";
     public static final String EMPLOYEE_MASTER = "EmployeeDetails";
@@ -82,7 +82,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+VALIDATE_LOGIN_VEHICLE_DATA+" (idVehicle INTEGER, vehicleNumber TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idSalesDetails INTEGER,orderQuantity DOUBLE, rackNumber TEXT, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW+" (idItem INTEGER,Item TEXT, idUnit INTEGER, idSalesDetails INTEGER,orderQuantity DOUBLE, rackNumber TEXT, Rate DOUBLE, FloorNo TEXT, StockOutQuantity Double, CreatedBy Text, IsVerified INTEGER, employeeCode INTEGER, idVehicle INTEGER, idWareHouse INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "+WAREHOUSE_MASTER+" (idWarehouse INTEGER,warehouse TEXT)");
 
@@ -158,9 +158,13 @@ public class DbHelper extends SQLiteOpenHelper
         {
             db.execSQL("CREATE TABLE IF NOT EXISTS "+WAREHOUSE_MASTER+" (idWarehouse INTEGER,warehouse TEXT)");
         }
-        if (oldVersion <= 14)
+//        if (oldVersion <= 14)
+//        {
+//            db.execSQL("ALTER TABLE " + SAVE_PURCHASE_ORDER_TABLE + " ADD idWareHouse INTEGER");
+//        }
+        if (oldVersion <= 15)
         {
-            db.execSQL("ALTER TABLE " + SAVE_PURCHASE_ORDER_TABLE + " ADD idWareHouse INTEGER");
+            db.execSQL("ALTER TABLE " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW + " ADD idWareHouse INTEGER");
         }
         onCreate(db);
     }
@@ -1041,6 +1045,17 @@ public class DbHelper extends SQLiteOpenHelper
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.execSQL("update " + SAVE_PURCHASE_ORDER_TABLE + " set idWareHouse="+idWareHouse+" where idItem='" + idItem + "'");
+
+    }
+
+    public void updateStockoutSelectedIDWareHouse(int idItem, int idWareHouse, int employeeCode)
+    {
+        Log.e("Log", "updateAcceptedQuantity");
+        Log.e("Log", "idWareHouseDB" + idWareHouse);
+        Log.e("Log", "idItemDB" + idItem);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("update " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW + " set idWareHouse="+idWareHouse+" where idItem='" + idItem + "'");
 
     }
 }
