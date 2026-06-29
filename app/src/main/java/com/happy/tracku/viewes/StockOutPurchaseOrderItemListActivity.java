@@ -874,7 +874,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                         dialog.dismiss();
 
 
-                        context.get().startActivity(new Intent(context.get(), MainMenuActivity.class));
+                        context.get().startActivity(new Intent(context.get(), StockOutOrderListActivity.class));
                         context.get().finish();
 
                     }

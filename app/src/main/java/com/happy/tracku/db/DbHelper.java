@@ -519,43 +519,107 @@ public class DbHelper extends SQLiteOpenHelper
 
 
     }
-    public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idSalesDetails, String fileName, String base64, Integer companyValue, int employeeCode, int idVehicle)
-    {
+//    public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idSalesDetails, String fileName, String base64, Integer companyValue, int employeeCode, int idVehicle)
+//    {
+//        JSONObject finalJson = new JSONObject();
+//        JSONArray dataArray = new JSONArray();
+//        try {
+//
+//            SQLiteDatabase db = this.getReadableDatabase();
+//
+//            Cursor cur = db.rawQuery("select * from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW +" where idSalesDetails="+idSalesDetails+" and CreatedBy="+createdBy,null);
+//
+//            if(cur.getCount() > 0)
+//            {
+//
+//                cur.moveToFirst();
+//
+//                for (int i = 0; i < cur.getCount(); i++) {
+//
+//                    JSONObject singleDataObj = new JSONObject();
+//                    singleDataObj.put("idItem",cur.getInt(cur.getColumnIndex("idItem")));
+//                    singleDataObj.put("idUnit",cur.getInt(cur.getColumnIndex("idUnit")));
+//                    singleDataObj.put("Quantity",cur.getInt(cur.getColumnIndex("StockOutQuantity")));
+//                    singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idSalesDetails")));
+//                    singleDataObj.put("employeeCode",cur.getInt(cur.getColumnIndex("employeeCode")));
+//                    singleDataObj.put("idVehicle",cur.getInt(cur.getColumnIndex("idVehicle")));
+//                    singleDataObj.put("idWarehouse", cur.getInt(cur.getColumnIndex("idWareHouse")));
+//
+//
+//                    dataArray.put(singleDataObj);
+//
+//
+//                    cur.moveToNext();
+//
+//                }
+//
+//            }
+//            cur.close();
+//
+//            finalJson.put("createdBy", createdBy);
+//            finalJson.put("idStatus", idStatus);
+//            finalJson.put("idCompany", companyValue);
+//            finalJson.put("fileName", fileName);
+//            finalJson.put("photoUpload", base64);
+//            finalJson.put("employeeCode", employeeCode);
+//            finalJson.put("idVehicle", idVehicle);
+//            finalJson.put("StockOutTable",dataArray);
+//            Log.e("Log", "sendstockoutjson" + finalJson);
+//            Log.e("Log", "dataarray"+dataArray);
+//            Log.e("Log", "finalJsonDB"+finalJson);
+//
+//        } catch (JSONException e) {
+//            Log.e("Log", "exception" + e);
+//        }
+//
+//        return finalJson;
+//    }
+
+    public JSONObject getSendStockoutRequest(String createdBy, int idStatus, int idSalesDetails, String fileName, String base64, Integer companyValue, int employeeCode, int idVehicle) {
         JSONObject finalJson = new JSONObject();
         JSONArray dataArray = new JSONArray();
-        try {
+        Cursor cur = null;
 
+        try {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor cur = db.rawQuery("select * from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW +" where idSalesDetails="+idSalesDetails+" and CreatedBy="+createdBy,null);
+            // FIX: Use '?' placeholders instead of direct string concatenation
+            String query = "SELECT * FROM " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW +
+                    " WHERE CreatedBy = ?";
+            String[] selectionArgs = new String[]{  createdBy };
 
-            if(cur.getCount() > 0)
-            {
+            cur = db.rawQuery(query, selectionArgs);
 
-                cur.moveToFirst();
-
-                for (int i = 0; i < cur.getCount(); i++) {
-
+            // FIX: Standard, robust cursor traversal loop
+            if (cur != null && cur.moveToFirst()) {
+                do {
                     JSONObject singleDataObj = new JSONObject();
-                    singleDataObj.put("idItem",cur.getInt(cur.getColumnIndex("idItem")));
-                    singleDataObj.put("idUnit",cur.getInt(cur.getColumnIndex("idUnit")));
-                    singleDataObj.put("Quantity",cur.getInt(cur.getColumnIndex("StockOutQuantity")));
-                    singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idSalesDetails")));
-                    singleDataObj.put("employeeCode",cur.getInt(cur.getColumnIndex("employeeCode")));
-                    singleDataObj.put("idVehicle",cur.getInt(cur.getColumnIndex("idVehicle")));
-                    singleDataObj.put("idWarehouse", cur.getInt(cur.getColumnIndex("idWareHouse")));
 
+                    singleDataObj.put("idItem", cur.getInt(cur.getColumnIndexOrThrow("idItem")));
+                    singleDataObj.put("idUnit", cur.getInt(cur.getColumnIndexOrThrow("idUnit")));
+
+                    // Note: In your button click you save this as a Double,
+                    // but here you extract it as an Int. Ensure your data types align!
+                    singleDataObj.put("Quantity", cur.getInt(cur.getColumnIndexOrThrow("StockOutQuantity")));
+
+                    singleDataObj.put("idPurchaseOrderDetails", cur.getInt(cur.getColumnIndexOrThrow("idSalesDetails")));
+                    singleDataObj.put("employeeCode", cur.getInt(cur.getColumnIndexOrThrow("employeeCode")));
+                    singleDataObj.put("idVehicle", cur.getInt(cur.getColumnIndexOrThrow("idVehicle")));
+                    singleDataObj.put("idWarehouse", cur.getInt(cur.getColumnIndexOrThrow("idWareHouse")));
 
                     dataArray.put(singleDataObj);
-
-
-                    cur.moveToNext();
-
-                }
-
+                } while (cur.moveToNext());
             }
-            cur.close();
 
+        } catch (Exception e) {
+            Log.e("Log", "DB Exception: " + e.getMessage(), e);
+        } finally {
+            if (cur != null && !cur.isClosed()) {
+                cur.close();
+            }
+        }
+
+        try {
             finalJson.put("createdBy", createdBy);
             finalJson.put("idStatus", idStatus);
             finalJson.put("idCompany", companyValue);
@@ -563,13 +627,9 @@ public class DbHelper extends SQLiteOpenHelper
             finalJson.put("photoUpload", base64);
             finalJson.put("employeeCode", employeeCode);
             finalJson.put("idVehicle", idVehicle);
-            finalJson.put("StockOutTable",dataArray);
-            Log.e("Log", "sendstockoutjson" + finalJson);
-            Log.e("Log", "dataarray"+dataArray);
-            Log.e("Log", "finalJsonDB"+finalJson);
-
+            finalJson.put("StockOutTable", dataArray);
         } catch (JSONException e) {
-            Log.e("Log", "exception" + e);
+            Log.e("Log", "JSON construction exception", e);
         }
 
         return finalJson;
