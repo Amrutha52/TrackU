@@ -16,6 +16,35 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/txtVendorName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Vendor Name"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:padding="4dp" />
+
+            <TextView
+                android:id="@+id/txtInvoiceNumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="Invoice Name"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:padding="4dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:visibility="gone"
             android:orientation="horizontal">
             <com.google.android.material.textfield.TextInputLayout

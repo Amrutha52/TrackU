@@ -93,6 +93,8 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
     List<ValidateLoginResponseEmployeeDatum> employeeMasterDetailList;
     List<ValidateLoginResponseVehicle> validateLoginResponseVehicleList;
     int employeeCode = 0, idVehicle=0;
+    TextView txtVendorName, txtInvoiceNumber;
+    String vendorName, invoiceNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -132,8 +134,17 @@ public class PurchaseOrderItemListActivity extends AppCompatActivity
         companyValue = intent.getIntExtra("company",0);
         Log.e("Log", "companyValuePurchaseOrderItemListActivity" + companyValue);
 
+        vendorName = intent.getStringExtra("vendorName");
+        invoiceNumber = intent.getStringExtra("invoiceNumber");
+
         employeeCodeMATV = findViewById(R.id.employeecodeMATV);
         vehicleModelMATV = findViewById(R.id.vehicleModelMATV);
+
+        txtVendorName = findViewById(R.id.txtVendorName);
+        txtInvoiceNumber = findViewById(R.id.txtInvoiceNumber);
+
+        txtVendorName.setText(vendorName);
+        txtInvoiceNumber.setText(invoiceNumber);
 
         employeeMasterDetailList = dbHelper.getLoginEmployeeMaster();
         Log.e("Log", "employeeMasterDetailList" + employeeMasterDetailList);

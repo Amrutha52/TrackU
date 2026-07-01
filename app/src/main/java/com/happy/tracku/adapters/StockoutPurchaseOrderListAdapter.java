@@ -88,6 +88,8 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
             holder.viewTV.setOnClickListener(this);
             holder.viewTV.setTag(R.string.key_one, purchaseOrder.getIdSalesHeader());
             holder.viewTV.setTag(R.string.key_two, companyValue);
+            holder.viewTV.setTag(R.string.key_three, purchaseOrder.getVendorName());
+            holder.viewTV.setTag(R.string.key_four, purchaseOrder.getPurchaseOrderNumber());
 
 
         }
@@ -177,11 +179,14 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
                 Log.e("Log", "idPurchaseOrderAdapter" + idPurchaseOrder);
 
                 int company = (int) view.getTag(R.string.key_two);
-
+                String vendorName = (String) view.getTag(R.string.key_three);
+                String invoiceNumber = (String) view.getTag(R.string.key_four);
 
                 Intent intent = new Intent(context, StockOutPurchaseOrderItemListActivity.class);
                 intent.putExtra("idPurchaseOrder", idPurchaseOrder);
                 intent.putExtra("company", companyValue);
+                intent.putExtra("vendorName", vendorName);
+                intent.putExtra("invoiceNumber", invoiceNumber);
                 context.startActivity(intent);
             }
             break;

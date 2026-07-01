@@ -90,6 +90,8 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
             holder.viewTV.setOnClickListener(this);
             holder.viewTV.setTag(R.string.key_one, purchaseOrder.getIdPurchaseOrderHeader());
             holder.viewTV.setTag(R.string.key_two, companyValue);
+            holder.viewTV.setTag(R.string.key_three, purchaseOrder.getVendorName());
+            holder.viewTV.setTag(R.string.key_four, purchaseOrder.getPurchaseOrderNumber());
 
         }
 
@@ -177,9 +179,14 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
                 Integer companyValue = (Integer) view.getTag(R.string.key_two);
                 Log.e("Log", "companyValue" + companyValue);
 
+                String vendorName = (String) view.getTag(R.string.key_three);
+                String invoiceNumber = (String) view.getTag(R.string.key_four);
+
                 Intent intent = new Intent(context, PurchaseOrderItemListActivity.class);
                 intent.putExtra("idPurchaseOrder", idPurchaseOrder);
                 intent.putExtra("company", companyValue);
+                intent.putExtra("vendorName", vendorName);
+                intent.putExtra("invoiceNumber", invoiceNumber);
                 context.startActivity(intent);
 
             }

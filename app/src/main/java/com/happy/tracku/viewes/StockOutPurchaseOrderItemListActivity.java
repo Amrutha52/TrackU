@@ -103,6 +103,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
     List<WareHouseMasterDetail> wareHouseMasterDetailList;
     int idWareHouse = 0, idItem = 0;
     String prefilledWarehouse = "";
+    TextView txtVendorName, txtInvoiceNumber;
+    String vendorName, invoiceNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -143,9 +145,18 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         companyValue = intent.getIntExtra("company",0);
         Log.e("Log", "companyValue" + companyValue);
 
+        vendorName = intent.getStringExtra("vendorName");
+        invoiceNumber = intent.getStringExtra("invoiceNumber");
+
         employeeCodeMATV = findViewById(R.id.employeecodeMATV);
         vehicleModelMATV = findViewById(R.id.vehicleModelMATV);
         wareHouseACTV = findViewById(R.id.warehouseACTV);
+
+        txtVendorName = findViewById(R.id.txtVendorName);
+        txtInvoiceNumber = findViewById(R.id.txtInvoiceNumber);
+
+        txtVendorName.setText(vendorName);
+        txtInvoiceNumber.setText(invoiceNumber);
 
         //String prefilledWarehouse = purchaseOrderItem.getWarehouse();
 
