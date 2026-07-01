@@ -37,7 +37,7 @@ public class StockOutPurchaseOrderItem {
     private String floor;
     @SerializedName("rackNumber")
     @Expose
-    private Integer rackNumber;
+    private String rackNumber;
     @SerializedName("orderQuantity")
     @Expose
     private Double orderQuantity;
@@ -153,11 +153,11 @@ public class StockOutPurchaseOrderItem {
         this.floor = floor;
     }
 
-    public Integer getRackNumber() {
+    public String getRackNumber() {
         return rackNumber;
     }
 
-    public void setRackNumber(Integer rackNumber) {
+    public void setRackNumber(String rackNumber) {
         this.rackNumber = rackNumber;
     }
 

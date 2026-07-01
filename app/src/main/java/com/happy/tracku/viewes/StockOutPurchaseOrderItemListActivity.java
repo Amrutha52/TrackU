@@ -474,7 +474,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
         int idPurchaseOrder, companyValue, pulledIdPurchaseOrder;
         DbHelper dbHelper;
         AutoCompleteTextView wareHouseACTV;
-
+        String createdBy;
         public PullStockoutPurchaseOrderItemListDetails(StockOutPurchaseOrderItemListActivity context, int idPurchaseOrder, int companyValue, AutoCompleteTextView wareHouseACTV)
         {
             this.context = new WeakReference<>(context);
@@ -520,6 +520,8 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
                 jsonObjectPurchaseOrderItemList.put("createdBy", shp.getString(Const.Shp_Employee_Code, ""));
                 jsonObjectPurchaseOrderItemList.put("idPurchaseOrder", idPurchaseOrder);
+
+                createdBy = shp.getString(Const.Shp_Employee_Code, "");
 
                 Log.e("Log", "jsonObjectpurchaseOrderItemList" + jsonObjectPurchaseOrderItemList);
 
@@ -575,7 +577,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
             if (s.equals("success"))
             {
 
-                context.get().getPulledDetails(stockOutPurchaseOrderItemListJson, wareHouseACTV);
+                context.get().getPulledDetails(stockOutPurchaseOrderItemListJson, wareHouseACTV,createdBy);
                 Log.e("Log","pulledPurchaseOrder" + pulledIdPurchaseOrder);
                 RecyclerView purchaseOrderItemListRecyclerview = context.get().findViewById(R.id.purchaseorderitemlistrecyclerview);
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context.get());
@@ -602,10 +604,11 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
 
     }
 
-    private void getPulledDetails(StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson, AutoCompleteTextView wareHouseACTV)
+    private void getPulledDetails(StockOutPurchaseOrderItemListJson stockOutPurchaseOrderItemListJson, AutoCompleteTextView wareHouseACTV, String createdBy)
     {
         this.stockOutPurchaseOrderItemListJson = stockOutPurchaseOrderItemListJson;
         this.wareHouseACTV = wareHouseACTV;
+
 
         pulledIdSalesDetails = stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdSalesDetails();
 
@@ -643,7 +646,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                 idWareHouse = detail.getIdWarehouse();
                     Log.e("Log", "idWareHousewithoutselection" + idWareHouse);
                     // Update DB here
-                    dbHelper.updateStockoutSelectedIDWareHouse( stockOutPurchaseOrderItemListJson.getData() .getStockOutPurchaseOrderItemList() .get(0) .getIdItem(), idWareHouse, employeeCode );
+                    dbHelper.updateStockoutSelectedIDWareHouse( stockOutPurchaseOrderItemListJson.getData() .getStockOutPurchaseOrderItemList() .get(0) .getIdItem(), idWareHouse, createdBy );
                     Log.e("Log", "Default warehouse updated: " + idWareHouse); break;
 
             }
@@ -665,7 +668,7 @@ public class StockOutPurchaseOrderItemListActivity extends AppCompatActivity
                 idWareHouse = wareHouseMasterDetailList.get(position).getIdWarehouse();
                 Log.e("Log", "idWareHouse" + idWareHouse);
                 // purchaseOrderItem.setSelectedIDWareHouse(idWareHouse);
-                 dbHelper.updateStockoutSelectedIDWareHouse(stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdItem(),idWareHouse,employeeCode);
+                 dbHelper.updateStockoutSelectedIDWareHouse(stockOutPurchaseOrderItemListJson.getData().getStockOutPurchaseOrderItemList().get(0).getIdItem(),idWareHouse,createdBy);
 
 
             }

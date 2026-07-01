@@ -584,11 +584,12 @@ public class DbHelper extends SQLiteOpenHelper
             SQLiteDatabase db = this.getReadableDatabase();
 
             // FIX: Use '?' placeholders instead of direct string concatenation
-            String query = "SELECT * FROM " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW +
-                    " WHERE CreatedBy = ?";
-            String[] selectionArgs = new String[]{  createdBy };
 
-            cur = db.rawQuery(query, selectionArgs);
+             cur = db.rawQuery("select * from "+ SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW +" where  CreatedBy= '" + createdBy + "'",null);
+
+            //String[] selectionArgs = new String[]{  createdBy };
+
+            //cur = db.rawQuery(query, selectionArgs);
 
             // FIX: Standard, robust cursor traversal loop
             if (cur != null && cur.moveToFirst()) {
@@ -1108,14 +1109,14 @@ public class DbHelper extends SQLiteOpenHelper
 
     }
 
-    public void updateStockoutSelectedIDWareHouse(int idItem, int idWareHouse, int employeeCode)
+    public void updateStockoutSelectedIDWareHouse(int idItem, int idWareHouse, String createdBy)
     {
         Log.e("Log", "updateAcceptedQuantity");
         Log.e("Log", "idWareHouseDB" + idWareHouse);
         Log.e("Log", "idItemDB" + idItem);
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("update " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW + " set idWareHouse="+idWareHouse+" where idItem='" + idItem + "'");
+        db.execSQL("update " + SAVE_STOCKOUT_PURCHASE_ORDER_TABLE_NEW + " set idWareHouse="+idWareHouse+" where CreatedBy='" + createdBy + "'");
 
     }
 }
