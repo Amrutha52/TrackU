@@ -53,11 +53,11 @@ public class StockoutPurchaseOrderListAdapter extends RecyclerView.Adapter<Purch
 
         if (position == 0)
         {
-            holder.purchaseOrderNoTV.setText("Order\nNo");
+            holder.purchaseOrderNoTV.setText("Inv\nNo");
             holder.purchaseOrderNoTV.setTypeface(Typeface.DEFAULT_BOLD);
             //  holder.purchaseOrderNoTV.setBackgroundColor(ContextCompat.getColor(holder.purchaseOrderNoTV.getContext(), R.color.black));
 
-            holder.purchaseOrderDateTV.setText("Order\nDate");
+            holder.purchaseOrderDateTV.setText("Inv\nDate");
             holder.purchaseOrderDateTV.setTypeface(Typeface.DEFAULT_BOLD);
             //   holder.purchaseOrderDateTV.setBackgroundColor(ContextCompat.getColor(holder.purchaseOrderDateTV.getContext(), R.color.black));
 

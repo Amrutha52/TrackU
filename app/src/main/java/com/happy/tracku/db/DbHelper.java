@@ -427,7 +427,7 @@ public class DbHelper extends SQLiteOpenHelper
                     JSONObject singleDataObj = new JSONObject();
                     singleDataObj.put("idItem",cur.getInt(cur.getColumnIndex("idItem")));
                     singleDataObj.put("idUnit",cur.getInt(cur.getColumnIndex("idUnit")));
-                    singleDataObj.put("Quantity",cur.getInt(cur.getColumnIndex("AcceptedQty")));
+                    singleDataObj.put("Quantity",cur.getDouble(cur.getColumnIndex("AcceptedQty")));
                     singleDataObj.put("idPurchaseOrderDetails",cur.getInt(cur.getColumnIndex("idPurchaseOrder")));
                     singleDataObj.put("employeeCode",cur.getInt(cur.getColumnIndex("employeeCode")));
                     singleDataObj.put("idVehicle",cur.getInt(cur.getColumnIndex("idVehicle")));
@@ -601,7 +601,7 @@ public class DbHelper extends SQLiteOpenHelper
 
                     // Note: In your button click you save this as a Double,
                     // but here you extract it as an Int. Ensure your data types align!
-                    singleDataObj.put("Quantity", cur.getInt(cur.getColumnIndexOrThrow("StockOutQuantity")));
+                    singleDataObj.put("Quantity", cur.getDouble(cur.getColumnIndexOrThrow("StockOutQuantity")));
 
                     singleDataObj.put("idPurchaseOrderDetails", cur.getInt(cur.getColumnIndexOrThrow("idSalesDetails")));
                     singleDataObj.put("employeeCode", cur.getInt(cur.getColumnIndexOrThrow("employeeCode")));

@@ -40,7 +40,7 @@
                     android:layout_weight="1"
                     android:padding="2dp"
                     android:textStyle="bold"
-                    android:text="Order No" />
+                    android:text="Inv No" />
 
                 <TextView
                     android:id="@+id/purchase_order_dateTV"
@@ -51,7 +51,7 @@
                     android:padding="2dp"
                     android:layout_marginLeft="5dp"
                     android:textStyle="bold"
-                    android:text="Date" />
+                    android:text="Inv Date" />
 
                 <TextView
                     android:id="@+id/purchase_order_amountTV"
